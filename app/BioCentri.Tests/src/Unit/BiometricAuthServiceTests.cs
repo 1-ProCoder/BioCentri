@@ -28,19 +28,21 @@ public sealed class BiometricAuthServiceTests
     private static BiometricAuthService CreateSut(
         out FakeHelloService hello,
         out FakeToastService toast,
-        out ShellState shellState)
+        out ShellState shellState,
+        out FakeActivityLogger activity)
     {
         var dispatcher = new FakeDispatcher();
         hello = new FakeHelloService();
         toast = new FakeToastService();
         shellState = new ShellState();
-        return new BiometricAuthService(dispatcher, toast, shellState, hello);
+        activity = new FakeActivityLogger();
+        return new BiometricAuthService(dispatcher, toast, shellState, hello, activity);
     }
 
     [Fact]
     public async Task AuthenticateAsync_Verified_SetsShellStateAndReturnsVerified()
     {
-        var sut = CreateSut(out var hello, out _, out var shellState);
+        var sut = CreateSut(out var hello, out _, out var shellState, out var activity);
         hello.NextOutcome = HelloOutcome.Verified;
 
         var outcome = await sut.AuthenticateAsync("Chrome", CancellationToken.None);
@@ -48,12 +50,15 @@ public sealed class BiometricAuthServiceTests
         outcome.Should().Be(AuthOutcome.Verified);
         shellState.PendingAppName.Should().BeEmpty("cleared after the call completes");
         shellState.IsAuthenticationInProgress.Should().BeFalse();
+        activity.Events.Should().ContainSingle("every successful auth writes a Verified event");
+        activity.Events[0].Outcome.Should().Be(nameof(AuthOutcome.Verified));
+        activity.Events[0].Severity.Should().Be("INFO");
     }
 
     [Fact]
     public async Task AuthenticateAsync_UserCancelled_ReturnsUserCancelled()
     {
-        var sut = CreateSut(out var hello, out _, out _);
+        var sut = CreateSut(out var hello, out _, out _, out _);
         hello.NextOutcome = HelloOutcome.UserCancelled;
 
         var outcome = await sut.AuthenticateAsync("Chrome", CancellationToken.None);
@@ -64,7 +69,7 @@ public sealed class BiometricAuthServiceTests
     [Fact]
     public async Task AuthenticateAsync_SameAppName_CoalescesToOnePrompt()
     {
-        var sut = CreateSut(out var hello, out _, out _);
+        var sut = CreateSut(out var hello, out _, out _, out _);
         hello.NextOutcome = HelloOutcome.Verified;
         hello.Delay = TimeSpan.FromMilliseconds(80); // force overlap
 
@@ -81,22 +86,21 @@ public sealed class BiometricAuthServiceTests
     [Fact]
     public async Task AuthenticateAsync_DifferentAppNames_DoNotCoalesce()
     {
-        var sut = CreateSut(out var hello, out _, out _);
-        hello.NextOutcome = HelloOutcome.Verified;
+        var sut = CreateSut(out var hello, out _, out _, out _);
+        hello.NextOutcome = HelloOutcome.Verified;            var t1 = sut.AuthenticateAsync("Chrome", CancellationToken.None);
+            var t2 = sut.AuthenticateAsync("Discord", CancellationToken.None);
 
-        var t1 = sut.AuthenticateAsync("Chrome", CancellationToken.None);
-        var t2 = sut.AuthenticateAsync("Discord", CancellationToken.None);
+            var results = await Task.WhenAll(t1, t2);
 
-        var results = await Task.WhenAll(t1, t2);
+            results.Should().AllBeEquivalentTo(AuthOutcome.Verified);
+            hello.Messages.Should().HaveCount(2);
+        }
 
-        results.Should().AllBeEquivalentTo(AuthOutcome.Verified);
-        hello.Messages.Should().HaveCount(2);
-    }
 
     [Fact]
     public async Task AuthenticateAsync_WithinDedupeWindow_ReturnsDeduped()
     {
-        var sut = CreateSut(out var hello, out _, out _);
+        var sut = CreateSut(out var hello, out _, out _, out _);
         hello.NextOutcome = HelloOutcome.Verified;
         await sut.AuthenticateAsync("Chrome", CancellationToken.None); // first challenge
 
@@ -108,7 +112,7 @@ public sealed class BiometricAuthServiceTests
     [Fact]
     public async Task GetCapabilityAsync_Available_ReturnsAvailable()
     {
-        var sut = CreateSut(out var hello, out _, out _);
+        var sut = CreateSut(out var hello, out _, out _, out _);
         hello.NextCapability = HelloCapability.Available;
 
         var cap = await sut.GetCapabilityAsync(CancellationToken.None);
@@ -119,7 +123,7 @@ public sealed class BiometricAuthServiceTests
     [Fact]
     public async Task AuthenticateAsync_CancelOverlay_ReturnsUserCancelled()
     {
-        var sut = CreateSut(out var hello, out _, out var shellState);
+        var sut = CreateSut(out var hello, out _, out var shellState, out _);
         hello.NextOutcome = HelloOutcome.Verified;
         hello.Delay = TimeSpan.FromSeconds(5); // long-running; cancel will race
 

@@ -1,12 +1,19 @@
+using System.Windows;
 using System.Windows.Controls;
+using BioCentri.App.Components.Motion;
 
 namespace BioCentri.App.Features.Rules;
 
-/// <summary>
-/// Code-behind for <c>RulesPage.xaml</c>. See
-/// <see cref="DashboardPage"/> for the architecture rationale.
-/// </summary>
 public partial class RulesPage : Page
 {
-    public RulesPage() => InitializeComponent();
+    public RulesPage()
+    {
+        InitializeComponent();
+        Loaded += OnLoaded;
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (Content is Grid g) EntranceAnimation.Play(g);
+    }
 }

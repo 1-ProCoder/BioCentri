@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using BioCentri.App.State;
 using BioCentri.App.Types.Services;
+using ActivityEvent = BioCentri.App.Types.ActivityEvent;
 
 namespace BioCentri.App.Services;
 
@@ -22,6 +23,10 @@ namespace BioCentri.App.Services;
 /// because that's the surface that owns the in-flight WinRT task.
 /// Splitting them keeps the dedupe invariant next to the actual user
 /// experience, not buried in an event handler.
+///
+/// Every observed protected launch is logged via <see cref="IActivityLogger"/>
+/// so the Dashboard "Recent activity" + Activity page timelines stay
+/// in sync with the on-device audit trail.
 /// </summary>
 public sealed class ProcessWatcher : IDisposable
 {
@@ -32,6 +37,7 @@ public sealed class ProcessWatcher : IDisposable
     private readonly IAppLifecycleService _lifecycle;
     private readonly IDispatcher _dispatcher;
     private readonly AppLockController _lock;
+    private readonly IActivityLogger _activity;
     private bool _started;
     private bool _disposed;
 
@@ -42,7 +48,8 @@ public sealed class ProcessWatcher : IDisposable
         ShellState shellState,
         IAppLifecycleService lifecycle,
         IDispatcher dispatcher,
-        AppLockController @lock)
+        AppLockController @lock,
+        IActivityLogger activity)
     {
         ArgumentNullException.ThrowIfNull(monitor);
         ArgumentNullException.ThrowIfNull(rules);
@@ -51,6 +58,7 @@ public sealed class ProcessWatcher : IDisposable
         ArgumentNullException.ThrowIfNull(lifecycle);
         ArgumentNullException.ThrowIfNull(dispatcher);
         ArgumentNullException.ThrowIfNull(@lock);
+        ArgumentNullException.ThrowIfNull(activity);
         _monitor = monitor;
         _rules = rules;
         _biometric = biometric;
@@ -58,6 +66,7 @@ public sealed class ProcessWatcher : IDisposable
         _lifecycle = lifecycle;
         _dispatcher = dispatcher;
         _lock = @lock;
+        _activity = activity;
     }
 
     public void Start()
@@ -99,11 +108,23 @@ public sealed class ProcessWatcher : IDisposable
             if (outcome == AuthOutcome.Verified)
             {
                 Debug.WriteLine($"[ProcessWatcher] Allow (verified): {e.ProcessName}");
+                await _activity.LogAsync(new ActivityEvent(
+                    TimestampUtc: DateTimeOffset.UtcNow,
+                    Severity:     "INFO",
+                    AppName:      e.ProcessName,
+                    Outcome:      nameof(AuthOutcome.Verified),
+                    Description:  "Verified by Windows Hello")).ConfigureAwait(false);
             }
             else
             {
                 Debug.WriteLine($"[ProcessWatcher] Block ({outcome}): {e.ProcessName}");
                 _lock.Kill(e.Pid, e.ProcessName, outcome.ToString());
+                await _activity.LogAsync(new ActivityEvent(
+                    TimestampUtc: DateTimeOffset.UtcNow,
+                    Severity:     "BLOCKED",
+                    AppName:      e.ProcessName,
+                    Outcome:      outcome.ToString(),
+                    Description:  $"Blocked by BioCentri ({outcome})")).ConfigureAwait(false);
             }
         }
         catch (Exception ex)

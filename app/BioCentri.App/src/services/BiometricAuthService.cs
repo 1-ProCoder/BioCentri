@@ -41,6 +41,7 @@ public sealed class BiometricAuthService : IBiometricAuthService
     private readonly IToastService _toast;
     private readonly ShellState _shellState;
     private readonly IHelloService _hello;
+    private readonly IActivityLogger _activity;
 
     private readonly ConcurrentDictionary<string, TaskCompletionSource<AuthOutcome>> _pending = new();
     private readonly ConcurrentDictionary<string, DateTimeOffset> _lastChallengedAt = new();
@@ -51,16 +52,19 @@ public sealed class BiometricAuthService : IBiometricAuthService
         IDispatcher dispatcher,
         IToastService toast,
         ShellState shellState,
-        IHelloService hello)
+        IHelloService hello,
+        IActivityLogger activity)
     {
         ArgumentNullException.ThrowIfNull(dispatcher);
         ArgumentNullException.ThrowIfNull(toast);
         ArgumentNullException.ThrowIfNull(shellState);
         ArgumentNullException.ThrowIfNull(hello);
+        ArgumentNullException.ThrowIfNull(activity);
         _dispatcher = dispatcher;
         _toast = toast;
         _shellState = shellState;
         _hello = hello;
+        _activity = activity;
         _shellState.AuthenticationCancelRequested += OnShellStateCancelRequested;
     }
 
@@ -122,10 +126,14 @@ public sealed class BiometricAuthService : IBiometricAuthService
 
             var outcome = Translate(helloResult);
             tcs.TrySetResult(outcome);
-            // If the cancel handler already forced the TCS to
-            // UserCancelled before we got here, TrySetResult is
-            // idempotent (returns false) — so WE MUST propagate
-            // the TCS result, not the now-stale adapter outcome.
+            _ = _activity.LogAsync(new BioCentri.App.Types.ActivityEvent(
+                TimestampUtc: now,
+                Severity:     outcome == AuthOutcome.Verified ? "INFO" : "BLOCKED",
+                AppName:      appName,
+                Outcome:      outcome.ToString(),
+                Description:  outcome == AuthOutcome.Verified
+                    ? "Verified by Windows Hello"
+                    : $"Blocked by BioCentri ({outcome})"), cancellationToken);
             return tcs.Task.Result;
         }
         catch (Exception ex)

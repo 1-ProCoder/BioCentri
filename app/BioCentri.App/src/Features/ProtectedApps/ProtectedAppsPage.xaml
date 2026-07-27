@@ -65,10 +65,11 @@
             </Button>
         </Grid>
 
-        <!-- Body : empty state OR list -->
+        <!-- Body : empty state OR list — translucent so the MainWindow
+             atmosphere glow bleeds through. -->
         <Border Grid.Row="2"
-                Background="{StaticResource Brushes.Subtle.Surface}"
-                BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                Background="{StaticResource Brushes.GlassStrong.Tint}"
+                BorderBrush="{StaticResource Brushes.Border.HairlineInner}"
                 BorderThickness="1"
                 CornerRadius="{StaticResource Corners.Md}"
                 Padding="{StaticResource Spacing.Pad.Lg}"
@@ -99,7 +100,7 @@
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="{StaticResource Brushes.Surface.Base}"
+                            <Border Background="{StaticResource Brushes.Glass.Tint}"
                                     BorderBrush="{StaticResource Brushes.Border.Hairline}"
                                     BorderThickness="1"
                                     CornerRadius="{StaticResource Corners.Md}"

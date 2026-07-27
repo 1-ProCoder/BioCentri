@@ -1,12 +1,20 @@
+using System.Windows;
 using System.Windows.Controls;
+using BioCentri.App.Components.Motion;
 
 namespace BioCentri.App.Features.Activity;
 
-/// <summary>
-/// Code-behind for <c>ActivityPage.xaml</c>. See
-/// <see cref="DashboardPage"/> for the architecture rationale.
-/// </summary>
 public partial class ActivityPage : Page
 {
-    public ActivityPage() => InitializeComponent();
+    public ActivityPage()
+    {
+        InitializeComponent();
+        Loaded += OnLoaded;
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        // Top-level Grid has named rows; animate the three row children.
+        if (Content is Grid g) EntranceAnimation.Play(g);
+    }
 }

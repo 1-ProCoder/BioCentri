@@ -1,20 +1,27 @@
+<!--
+    FocalCard is the "hero" surface of every page. It is intentionally
+    translucent (Brushes.GlassStrong.Tint over the inherited atlas
+    gradient + IndigoGlow / EmeraldGlow ambient light at the
+    MainWindow level) so the premium atmosphere bleeds through the
+    hero card in a calm, frosted-glass way — not a flat black box.
+-->
 <Border x:Class="BioCentri.App.Components.Surface.FocalCard"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Background="{StaticResource Brushes.Focal.Background}"
-        BorderBrush="{StaticResource Brushes.Border.Hairline}"
+        BorderBrush="{StaticResource Brushes.Border.HairlineInner}"
         BorderThickness="1"
         CornerRadius="{StaticResource Corners.Lg}"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True"
-        Effect="{StaticResource Shadows.Card.Default}"
         Cursor="Hand">
 
-    <Border BorderBrush="{StaticResource Shadows.InnerHighlight.Default}"
-            BorderThickness="0,1,0,0"
-            CornerRadius="{StaticResource Corners.Lg}">
-        <ContentPresenter x:Name="Body"
-                          Margin="{StaticResource Spacing.Pad.Xl}" />
+    <Border Background="{StaticResource Brushes.GlassStrong.Tint}">
+        <Border BorderBrush="{StaticResource Shadows.InnerHighlight.Default}"
+                BorderThickness="0,1,0,0"
+                CornerRadius="{StaticResource Corners.Lg}">
+            <ContentPresenter x:Name="Body"
+                              Margin="{StaticResource Spacing.Pad.Xl}" />
+        </Border>
     </Border>
 
     <Border.Style>

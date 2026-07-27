@@ -169,17 +169,56 @@
                        Foreground="{StaticResource Brushes.Accent.IndigoLight}"
                        Margin="12,32,12,8" />
 
-            <Border Background="{StaticResource Brushes.Subtle.Surface}"
-                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
+            <Border Background="{StaticResource Brushes.GlassStrong.Tint}"
+                    BorderBrush="{StaticResource Brushes.Border.HairlineInner}"
                     BorderThickness="1"
                     CornerRadius="{StaticResource Corners.Md}"
                     Padding="{StaticResource Spacing.Pad.Lg}">
                 <Border.Effect>
                     <StaticResource ResourceKey="Elevation.1.Resting" />
                 </Border.Effect>
-                <feedback:EmptyState Title="No challenges yet"
-                                     Subtitle="When BioCentri gates an app for you, the events will appear here. Activity is fully on-device."
-                                     IconKey="Icons.Route.Activity" />
+                <Grid>
+                    <feedback:EmptyState Title="No challenges yet"
+                                         Subtitle="When BioCentri gates an app for you, the events will appear here. Activity is fully on-device."
+                                         IconKey="Icons.Route.Activity"
+                                         Visibility="{Binding Recent.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=zero}" />
+                    <ItemsControl ItemsSource="{Binding Recent}"
+                                  Visibility="{Binding Recent.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=nonzero}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Ellipse Grid.Column="0" Width="8" Height="8"
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,12,0"
+                                             Fill="{StaticResource Brushes.Accent.Indigo}" />
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Title}"
+                                                   FontFamily="{StaticResource Typography.Sans}"
+                                                   FontSize="{StaticResource Typography.Size.Body}"
+                                                   FontWeight="{StaticResource Typography.Weight.Medium}"
+                                                   Foreground="{StaticResource Brushes.Text.Primary}" />
+                                        <TextBlock Text="{Binding Detail}"
+                                                   FontFamily="{StaticResource Typography.Sans}"
+                                                   FontSize="{StaticResource Typography.Size.Small}"
+                                                   Foreground="{StaticResource Brushes.Text.Muted}"
+                                                   TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding Timestamp, StringFormat='{}{0:HH:mm}'}"
+                                               FontFamily="{StaticResource Typography.Monospace}"
+                                               FontSize="{StaticResource Typography.Size.Caption}"
+                                               Foreground="{StaticResource Brushes.Text.Muted}"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
             </Border>
 
             <TextBlock Text="{Binding ReadinessLine}"

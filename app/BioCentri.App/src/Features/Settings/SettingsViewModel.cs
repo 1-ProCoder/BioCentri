@@ -20,8 +20,12 @@ public sealed class SettingsViewModel : ObservableObject
     public string Subtitle => RouteTable.Get(Route.Settings).Subtitle;
 
     /// <summary>POCO serialised to <c>%LOCALAPPDATA%\BioCentri\Settings.json</c>
-    /// so the reduced-motion toggle survives app restarts.</summary>
-    private sealed record PersistentSettings(bool IsReducedMotionEnabled);
+    /// so user preferences survive app restarts. <see cref="DefaultAuthMethod"/>
+    /// is the fallback credential tier the OS offers when biometric is
+    /// disabled by policy / not configured for this user.</summary>
+    private sealed record PersistentSettings(
+        bool IsReducedMotionEnabled,
+        string DefaultAuthMethod);
 
     private static readonly string SettingsPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -60,6 +64,24 @@ public sealed class SettingsViewModel : ObservableObject
         }
     }
 
+    private AuthMethodOption _defaultAuthMethod = AuthMethodOption.Biometric;
+
+    /// <summary>
+    /// Fallback credential choice when Windows Hello biometric is
+    /// unavailable or disabled by policy. <c>Biometric</c> prefers
+    /// fingerprint / face when available; <c>PinFallback</c> routes the
+    /// user through the OS PIN sign-in path instead. Persisted.
+    /// </summary>
+    public AuthMethodOption DefaultAuthMethod
+    {
+        get => _defaultAuthMethod;
+        set
+        {
+            if (!SetProperty(ref _defaultAuthMethod, value)) return;
+            PersistSettings();
+        }
+    }
+
     public ObservableCollection<SettingsCategoryRow> Categories { get; } = new();
 
     public SettingsViewModel()
@@ -94,7 +116,9 @@ public sealed class SettingsViewModel : ObservableObject
             if (settings is not null)
             {
                 _isReducedMotionEnabled = settings.IsReducedMotionEnabled;
+                _defaultAuthMethod = ParseAuthMethod(settings.DefaultAuthMethod);
                 OnPropertyChanged(nameof(IsReducedMotionEnabled));
+                OnPropertyChanged(nameof(DefaultAuthMethod));
 
                 if (_isReducedMotionEnabled)
                     UseReducedMotion.Enable();
@@ -105,7 +129,7 @@ public sealed class SettingsViewModel : ObservableObject
         }
         catch
         {
-            // First launch, corrupt file, or permission issue — use default (false).
+            // First launch, corrupt file, or permission issue — use defaults.
         }
     }
 
@@ -114,7 +138,9 @@ public sealed class SettingsViewModel : ObservableObject
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
-            var settings = new PersistentSettings(_isReducedMotionEnabled);
+            var settings = new PersistentSettings(
+                IsReducedMotionEnabled: _isReducedMotionEnabled,
+                DefaultAuthMethod:    _defaultAuthMethod.ToString());
             var json = JsonSerializer.Serialize(settings, SettingsJsonOptions);
 
             // Atomic write (temp + rename) — same durability as LocalJsonStore.
@@ -127,6 +153,25 @@ public sealed class SettingsViewModel : ObservableObject
             // Best-effort persistence; don't crash the setter.
         }
     }
+
+    private static AuthMethodOption ParseAuthMethod(string? raw)
+    {
+        if (Enum.TryParse<AuthMethodOption>(raw, ignoreCase: true, out var parsed))
+            return parsed;
+        return AuthMethodOption.Biometric;
+    }
+}
+
+/// <summary>
+/// Public UI-facing enum bound by the Settings page. Maps to the
+/// app-internal <c>AuthOutcome</c> / OS choice; kept as a stable
+/// 2-value type today because Phase-2 will add the broader
+/// time-window policies on top.
+/// </summary>
+public enum AuthMethodOption
+{
+    Biometric,
+    PinFallback,
 }
 
 public sealed record SettingsCategoryRow(string Title, string Subtitle, string Glyph);

@@ -14,6 +14,7 @@ using BioCentri.App.Routing;
 using BioCentri.App.Services;
 using BioCentri.App.State;
 using BioCentri.App.Types.Services;
+using ActivityEvent = BioCentri.App.Types.ActivityEvent;
 using BioCentri.App.Windows;
 using BioCentri.Core.Interop;
 using BioCentri.Core.Services;
@@ -99,7 +100,7 @@ public partial class App : Application
             host.Get<IDialogService>(),
             host.Get<IDispatcher>(),
             host.Get<IInstalledAppsDiscovery>()))
-            .AddSingleton<RulesViewModel>(new RulesViewModel())
+            .AddSingleton<RulesViewModel>(new RulesViewModel(host.Get<ILocalJsonStore>()))
             .AddSingleton<SettingsViewModel>(new SettingsViewModel())
             .AddSingleton<AboutViewModel>(new AboutViewModel());
 
@@ -130,7 +131,8 @@ public partial class App : Application
                 host.Get<IDispatcher>(),
                 host.Get<IToastService>(),
                 host.Get<ShellState>(),
-                host.Get<IHelloService>()))
+                host.Get<IHelloService>(),
+                host.Get<IActivityLogger>()))
             .AddSingleton<ProcessWatcher>(new ProcessWatcher(
                 host.Get<IProcessMonitor>(),
                 host.Get<IAuthAppRules>(),
@@ -138,7 +140,8 @@ public partial class App : Application
                 host.Get<ShellState>(),
                 host.Get<IAppLifecycleService>(),
                 host.Get<IDispatcher>(),
-                host.Get<AppLockController>()))
+                host.Get<AppLockController>(),
+                host.Get<IActivityLogger>()))
             .AddSingleton<AuthenticationOverlayViewModel>(new AuthenticationOverlayViewModel(
                 host.Get<ShellState>()));
 
@@ -149,8 +152,8 @@ public partial class App : Application
         //      The M5-strict event-subscription wiring is documented in
         //      DECISIONS.md and re-introduced when those milestones launch.
         host.AddSingleton<DiagnosticsViewModel>(new DiagnosticsViewModel())
-            .AddSingleton<ActivityViewModel>(new ActivityViewModel())
-            .AddSingleton<DashboardViewModel>(new DashboardViewModel());
+            .AddSingleton<ActivityViewModel>(new ActivityViewModel(host.Get<ILocalJsonStore>()))
+            .AddSingleton<DashboardViewModel>(new DashboardViewModel(host.Get<ILocalJsonStore>()));
 
         // ---- TrayIcon VM (M7.1 pending) — pre-registered so the
         //      DI slot is reserved. Tray icon activation is deferred:
