@@ -171,19 +171,19 @@ export default function BiometricOrb({ size = 420, className = '' }) {
 
     // ── 8. Floating data particles ──
     const particles = [
-      { angle: 0.8,  orbit: r2, size: 3, speed: 0.35, color: 'rgba(165,180,252,0.8)' },
-      { angle: 2.1,  orbit: r2, size: 2, speed: 0.28, color: 'rgba(103,232,249,0.7)' },
-      { angle: 3.9,  orbit: r2, size: 2.5, speed: 0.32, color: 'rgba(165,180,252,0.6)' },
-      { angle: 5.0,  orbit: r1, size: 2, speed: 0.5, color: 'rgba(200,210,255,0.9)' },
-      { angle: 1.3,  orbit: r1, size: 1.5, speed: 0.45, color: 'rgba(103,232,249,0.6)' },
+      { angle: 0.8,  orbit: r2, size: 3, speed: 0.35, color: 'rgba(165,180,252,0.8)', glow: 'rgba(165,180,252,0.25)' },
+      { angle: 2.1,  orbit: r2, size: 2, speed: 0.28, color: 'rgba(103,232,249,0.7)', glow: 'rgba(103,232,249,0.20)' },
+      { angle: 3.9,  orbit: r2, size: 2.5, speed: 0.32, color: 'rgba(165,180,252,0.6)', glow: 'rgba(165,180,252,0.18)' },
+      { angle: 5.0,  orbit: r1, size: 2, speed: 0.5, color: 'rgba(200,210,255,0.9)', glow: 'rgba(200,210,255,0.28)' },
+      { angle: 1.3,  orbit: r1, size: 1.5, speed: 0.45, color: 'rgba(103,232,249,0.6)', glow: 'rgba(103,232,249,0.18)' },
     ];
     particles.forEach((p) => {
       const a = p.angle + t * p.speed;
       const px = tx + Math.cos(a) * p.orbit;
       const py = ty + Math.sin(a) * p.orbit;
-      // glow halo
+      // glow halo — use explicit glow color instead of broken string manipulation
       const halo = ctx.createRadialGradient(px, py, 0, px, py, p.size * 4);
-      halo.addColorStop(0, p.color.replace(')', ', 0.3)').replace('rgba', 'rgba'));
+      halo.addColorStop(0, p.glow);
       halo.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.beginPath();
       ctx.arc(px, py, p.size * 4, 0, Math.PI * 2);
