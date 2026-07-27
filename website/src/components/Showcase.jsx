@@ -53,9 +53,11 @@ export default function Showcase() {
 
   const logEndRef = useRef(null);
 
+  // Scroll log terminal to bottom on new entries — instant only, no smooth
+  // (smooth scrollIntoView can be intercepted by Lenis and scroll the page)
   useEffect(() => {
     if (logEndRef.current) {
-      logEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      logEndRef.current.scrollIntoView();
     }
   }, [logs]);
 

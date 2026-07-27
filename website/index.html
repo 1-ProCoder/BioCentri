@@ -47,6 +47,9 @@
     <meta name="twitter:image" content="https://biocentri.com/og.png" />
     <meta name="twitter:image:alt" content="BioCentri — Protect your Windows apps with biometric security" />
 
+    <!-- Force scroll reset before React mounts (fixes browser scroll restoration) -->
+    <script>history.scrollRestoration='manual';window.scrollTo(0,0)</script>
+
     <!-- JSON-LD Structured Data for SEO -->
     <script type="application/ld+json">
       {
