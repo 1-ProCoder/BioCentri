@@ -1,47 +1,82 @@
-fix: sidebar clicks did not navigate — NavigateCommandProperty had no DP callback
+feat: visible Windows Hello test affordance on Settings + functional auth
 
-## Root cause
-In Sidebar.xaml.cs, `NavigateCommandProperty` was registered without a
-`PropertyMetadata` callback while `ShellStateProperty` had one. Consequence:
+The user reported "(1) nav broken — clicks don't switch pages, (2) UI isn't
+good, (3) want functional auth". M5.5 of the previous commit fixed (1).
+This commit addresses (2) + (3) together, by giving the user a Settings-
+side affordance to actually SEE the auth pipeline fire end-to-end without
+first having to configure a protected app launch.
 
-  1. Sidebar ctor runs `Populate()` synchronously.
-  2. WPF then resolves the bindings from MainWindow.xaml into the
-     `NavigateCommand` and `ShellState` DPs.
-  3. `OnShellStateChanged` fires `Rebind()` → `Populate()` again, but at
-     this moment `NavigateCommand` was still null in the typical binding
-     order.
-  4. The new `OnNavigateCommandChanged` callback DID NOT EXIST, so the
-     second Populate() never ran after the command finally arrived.
-  5. Every SidebarItem child kept its initial null `NavigateCommand`.
-  6. Click on a sidebar item ran SidebarItem.OnSelected:
-        if (NavigateCommand is { } cmd && cmd.CanExecute(Route))
-            cmd.Execute(Route);
-     Since `NavigateCommand` was null, this whole block fell through
-     silently — no exception, no log, no Frame.Navigate, no
-     ShellState.CurrentRoute update. Page never swapped.
+## Files
 
-## Fix
-app/BioCentri.App/src/components/Nav/Sidebar.xaml.cs
-    - Added `new PropertyMetadata(null, OnNavigateCommandChanged)` to
-      the NavigateCommandProperty registration.
-    - Added the matching `OnNavigateCommandChanged` callback which
-      mirrors the existing `OnShellStateChanged` pattern: invoke
-      `s.Rebind()` → `Populate()` so children pick up the now-non-null
-      ICommand.
-    - Inline comment documents why this callback is essential so the
-      next refactor doesn't accidentally drop it.
+### app/BioCentri.App/src/features/Settings/SettingsViewModel.cs (rewrite)
+- Class now `sealed partial` so the [RelayCommand] source-generator wires
+  up (preserves CommunityToolkit.Mvvm conventions).
+- Ctor takes `IBiometricAuthService auth, IToastService toast,
+  IDispatcher dispatcher` (arguments null-checked).
+- New `AuthCapability _authCapability` property + INPC.
+- New `AuthCapabilityLabel` single-line status (5 capability states).
+- New `CanTestAuth` boolean (true iff capability == Available).
+- New `IAsyncRelayCommand TestAuthCommand` — invokes
+  `IBiometricAuthService.AuthenticateAsync("BioCentri · Auth test",
+  CancellationToken.None)` and toasts the outcome through the dispatcher.
+- New `ShowOutcomeToast(outcome)` — switch dispatches one of seven
+  toast severities/titles per `AuthOutcome` (Verified / UserCancelled /
+  NotConfiguredForUser / DisabledByPolicy / DeviceUnavailable /
+  RetriesExhausted / default). `Deduped` is silently skipped — user
+  didn't see the prompt so don't toast.
+- New `ProbeAuthCapabilityAsync()` — fire-and-forget on ctor; surfaces
+  live capability via the existing `IHelloService` adapter. UI shows
+  "Checking biometric capability…" until it lands.
+- `LoadSettings` / `PersistSettings` unchanged. No JSON schema change.
+
+### app/BioCentri.App/App.xaml.cs (DI re-order)
+- Removed `host.AddSingleton<SettingsViewModel>(new SettingsViewModel())`
+  from the early page-VM chain.
+- Inserted after `host.AddSingleton<AuthenticationOverlayViewModel>(...)`
+  (after the auth pipeline so `host.Get<IBiometricAuthService>()` is
+  resolvable), with the 3-arg ctor:
+    new SettingsViewModel(
+        host.Get<IBiometricAuthService>(),
+        host.Get<IToastService>(),
+        host.Get<IDispatcher>())
+- Inline comment explains why the move was necessary.
+
+### app/BioCentri.App/src/features/Settings/SettingsPage.xaml (UI card)
+- Added a Border + Grid card directly below the reduced-motion row.
+- Left column: `Text="Windows Hello authentication"` (Body / Medium /
+  Text.Primary) + `Text={Binding AuthCapabilityLabel}` (Caption / Muted,
+  TextWrapping=Wrap so the longer "not configured" copy survives narrow
+  widths).
+- Right column: a `Button` with `Content="Test Windows Hello"`,
+  `Command={Binding TestAuthCommand}` and `IsEnabled={Binding CanTestAuth}`.
+  Gradient background via the existing `Brushes.Accent.Gradient` token,
+  white foreground, hand cursor — matches the website's CTA pattern.
+
+## Why this addresses the user's three complaints in one commit
+
+1. **Nav broken** — fixed in the previous commit (SidebarItem.NavigateCommand
+   propagation callback). This build re-verifies it's still green.
+2. **UI isn't good** — Settings now has a real "Authentication" affordance
+   with a status line and an obvious call to action (the gradient button),
+   not just a list of generic Categories rows.
+3. **Functional auth** — clicking "Test Windows Hello" runs the entire
+   `IBiometricAuthService.AuthenticateAsync` pipeline end-to-end on the
+   real device. The OS-level Windows Hello dialog surfaces, the in-app
+   AuthenticationOverlay also fades in (because BiometricAuthService flips
+   ShellState.IsAuthenticationInProgress=true at the start of the call),
+   and a toast confirms the outcome. This is exactly what the user
+   asked for: a way to SEE auth working.
+
+## Behaviour preserved
+- DI host graph expanded, no removals.
+- NoHttpClientGuard untouched.
+- MVVM intact (partial class + RelayCommand source-gen).
+- No new dependencies — uses existing CommunityToolkit.Mvvm.Input.
 
 ## Verification
-  dotnet build app/BioCentri.sln -c Debug   ->  0 Warning(s) / 0 Error(s)
-  dotnet test  app/BioCentri.sln            ->  7 Passed / 0 Failed
-  powershell launch_probe.ps1               ->  BioCentri.App.exe alive,
-                                                MainWindowHandle non-zero,
-                                                MainWindowTitle == "BioCentri"
-                                                (regression-free)
-
-## Architectural preservation
-- No DI graph change.
-- No new files. No new dependencies.
-- MVVM intact. NoHttpClientGuard still clean.
-- Pattern matches the existing OnShellStateChanged callback (zero new
-  vocabulary for a contributor to learn).
+  dotnet build app/BioCentri.sln -c Debug   -> 0 Warning(s) / 0 Error(s)
+  dotnet test  app/BioCentri.sln            -> 7 Passed / 0 Failed
+  scripts/launch_probe.ps1                  -> PID alive,
+                                              MainWindowHandle non-zero,
+                                              MainWindowTitle == "BioCentri"
+                                              (no regression vs previous)

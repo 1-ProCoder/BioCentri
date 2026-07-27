@@ -101,7 +101,6 @@ public partial class App : Application
             host.Get<IDispatcher>(),
             host.Get<IInstalledAppsDiscovery>()))
             .AddSingleton<RulesViewModel>(new RulesViewModel(host.Get<ILocalJsonStore>()))
-            .AddSingleton<SettingsViewModel>(new SettingsViewModel())
             .AddSingleton<AboutViewModel>(new AboutViewModel());
 
         // ---- Navigation / overlay services
@@ -144,7 +143,16 @@ public partial class App : Application
                 host.Get<AppLockController>(),
                 host.Get<IActivityLogger>()))
             .AddSingleton<AuthenticationOverlayViewModel>(new AuthenticationOverlayViewModel(
-                host.Get<ShellState>()));
+                host.Get<ShellState>()))
+            // M7.5: SettingsViewModel now injects IBiometricAuthService +
+            // IToastService + IDispatcher so the page exposes a live
+            // "Test Windows Hello" affordance. The registration moves
+            // here (after the auth pipeline) to satisfy the dep-light
+            // bespoke DI host's order-sensitive AddSingleton chain.
+            .AddSingleton<SettingsViewModel>(new SettingsViewModel(
+                host.Get<IBiometricAuthService>(),
+                host.Get<IToastService>(),
+                host.Get<IDispatcher>()));
 
         // ---- DiagnosticsViewModel → ActivityViewModel → DashboardViewModel
         //      are registered LAST among the page VMs so their dependencies

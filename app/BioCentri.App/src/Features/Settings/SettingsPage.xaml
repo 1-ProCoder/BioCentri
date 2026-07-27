@@ -55,6 +55,49 @@
                                         VerticalAlignment="Center" />
                 </Grid>
             </Border>
+
+            <!-- M7.5: Windows Hello authentication affordance.
+                 The status line binds to AuthCapabilityLabel (a single
+                 string derived from the IBiometricAuthService capability
+                 probe); the button binds to TestAuthCommand so the user
+                 can SEE the full OS Hello prompt fire without first
+                 configuring a protected app launch. -->
+            <Border Background="Transparent"
+                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                    BorderThickness="0,0,0,1"
+                    Padding="0,16"
+                    Margin="{StaticResource Spacing.Pad.Sm}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Windows Hello authentication"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Body}"
+                                   FontWeight="{StaticResource Typography.Weight.Medium}"
+                                   Foreground="{StaticResource Brushes.Text.Primary}" />
+                        <TextBlock Text="{Binding AuthCapabilityLabel}"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Caption}"
+                                   Foreground="{StaticResource Brushes.Text.Muted}"
+                                   Margin="0,4,0,0"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Content="Test Windows Hello"
+                            Command="{Binding TestAuthCommand}"
+                            IsEnabled="{Binding CanTestAuth}"
+                            FontFamily="{StaticResource Typography.Sans}"
+                            FontSize="{StaticResource Typography.Size.Body}"
+                            Padding="16,8"
+                            Background="{StaticResource Brushes.Accent.Gradient}"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Cursor="Hand" />
+                </Grid>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>
