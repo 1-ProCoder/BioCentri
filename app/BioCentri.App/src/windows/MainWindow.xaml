@@ -108,7 +108,7 @@
                                    GeometryKey="Icons.Route.Diagnostics"
                                    Stroke="{DynamicResource Brushes.Theme.StatusBar.Foreground}"
                                    Margin="0,0,4,0" />
-                        <TextBlock Text="v0.2.0+milestone.2"
+                        <TextBlock Text="v1.0.0"
                                    FontFamily="{StaticResource Typography.Sans}"
                                    FontSize="{StaticResource Typography.Size.Caption}"
                                    Foreground="{DynamicResource Brushes.Theme.StatusBar.Foreground}" />

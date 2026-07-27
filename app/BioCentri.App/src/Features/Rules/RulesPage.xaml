@@ -32,7 +32,7 @@
                 <StaticResource ResourceKey="Elevation.1.Resting" />
             </Border.Effect>
             <feedback:EmptyState Title="No automation rules"
-                                 Subtitle="Rules schedule when protected apps require authentication. Add your first rule in Milestone 4."
+                                 Subtitle="Rules schedule when protected apps require authentication — shipping in Phase 2 (productivity)."
                                  IconKey="Icons.Route.Rules" />
         </Border>
     </Grid>

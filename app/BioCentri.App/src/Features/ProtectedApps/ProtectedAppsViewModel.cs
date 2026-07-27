@@ -39,6 +39,30 @@ public sealed partial class ProtectedAppsViewModel : ObservableObject
     /// (after <c>IDispatcher.InvokeAsync</c>). </summary>
     public ObservableCollection<ProtectedApp> Protected { get; } = new();
 
+    /// <summary>Client-side filter — the TextBox on ProtectedAppsPage
+    /// binds to this. Changing it re-filters <see cref="Filtered"/>.</summary>
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    /// <summary>Filtered view of <see cref="Protected"/>. The ListBox
+    /// binds here so typing in the search box trims the visible list
+    /// in real time without mutating the source-of-truth.</summary>
+    public ObservableCollection<ProtectedApp> Filtered { get; } = new();
+
+    partial void OnSearchTextChanged(string value) => ApplyFilter();
+
+    private void ApplyFilter()
+    {
+        var q = (SearchText ?? string.Empty).Trim();
+        Filtered.Clear();
+        foreach (var a in Protected)
+        {
+            if (q.Length == 0 ||
+                (a.DisplayName ?? string.Empty).Contains(q, StringComparison.OrdinalIgnoreCase))
+                Filtered.Add(a);
+        }
+    }
+
     public ProtectedAppsViewModel(
         IToastService toast,
         ILocalJsonStore store,
@@ -76,6 +100,7 @@ public sealed partial class ProtectedAppsViewModel : ObservableObject
             {
                 Protected.Clear();
                 foreach (var a in apps) Protected.Add(a);
+                ApplyFilter();
             });
         }
         catch (Exception ex)
@@ -123,7 +148,7 @@ public sealed partial class ProtectedAppsViewModel : ObservableObject
             IconKey: pick.IconKey,
             AddedUtc: DateTimeOffset.Now);
 
-        await _dispatcher.InvokeAsync(() => Protected.Add(entry));
+        await _dispatcher.InvokeAsync(() => { Protected.Add(entry); ApplyFilter(); });
         await PersistAsync();
         _toast.Show(ToastSeverity.Success, "Protected",
             $"{entry.DisplayName} now requires authentication.");
@@ -149,6 +174,7 @@ public sealed partial class ProtectedAppsViewModel : ObservableObject
                     break;
                 }
             }
+            if (removed) ApplyFilter();
         });
 
         if (!removed) return;

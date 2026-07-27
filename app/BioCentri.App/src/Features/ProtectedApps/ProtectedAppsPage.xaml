@@ -29,6 +29,7 @@
             </Grid.ColumnDefinitions>
 
             <TextBox Grid.Column="0"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                      Background="{StaticResource Brushes.Subtle.Surface}"
                      Foreground="{StaticResource Brushes.Text.Primary}"
                      CaretBrush="{StaticResource Brushes.Accent.Indigo}"
@@ -86,7 +87,7 @@
                 <!-- Protected list -->
                 <ListBox Background="Transparent"
                          BorderThickness="0"
-                         ItemsSource="{Binding Protected}"
+                         ItemsSource="{Binding Filtered}"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          Visibility="{Binding Protected.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=nonzero}">
                     <ListBox.ItemContainerStyle>
