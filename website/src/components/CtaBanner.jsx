@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ArrowRight, Check, Fingerprint } from 'lucide-react';
 import { blurIn, staggerParent, perspectiveReveal, viewportOnce } from '../motion';
 import { useMagneticButton } from '../hooks/useMagneticButton';
+import BiometricOrb from './Atmosphere/BiometricOrb';
 
 const STORAGE_KEY = 'biocentri-waitlist-email';
 
@@ -135,6 +136,10 @@ export default function CtaBanner() {
               className="absolute -top-40 left-1/2 -translate-x-1/2 h-80 w-[700px] opacity-40"
               style={{ background: 'radial-gradient(ellipse at center, rgba(129,140,248,0.22), transparent 65%)', filter: 'blur(50px)' }}
             />
+            {/* BiometricOrb decorative element - top right */}
+            <div className="absolute -top-20 -right-20 opacity-60">
+              <BiometricOrb size={168} className="opacity-50" />
+            </div>
             {/* Expanding rings */}
             <div className="absolute top-1/2 right-16 -translate-y-1/2 w-64 h-64 opacity-30">
               <div className="absolute inset-0 rounded-full border border-indigo-400/25 animate-ring-expand" />

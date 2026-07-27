@@ -95,7 +95,7 @@ export default function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={s.label}
-                    className="group inline-flex items-center gap-1 rounded-full border border-white/[0.07] bg-white/[0.02] px-3 h-8 text-[12px] font-medium text-white/55 hover:bg-white/[0.07] hover:text-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+                    className="group inline-flex items-center gap-1 rounded-full border border-white/[0.07] bg-white/[0.02] px-3 h-8 text-[12px] font-medium text-white/55 hover:bg-white/[0.07] hover:text-white hover:shadow-[0_0_16px_-4px_rgba(129,140,248,0.3)] hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
                   >
                     {s.label}
                     <ArrowUpRight className="h-3 w-3 opacity-0 -translate-y-0.5 translate-x-0.5 transition-all group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0" />

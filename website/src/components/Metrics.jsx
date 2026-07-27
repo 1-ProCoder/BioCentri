@@ -23,7 +23,7 @@ function Sparkline({ id, color }) {
   const nodes = NODES[id];
   const nodeY = NODE_Y[id];
   return (
-    <svg viewBox="0 0 220 40" className="h-14 w-full" aria-hidden="true">
+    <svg viewBox="0 0 220 40" className="h-24 w-full" aria-hidden="true">
       <defs>
         <linearGradient id={`grad-${id}`} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%"   stopColor={color} stopOpacity="0.12" />
@@ -92,11 +92,15 @@ function Sparkline({ id, color }) {
   );
 }
 
-function CountUp({ to, decimals = 0, prefix = '', suffix = '' }) {
+function CountUp({ to, decimals = 0, prefix = '', suffix = '', formatComma = false }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
   const value = useMotionValue(0);
-  const display = useTransform(value, (v) => `${prefix}${v.toFixed(decimals)}${suffix}`);
+  const display = useTransform(value, (v) => {
+    const formatted = v.toFixed(decimals);
+    const withComma = formatComma ? Number(formatted).toLocaleString() : formatted;
+    return `${prefix}${withComma}${suffix}`;
+  });
   const [text, setText] = useState(`${prefix}0${decimals > 0 ? '.0'.repeat(decimals) : ''}${suffix}`);
 
   useEffect(() => {
@@ -180,33 +184,64 @@ export default function Metrics() {
             initial="hidden"
             whileInView="show"
             viewport={viewportOnce}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-14"
+            className="grid grid-cols-1 lg:grid-cols-3 gap-x-12 gap-y-16"
           >
-            {metrics.map((m) => (
-              <motion.div key={m.n} variants={blurIn} className="flex flex-col gap-4">
-                {/* Number */}
-                <div className="relative">
-                  <div className={
-                    'font-display font-extrabold tracking-tightest leading-none font-mono-num tabular-nums ' +
-                    m.tone + (m.big ? ' text-[76px] md:text-[88px]' : ' text-[60px] md:text-[72px]')
-                  }>
-                    <CountUp to={m.value} decimals={m.decimals} prefix={m.prefix} suffix={m.suffix} />
+            {/* Left: 2 large stats */}
+            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-14">
+              {metrics.slice(0, 2).map((m) => (
+                <motion.div key={m.n} variants={blurIn} className="flex flex-col gap-4">
+                  {/* Number */}
+                  <div className="relative">
+                    <div className={
+                      'font-display font-extrabold tracking-tightest leading-none font-mono-num tabular-nums ' +
+                      m.tone + ' text-[76px] md:text-[88px]'
+                    }>
+                      <CountUp to={m.value} decimals={m.decimals} prefix={m.prefix} suffix={m.suffix} formatComma={m.value > 999} />
+                    </div>
+                    {/* Subtle glow under number */}
+                    <div
+                      className="absolute -bottom-2 left-0 h-8 w-3/4 opacity-20 blur-lg rounded-full"
+                      style={{ background: m.color }}
+                    />
                   </div>
-                  {/* Subtle glow under number */}
-                  <div
-                    className="absolute -bottom-2 left-0 h-8 w-3/4 opacity-20 blur-lg rounded-full"
-                    style={{ background: m.color }}
-                  />
-                </div>
-                {/* Labels */}
-                <div className="space-y-1">
-                  <div className="font-display text-[15px] font-semibold text-white/90">{m.label}</div>
-                  <div className="text-[13px] text-white/40 leading-relaxed">{m.sub}</div>
-                </div>
-                {/* Sparkline */}
-                <Sparkline id={m.spark} color={m.color} />
-              </motion.div>
-            ))}
+                  {/* Labels */}
+                  <div className="space-y-1">
+                    <div className="font-display text-[15px] font-semibold text-white/90">{m.label}</div>
+                    <div className="text-[13px] text-white/40 leading-relaxed">{m.sub}</div>
+                  </div>
+                  {/* Sparkline */}
+                  <Sparkline id={m.spark} color={m.color} />
+                </motion.div>
+              ))}
+            </div>
+            {/* Right: 2 medium stats */}
+            <div className="grid grid-cols-1 gap-y-14">
+              {metrics.slice(2).map((m) => (
+                <motion.div key={m.n} variants={blurIn} className="flex flex-col gap-4">
+                  {/* Number */}
+                  <div className="relative">
+                    <div className={
+                      'font-display font-extrabold tracking-tightest leading-none font-mono-num tabular-nums ' +
+                      m.tone + ' text-[60px] md:text-[72px]'
+                    }>
+                      <CountUp to={m.value} decimals={m.decimals} prefix={m.prefix} suffix={m.suffix} formatComma={m.value > 999} />
+                    </div>
+                    {/* Subtle glow under number */}
+                    <div
+                      className="absolute -bottom-2 left-0 h-8 w-3/4 opacity-20 blur-lg rounded-full"
+                      style={{ background: m.color }}
+                    />
+                  </div>
+                  {/* Labels */}
+                  <div className="space-y-1">
+                    <div className="font-display text-[15px] font-semibold text-white/90">{m.label}</div>
+                    <div className="text-[13px] text-white/40 leading-relaxed">{m.sub}</div>
+                  </div>
+                  {/* Sparkline */}
+                  <Sparkline id={m.spark} color={m.color} />
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         </div>
 

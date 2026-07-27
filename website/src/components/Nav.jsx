@@ -71,7 +71,7 @@ export default function Nav() {
           className={
             'flex w-full max-w-5xl items-center justify-between gap-2 rounded-full px-2.5 py-2 transition-all duration-300 ' +
             (scrolled
-              ? 'glass-strong shadow-[0_8px_40px_-12px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.05)]'
+              ? 'glass-strong shadow-[0_8px_40px_-12px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.05)] backdrop-blur-2xl'
               : 'bg-black/25 border border-white/[0.06] backdrop-blur-md')
           }
         >
@@ -80,7 +80,7 @@ export default function Nav() {
             href="#top"
             className="group flex items-center gap-2 rounded-full pl-1.5 pr-3 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
           >
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-indigo-300 to-violet-400 text-ink-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] transition-transform duration-300 group-hover:scale-105">
+            <span className={`grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-indigo-300 to-violet-400 text-ink-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] transition-all duration-300 group-hover:scale-105 ${scrolled ? 'shadow-[0_0_16px_-4px_rgba(129,140,248,0.5)]' : ''}`}>
               <Shield className="h-3.5 w-3.5" strokeWidth={2.5} />
             </span>
             <span className="font-display text-[15px] font-bold tracking-tight">BioCentri</span>
