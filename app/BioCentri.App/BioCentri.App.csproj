@@ -18,9 +18,9 @@
          of XAML files that compile into the assembly (subset decisions
          documented in docs/DECISIONS.md). -->
     <EnableDefaultPageItems>false</EnableDefaultPageItems>
-    <Version>0.5.0</Version>
-    <FileVersion>0.1.0.0</FileVersion>
-    <InformationalVersion>0.5.0+milestone.5</InformationalVersion>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <InformationalVersion>1.0.0+milestone.7</InformationalVersion>
   </PropertyGroup>
 
   <!--

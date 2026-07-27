@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--
+    BioCentri WiX 3.14 Setup project.
+    Requires WiX Toolset 3.14+ installed with %WIX%\bin on PATH.
+    Builds: candle.exe BioCentri.Setup.wxs obj\harvest.wxs -o obj\
+            light.exe obj\BioCentri.Setup.wixobj obj\harvest.wixobj -o bin\BioCentri.msi
+
+    Before building, run:
+      1. dotnet publish ..\BioCentri.App -c Release -o ..\publish
+      2. heat.exe dir ..\publish -dr INSTALLFOLDER -cg AppComponents -gg -sfrag -out obj\harvest.wxs
+  -->
+
+  <PropertyGroup>
+    <Configuration>Release</Configuration>
+    <Platform>x64</Platform>
+    <OutputName>BioCentri</OutputName>
+    <OutputType>Package</OutputType>
+    <SchemaVersion>2.0</SchemaVersion>
+  </PropertyGroup>
+
+  <!-- If WiX is in a custom location (e.g. zip install), set WIX=path\to\bin
+       before building. This ensures WixTargetsPath resolves correctly. -->
+  <PropertyGroup Condition="'$(WixTargetsPath)' == ''">
+    <WixTargetsPath>$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="BioCentri.Setup.wxs" />
+    <Compile Include="obj\harvest.wxs" Condition="Exists('obj\harvest.wxs')" />
+  </ItemGroup>
+
+  <Import Project="$(WixTargetsPath)" Condition="Exists('$(WixTargetsPath)')" />
+
+  <Target Name="EnsureWixInstalled" BeforeTargets="Compile">
+    <Error
+      Text="WiX Toolset 3.14+ is not installed. Download from https://wixtoolset.org/releases/"
+      Condition="!Exists('$(WixTargetsPath)')" />
+  </Target>
+
+</Project>
