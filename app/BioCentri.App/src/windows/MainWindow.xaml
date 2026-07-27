@@ -118,15 +118,21 @@
 
         </Grid>
 
-        <!-- (2) Toast host — bottom-right of the content column -->
+        <!-- (2) Toast host — bottom-right of the content column.
+                 ItemsSource binds to ToastService.Toasts (the DataContext
+                 is set to ToastService in Initialize()). -->
         <feedback:ToastHost x:Name="ToastLayer"
+                            ItemsSource="{Binding Toasts}"
                             Grid.Column="1"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Bottom"
                             Margin="0,0,0,40" />
 
-        <!-- (3) Dialog overlay — full window, dimmer + presenter -->
+        <!-- (3) Dialog overlay — full window, dimmer + presenter.
+                 ActiveDialog binds to DialogService.ActiveDialog (the
+                 DataContext is set to DialogService in Initialize()). -->
         <feedback:DialogHost x:Name="DialogOverlay"
+                             ActiveDialog="{Binding ActiveDialog}"
                              Grid.Column="0"
                              Grid.ColumnSpan="2" />
 
