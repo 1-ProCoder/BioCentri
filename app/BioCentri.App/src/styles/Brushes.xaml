@@ -48,6 +48,20 @@
     <SolidColorBrush x:Key="Brushes.Accent.IndigoGlow"  Color="#40818CF8" />
     <SolidColorBrush x:Key="Brushes.Accent.EmeraldGlow" Color="#3034D399" />
 
+    <!-- ============================================================== -->
+    <!-- Paired Color tokens                                              -->
+    <!-- WPF does NOT implicitly convert a SolidColorBrush resource into  -->
+    <!-- a Color value at StaticResource lookup time. `GradientStop.Color` -->
+    <!-- therefore cannot bind directly to a Brush resource — it requires -->
+    <!-- a Color. These Color keys mirror the SolidColorBrush.Color's      -->
+    <!-- above so designers can keep the palette synced across surfaces.  -->
+    <!-- Keep values identical to the matching SolidColorBrush.Color.     -->
+    <!-- ============================================================== -->
+    <Color    x:Key="Colors.Ink.950">           #060606</Color>
+    <Color    x:Key="Colors.Ink.900">           #0A0A0B</Color>
+    <Color    x:Key="Colors.Accent.IndigoGlow">  #40818CF8</Color>
+    <Color    x:Key="Colors.Accent.EmeraldGlow"> #3034D399</Color>
+
     <!-- Indigo→violet gradient (matches .text-gradient-violet) -->
     <LinearGradientBrush x:Key="Brushes.Accent.Gradient"
                          StartPoint="0,0" EndPoint="1,1">

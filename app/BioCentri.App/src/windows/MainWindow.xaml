@@ -78,9 +78,9 @@
                     ClipToBounds="True">
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="{StaticResource Brushes.Ink.950}" Offset="0.0" />
-                        <GradientStop Color="{StaticResource Brushes.Ink.900}" Offset="0.5" />
-                        <GradientStop Color="{StaticResource Brushes.Ink.950}" Offset="1.0" />
+                        <GradientStop Color="{StaticResource Colors.Ink.950}" Offset="0.0" />
+                        <GradientStop Color="{StaticResource Colors.Ink.900}" Offset="0.5" />
+                        <GradientStop Color="{StaticResource Colors.Ink.950}" Offset="1.0" />
                     </LinearGradientBrush>
                 </Border.Background>
 
@@ -94,7 +94,7 @@
                              IsHitTestVisible="False">
                         <Ellipse.Fill>
                             <RadialGradientBrush Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
-                                <GradientStop Color="{StaticResource Brushes.Accent.IndigoGlow}" Offset="0.0" />
+                                <GradientStop Color="{StaticResource Colors.Accent.IndigoGlow}" Offset="0.0" />
                                 <GradientStop Color="Transparent" Offset="1.0" />
                             </RadialGradientBrush>
                         </Ellipse.Fill>
@@ -109,7 +109,7 @@
                              IsHitTestVisible="False">
                         <Ellipse.Fill>
                             <RadialGradientBrush Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
-                                <GradientStop Color="{StaticResource Brushes.Accent.EmeraldGlow}" Offset="0.0" />
+                                <GradientStop Color="{StaticResource Colors.Accent.EmeraldGlow}" Offset="0.0" />
                                 <GradientStop Color="Transparent" Offset="1.0" />
                             </RadialGradientBrush>
                         </Ellipse.Fill>

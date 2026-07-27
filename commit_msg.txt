@@ -1,23 +1,39 @@
-feat: functional overhaul — Rules CRUD, real-data VMs, glassmorphic content, entrance animations, Hello→activity log wiring
+fix: WPF startup crash — GradientStop.Color can't reference SolidColorBrush resources
 
-Functional implementation (per docs/PRODUCT_REQUIREMENTS.md):
-- RulesViewModel: full CRUD + ILocalJsonStore persistence (rules.json). Add/Toggle/Delete. Auto-persist on CollectionChanged.
-- ActivityViewModel: reads activity.json, recomputes stat tiles, exposes 5-most-recent events.
-- DashboardViewModel: real counts from protectedApps.json + activity.json + rules.json. Latest 5 challenges surfaced to a new Recent activity items control.
-- SettingsViewModel: added AuthMethodOption enum (Biometric/PinFallback), DefaultAuthMethod property, persisted via composite PersistentSettings record.
-- IActivityLogger / ActivityLogger: on-device persistence of auth outcomes. Serialised via SemaphoreSlim, capped at 200 events.
-- BiometricAuthService: 5-arg ctor (added IActivityLogger). Fire-and-forget LogAsync after each outcome (cancellationToken forwarded, CA2016).
-- ProcessWatcher: 8-arg ctor (added IActivityLogger). Logs every protected-app launch with INFO + Verified or BLOCKED + outcome.
+## Root cause
+MainWindow.xaml was assigning SolidColorBrush resources (Brushes.Ink.950,
+Brushes.Accent.IndigoGlow, Brushes.Accent.EmeraldGlow) to GradientStop.Color
+on three GradientBrush definitions (one Linear, two Radial). WPF does NOT
+implicitly convert SolidColorBrush → Color in StaticResource lookups, so
+MainWindow.InitializeComponent() threw a XamlParseException. The catch in
+MainWindow.xaml.cs surfaced a MessageBox titled "Startup Error" while the
+process stayed alive; MainWindow itself never rendered.
 
-UI overhaul:
-- EntranceAnimation motion util: 320 ms staggered fade-up on Page Loaded, honours Motion.RespectReducedMotion.
-- All 7 page code-behinds hook Loaded -> EntranceAnimation.Play(rootPanel/Grid).
-- FocalCard / ProtectedAppsPage body / ActivityPage / RulesPage / DashboardPage Recent / SettingsPage rows glassmorphic over IndigoGlow + EmeraldGlow ambient.
-- Pages background Painted Transparent so the MainWindow atmosphere bleeds through.
-- RulesPage.xaml rewritten with composer + ListBox + EmptyState + per-row Toggle + Delete.
-- DashboardPage.xaml Recent activity ItemsControl + CountToVisibility swap.
+## Fix
+- app/BioCentri.App/src/styles/Brushes.xaml
+    Added paired Color keys mirroring each affected SolidColorBrush.Color:
+      Colors.Ink.950            = #060606
+      Colors.Ink.900            = #0A0A0B
+      Colors.Accent.IndigoGlow  = #40818CF8
+      Colors.Accent.EmeraldGlow = #3034D399
+    Inline comment explains why the pair is required (GradientStop.Color
+    takes Color, not Brush; designers must keep hex in sync).
 
-Tests / build:
-- 0 errors, 0 warnings.
-- 7/7 auth tests pass; BiometricAuthServiceTests.CreateSut expanded with FakeActivityLogger for activity-event assertions.
-- Type alias `using ActivityEvent = BioCentri.App.Types.ActivityEvent;` in ProcessWatcher to avoid System.Diagnostics clash.
+- app/BioCentri.App/src/windows/MainWindow.xaml
+    5 GradientStop.Color edits: 3 stops on the vertical backdrop gradient +
+    Indigo aura + Emerald aura now reference Colors.* instead of Brushes.*.
+
+## Verification
+  dotnet build app/BioCentri.sln -c Debug   ->  0 Warning(s) / 0 Error(s)
+  dotnet test  app/BioCentri.sln            ->  7 Passed / 0 Failed
+  powershell launch_probe.ps1               ->  BioCentri.App.exe alive,
+                                                MainWindowHandle non-zero,
+                                                MainWindowTitle == "BioCentri"
+                                                (was "Startup Error")
+
+## Architectural preservation
+- No DI graph change (ProcessWatcher / BiometricAuthService / IActivityLogger
+  DI chain unchanged from the previous commit).
+- No new files. No new dependencies.
+- MVVM intact. NoHttpClientGuard still clean.
+- Design-token model extended, not bypassed.

@@ -126,6 +126,7 @@ public partial class App : Application
                 host.Get<ILocalJsonStore>()))
             .AddSingleton<AppLockController>(new AppLockController(
                 host.Get<IToastService>()))
+            .AddSingleton<IActivityLogger>(new ActivityLogger(host.Get<ILocalJsonStore>()))
             .AddSingleton<IHelloService>(new UserConsentVerifierAdapter())
             .AddSingleton<IBiometricAuthService>(new BiometricAuthService(
                 host.Get<IDispatcher>(),
