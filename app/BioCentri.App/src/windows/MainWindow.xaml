@@ -55,7 +55,7 @@
         <!-- (1) Sidebar column -->
         <nav:Sidebar x:Name="Sidebar"
                      Grid.Column="0"
-                     ShellState="{Binding ShellState}"
+                     ShellState="{Binding State}"
                      NavigateCommand="{Binding NavigateCommand}" />
 
         <!-- Content column: topbar + Frame PageHost + statusbar -->
@@ -69,7 +69,7 @@
 
             <nav:TopBar x:Name="TopBar"
                         Grid.Row="0"
-                        ShellState="{Binding ShellState}" />
+                        ShellState="{Binding State}" />
 
             <Border Grid.Row="1"
                     Background="{DynamicResource Brushes.Theme.Window.Background}"
