@@ -56,15 +56,16 @@
             <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
             <conv:StringToVisibilityConverter  x:Key="StringToVisibility" />
             <conv:CountToVisibilityConverter   x:Key="CountToVisibility" />
+            <!-- Milestone 4: DataTemplate-by-DataType wiring so the shell
+                 DialogHost automatically renders AppPickerView when
+                 IDialogService.ShowAsync passes an AppPickerViewModel. The
+                 VM ↔ View binding is structural; one entry per dialog VM.
+                 Must be INSIDE ResourceDictionary (not a sibling) or WPF
+                 tries to set Application.Resources twice. -->
+            <DataTemplate DataType="{x:Type items:AppPickerViewModel}">
+                <items:AppPickerView />
+            </DataTemplate>
         </ResourceDictionary>
-
-        <!-- Milestone 4: DataTemplate-by-DataType wiring so the shell
-             DialogHost automatically renders AppPickerView when
-             IDialogService.ShowAsync passes an AppPickerViewModel. The
-             VM ↔ View binding is structural; one entry per dialog VM. -->
-        <DataTemplate DataType="{x:Type items:AppPickerViewModel}">
-            <items:AppPickerView />
-        </DataTemplate>
     </Application.Resources>
 
 </Application>
