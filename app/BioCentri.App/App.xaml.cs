@@ -215,8 +215,12 @@ public partial class App : Application
     {
         // Decision 6: no telemetry, no log file. Surface and continue so
         // the shell remains usable; the user can grab a screenshot.
+        // e.Exception.ToString() unwraps the full chain (message + all inner
+        // exceptions + stack traces), unlike .Message which shows only the
+        // top-level string (often a generic wrapper like "Cannot locate
+        // resource"). WPF exceptions routinely nest 3+ levels deep.
         MessageBox.Show(
-            $"BioCentri hit an unexpected error:\n\n{e.Exception.Message}",
+            $"BioCentri hit an unexpected error:\n\n{e.Exception}",
             "BioCentri",
             MessageBoxButton.OK,
             MessageBoxImage.Error);
