@@ -8,56 +8,52 @@
 
 ## Current Focus
 
-- [ ] **TASK-001 — Finalize BioCentri product definition.**
-  *Owner:* founder. *Depends on:* `PROJECT_BIBLE.md`, `PRODUCT_REQUIREMENTS.md`,
-  `FEATURE_ROADMAP.md`. *Acceptance:* the three docs above are reviewed and
-  signed off as the v1 product definition; they can be shown to a new
-  contributor without rewrites.
+**v1.0.0 launch readiness.** Phase 1 MVP code is complete. The remaining
+gates are packaging and distribution:
 
----
-
-## Next Tasks
-
-Ordered by what unblocks the MVP next.
-
-- [ ] **TASK-002 — Design website.** Marketing pages and a waitlist only —
-  no product surface, no code dependencies.
-- [ ] **TASK-003 — Create branding.** Logo, palette, typography, and a one-
-  page brand reference, captured in `assets/`.
-- [ ] **TASK-004 — Plan MVP architecture.** Pick the Windows-native stack
-  for the desktop app, and capture the decision in writing
-  (`docs/DECISIONS.md` once created).
-- [ ] **TASK-005 — Build first prototype.** App discovery + protection
-  toggle working end-to-end; auth interception is **not** in scope for
-  this prototype.
-- [ ] **TASK-006 — Test authentication system.** End-to-end Windows Hello
-  coverage (face, fingerprint, PIN) on a clean test profile, with both
-  success and failure paths.
-
----
-
-## Backlog
-
-Held until after MVP ships — captured so we don't re-derive the idea later.
-
-- Usage tracking (Phase 2).
-- Time limits and schedules (Phase 2).
-- Weekly protected-app reports (Phase 2).
-- Browser extension (Phase 3).
-- Website protection parity (Phase 3).
-- AI productivity assistant, narrowly scoped (Phase 3).
-- Cloud sync for protected apps across devices (post-MVP revisit).
+- [ ] **TASK-007 — WiX installer compilation.** Run `heat.exe` + `candle.exe`
+  + `light.exe` against `app/BioCentri.Setup/BioCentri.Setup.*`. Requires
+  WiX Toolset 3.14+ on the build machine.
+- [ ] **TASK-008 — Code signing.** Procure an EV certificate (or Azure
+  Trusted Signing) and sign `BioCentri.msi`.
+- [ ] **TASK-009 — SmartScreen seeding.** Submit the signed `.msi` to
+  Microsoft for initial reputation.
+- [ ] **TASK-010 — Tray icon activation.** Re-add `H.NotifyIcon.Wpf` 2.x
+  NuGet when the offline cache syncs; uncomment the activation block in
+  `App.xaml.cs`. The `TrayIconViewModel` is already registered in DI.
 
 ---
 
 ## Completed
 
-- [x] Created the BioCentri repository scaffold: `app/`, `website/`, `api/`,
-  `extension/`, `docs/`, `assets/`.
-- [x] Authored the documentation foundation: `PROJECT_BIBLE.md`,
-  `PRODUCT_REQUIREMENTS.md`, `FEATURE_ROADMAP.md`, `TASKS.md`, and
-  `CHANGELOG.md`.
+- [x] **TASK-001 — Product definition.** `PROJECT_BIBLE.md`,
+  `PRODUCT_REQUIREMENTS.md`, `FEATURE_ROADMAP.md` authored and reviewed.
+- [x] **TASK-002 — Website.** React/Vite/Tailwind landing page with hero,
+  features, showcase, waitlist, and SEO metadata. Builds 0/0.
+- [x] **TASK-003 — Branding.** Logo, indigo/violet palette, Plus Jakarta
+  Sans + Inter typography. Applied consistently across website and WPF app.
+- [x] **TASK-004 — MVP architecture.** WPF on .NET 8 with Wpf.Ui,
+  CommunityToolkit.Mvvm, M.E.DI. Documented in `docs/DECISIONS.md`.
+- [x] **TASK-005 — First prototype → full MVP.** M1–M7 shipped:
+  app discovery (registry), protection toggle, Windows Hello auth,
+  process monitoring (WMI), app-locking enforcement, 7 feature pages,
+  toast/dialog system, dark theme, high-contrast hook, reduced-motion
+  toggle, accessibility labels.
+- [x] **TASK-006 — Auth testing.** 7 xUnit tests covering Hello outcomes,
+  coalescing, dedupe, and cancel-overlay. Manual QA script at
+  `docs/MANUAL_QA.md`.
 
 ---
 
-_Last reviewed: project foundation._
+## Backlog (Phase 2 — Productivity & Digital Wellbeing)
+
+Held until after Phase 1 ships.
+
+- Usage tracking for protected apps.
+- Per-app time limits with configurable enforcement.
+- Schedules (e.g. "require auth outside 9–5").
+- Weekly protected-app usage reports, fully on-device.
+
+---
+
+_Last reviewed: v1.0.0 — Phase 1 MVP code complete._

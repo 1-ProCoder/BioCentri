@@ -685,4 +685,20 @@ deferred to M7.1 pending `H.NotifyIcon.Wpf` 2.x NuGet resolution.
 
 ---
 
-_Last reviewed: project foundation + Milestone 1 + Milestone 2 (incl. recovery) + Milestone 3 + Milestone 4 + Milestone 5 + Milestone 6 + Milestone 7._
+_Last reviewed: project foundation + M1 + M2 (incl. recovery) + M3 + M4 + M5 + M6 + M7 + v1.0.0._
+
+---
+
+## v1.0.0 — Phase 1 MVP (2026-08)
+
+Phase 1 MVP is code-complete. Seven milestones delivered end-to-end:
+app discovery → protection toggle → Windows Hello biometric challenge →
+process monitoring → enforcement. Built on WPF / .NET 8, local-first,
+zero outbound network.
+
+### Distribution
+- WiX 3.14 installer source authored (`app/BioCentri.Setup/`)
+- Publish profile: single-file, framework-dependent, win-x64
+- All 3 projects bumped to v1.0.0
+- Tray icon deferred to M7.1 (H.NotifyIcon.Wpf blocked by offline NuGet cache)
+

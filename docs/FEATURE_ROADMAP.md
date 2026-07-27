@@ -84,4 +84,5 @@ get its own phase and its own rationale.
 
 ---
 
-_Last reviewed: project foundation._
+_Last reviewed: 2026-07-27 — Phase 1 MVP code-complete. All M1–M7 delivered.
+Installer source authored (WiX 3.14), tray icon deferred (NuGet cache)._
