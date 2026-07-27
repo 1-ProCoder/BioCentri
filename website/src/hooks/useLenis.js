@@ -6,6 +6,7 @@ import Lenis from 'lenis';
  * RAF loop via requestAnimationFrame.
  *
  * Returns the lenis instance for programmatic scrolling (lenis.scrollTo('#section')).
+ * Also forces scroll-to-top on first mount to prevent browser scroll restoration.
  */
 export function useLenis() {
   const lenisRef = useRef(null);
@@ -21,6 +22,9 @@ export function useLenis() {
     });
 
     lenisRef.current = lenis;
+
+    // Force scroll to top on first mount (fixes browser scroll restoration)
+    lenis.scrollTo(0, { immediate: true });
 
     let raf;
     function onRaf(time) {

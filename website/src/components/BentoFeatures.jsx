@@ -355,8 +355,8 @@ export default function BentoFeatures() {
           viewport={viewportOnce}
           className="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
         >
-          {/* Big hero card — spans 2×2 */}
-          <div className="lg:col-span-2 lg:row-span-2">
+          {/* Big hero card — spans 2×2 on lg, 2 cols on md */}
+          <div className="md:col-span-2 lg:col-span-2 lg:row-span-2">
             <WindowsHelloCard />
           </div>
           {/* Right column */}

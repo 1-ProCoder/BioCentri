@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useRef } from 'react';
 import Nav from './components/Nav';
 import Hero from './components/Hero';
 import TrustStrip from './components/TrustStrip';
@@ -23,6 +23,15 @@ function SectionSkeleton() {
 export default function App() {
   // Initialise Lenis smooth scroll
   useLenis();
+
+  // Force scroll to top on fresh page load (fixes browser scroll restoration)
+  const didReset = useRef(false);
+  useEffect(() => {
+    if (didReset.current) return;
+    didReset.current = true;
+    history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div id="top" className="relative min-h-screen bg-ink-950 text-white cursor-none">
