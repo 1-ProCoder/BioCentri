@@ -23,12 +23,19 @@ export function useLenis() {
 
     lenisRef.current = lenis;
 
-    // Force scroll to top on first mount (fixes browser scroll restoration)
-    lenis.scrollTo(0, { immediate: true });
-
+    // Prevent native scroll from fighting Lenis by immediately starting the RAF loop
+    // and forcing scroll-to-top on the very first frame (after Lenis has measured
+    // its virtual scroll position from window.scrollY)
+    let fired = false;
     let raf;
     function onRaf(time) {
       lenis.raf(time);
+      if (!fired) {
+        fired = true;
+        // Force scroll to top on the first frame — this runs AFTER Lenis has
+        // initialised its virtual position, so it overrides any browser restoration
+        lenis.scrollTo(0, { immediate: true });
+      }
       raf = requestAnimationFrame(onRaf);
     }
     raf = requestAnimationFrame(onRaf);

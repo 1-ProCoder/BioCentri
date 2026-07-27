@@ -51,13 +51,13 @@ export default function Showcase() {
     { id: 4, time: '11:50:03.208', type: 'ARM', msg: 'Active biometric hook deployed on discord.exe' },
   ]);
 
-  const logEndRef = useRef(null);
+  const logContainerRef = useRef(null);
 
-  // Scroll log terminal to bottom on new entries — instant only, no smooth
-  // (smooth scrollIntoView can be intercepted by Lenis and scroll the page)
+  // Scroll log terminal to bottom on new entries — use scrollTop instead of
+  // scrollIntoView so Lenis doesn't intercept it as a page-level scroll
   useEffect(() => {
-    if (logEndRef.current) {
-      logEndRef.current.scrollIntoView();
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
   }, [logs]);
 
@@ -337,7 +337,7 @@ export default function Showcase() {
               <Terminal className="h-3.5 w-3.5" />
               <span>Diagnostic Audit Log Stream</span>
             </div>
-            <div className="h-[95px] overflow-y-auto space-y-1 text-[11px] leading-relaxed text-white/50 select-text">
+            <div ref={logContainerRef} className="h-[95px] overflow-y-auto space-y-1 text-[11px] leading-relaxed text-white/50 select-text">
               {logs.map((log) => (
                 <div key={log.id} className="flex gap-2.5 items-start">
                   <span className="text-white/25 shrink-0 select-none">[{log.time}]</span>
@@ -351,7 +351,7 @@ export default function Showcase() {
                   <span className="text-white/70">{log.msg}</span>
                 </div>
               ))}
-              <div ref={logEndRef} />
+
             </div>
           </div>
         </motion.div>
