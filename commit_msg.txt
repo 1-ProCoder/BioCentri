@@ -1,27 +1,35 @@
-fix: WPF startup crash — GradientStop.Color can't reference SolidColorBrush resources
+fix: sidebar clicks did not navigate — NavigateCommandProperty had no DP callback
 
 ## Root cause
-MainWindow.xaml was assigning SolidColorBrush resources (Brushes.Ink.950,
-Brushes.Accent.IndigoGlow, Brushes.Accent.EmeraldGlow) to GradientStop.Color
-on three GradientBrush definitions (one Linear, two Radial). WPF does NOT
-implicitly convert SolidColorBrush → Color in StaticResource lookups, so
-MainWindow.InitializeComponent() threw a XamlParseException. The catch in
-MainWindow.xaml.cs surfaced a MessageBox titled "Startup Error" while the
-process stayed alive; MainWindow itself never rendered.
+In Sidebar.xaml.cs, `NavigateCommandProperty` was registered without a
+`PropertyMetadata` callback while `ShellStateProperty` had one. Consequence:
+
+  1. Sidebar ctor runs `Populate()` synchronously.
+  2. WPF then resolves the bindings from MainWindow.xaml into the
+     `NavigateCommand` and `ShellState` DPs.
+  3. `OnShellStateChanged` fires `Rebind()` → `Populate()` again, but at
+     this moment `NavigateCommand` was still null in the typical binding
+     order.
+  4. The new `OnNavigateCommandChanged` callback DID NOT EXIST, so the
+     second Populate() never ran after the command finally arrived.
+  5. Every SidebarItem child kept its initial null `NavigateCommand`.
+  6. Click on a sidebar item ran SidebarItem.OnSelected:
+        if (NavigateCommand is { } cmd && cmd.CanExecute(Route))
+            cmd.Execute(Route);
+     Since `NavigateCommand` was null, this whole block fell through
+     silently — no exception, no log, no Frame.Navigate, no
+     ShellState.CurrentRoute update. Page never swapped.
 
 ## Fix
-- app/BioCentri.App/src/styles/Brushes.xaml
-    Added paired Color keys mirroring each affected SolidColorBrush.Color:
-      Colors.Ink.950            = #060606
-      Colors.Ink.900            = #0A0A0B
-      Colors.Accent.IndigoGlow  = #40818CF8
-      Colors.Accent.EmeraldGlow = #3034D399
-    Inline comment explains why the pair is required (GradientStop.Color
-    takes Color, not Brush; designers must keep hex in sync).
-
-- app/BioCentri.App/src/windows/MainWindow.xaml
-    5 GradientStop.Color edits: 3 stops on the vertical backdrop gradient +
-    Indigo aura + Emerald aura now reference Colors.* instead of Brushes.*.
+app/BioCentri.App/src/components/Nav/Sidebar.xaml.cs
+    - Added `new PropertyMetadata(null, OnNavigateCommandChanged)` to
+      the NavigateCommandProperty registration.
+    - Added the matching `OnNavigateCommandChanged` callback which
+      mirrors the existing `OnShellStateChanged` pattern: invoke
+      `s.Rebind()` → `Populate()` so children pick up the now-non-null
+      ICommand.
+    - Inline comment documents why this callback is essential so the
+      next refactor doesn't accidentally drop it.
 
 ## Verification
   dotnet build app/BioCentri.sln -c Debug   ->  0 Warning(s) / 0 Error(s)
@@ -29,11 +37,11 @@ process stayed alive; MainWindow itself never rendered.
   powershell launch_probe.ps1               ->  BioCentri.App.exe alive,
                                                 MainWindowHandle non-zero,
                                                 MainWindowTitle == "BioCentri"
-                                                (was "Startup Error")
+                                                (regression-free)
 
 ## Architectural preservation
-- No DI graph change (ProcessWatcher / BiometricAuthService / IActivityLogger
-  DI chain unchanged from the previous commit).
+- No DI graph change.
 - No new files. No new dependencies.
 - MVVM intact. NoHttpClientGuard still clean.
-- Design-token model extended, not bypassed.
+- Pattern matches the existing OnShellStateChanged callback (zero new
+  vocabulary for a contributor to learn).

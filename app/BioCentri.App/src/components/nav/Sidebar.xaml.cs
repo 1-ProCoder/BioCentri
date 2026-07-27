@@ -24,7 +24,15 @@ public partial class Sidebar : Grid
 
     public static readonly DependencyProperty NavigateCommandProperty =
         DependencyProperty.Register(
-            nameof(NavigateCommand), typeof(ICommand), typeof(Sidebar));
+            nameof(NavigateCommand), typeof(ICommand), typeof(Sidebar),
+            // M5+: this callback fills the gap that previously left
+            // SidebarItem.NavigateCommand null at runtime. The Sidebar
+            // ctor runs Populate() before WPF resolves the DP bindings,
+            // so without an OnNavigateCommandChanged hook the children
+            // were constructed with a null NavigateCommand and clicks
+            // fell into the silent `if (NavigateCommand is { } cmd)`
+            // branch in SidebarItem.OnSelected.
+            new PropertyMetadata(null, OnNavigateCommandChanged));
 
     public ShellState? ShellState
     {
@@ -46,6 +54,16 @@ public partial class Sidebar : Grid
 
     private static void OnShellStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
+        if (d is Sidebar s) s.Rebind();
+    }
+
+    private static void OnNavigateCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        // Mirror the ShellState change pattern: when the bound
+        // NavigateCommand arrives (after Populate() ran in the ctor),
+        // rebuild the SidebarItem children so each one picks up the
+        // concrete ICommand instance. Populate() is cheap (7 items),
+        // so we don't need incremental bookkeeping here.
         if (d is Sidebar s) s.Rebind();
     }
 
