@@ -5,40 +5,53 @@
         x:Name="Root"
         Background="Transparent"
         BorderBrush="Transparent"
-        BorderThickness="0,0,0,1"
+        BorderThickness="0"
         CornerRadius="{StaticResource Corners.Pill}"
-        Padding="0,4,0,4"
+        Padding="0"
+        Margin="0,1,0,1"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True"
         Cursor="Hand"
         MouseLeftButtonUp="OnSelected"
         AutomationProperties.Name="{Binding Title}">
 
-    <Grid x:Name="Container" VerticalAlignment="Center">
+    <Grid x:Name="Container"
+          VerticalAlignment="Center"
+          MinHeight="44">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3" />
-            <ColumnDefinition Width="32" />
+            <ColumnDefinition Width="4" />
+            <ColumnDefinition Width="36" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Rectangle x:Name="SelectionStripe"
-                   Grid.Column="0"
-                   Width="3"
-                   Height="20"
-                   Margin="0,0,4,0"
-                   Fill="{StaticResource Brushes.Accent.Indigo}"
-                   Opacity="0"
-                   VerticalAlignment="Center" />
+        <!-- Active stripe — glows when selected -->
+        <Border x:Name="SelectionStripe"
+                Grid.Column="0"
+                Width="3"
+                CornerRadius="2"
+                Background="{StaticResource Brushes.Accent.Indigo}"
+                Opacity="0"
+                VerticalAlignment="Stretch"
+                Margin="1,6,3,6">
+            <Border.Effect>
+                <DropShadowEffect Color="#818CF8"
+                                  BlurRadius="8"
+                                  ShadowDepth="0"
+                                  Opacity="0" />
+            </Border.Effect>
+        </Border>
 
+        <!-- Icon -->
         <icon:Icon x:Name="LeadingIcon"
                    Grid.Column="1"
                    IconSize="20"
                    VerticalAlignment="Center"
                    HorizontalAlignment="Center"
-                   Margin="0,0,12,0"
+                   Margin="0,0,10,0"
                    GeometryKey="Icons.Route.Dashboard"
                    Stroke="{StaticResource Brushes.Text.Muted}" />
 
+        <!-- Label -->
         <TextBlock x:Name="TitleText"
                    Grid.Column="2"
                    Text="Title"
@@ -48,5 +61,18 @@
                    Foreground="{StaticResource Brushes.Text.Muted}"
                    VerticalAlignment="Center" />
     </Grid>
+
+    <Border.Style>
+        <Style TargetType="Border">
+            <!-- Resting: transparent background -->
+            <Setter Property="Background" Value="Transparent" />
+            <Style.Triggers>
+                <!-- Hover: subtle surface background -->
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource Brushes.Subtle.Surface}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Border.Style>
 
 </Border>

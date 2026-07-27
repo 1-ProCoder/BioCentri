@@ -7,7 +7,8 @@
         CornerRadius="{StaticResource Corners.Lg}"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True"
-        Effect="{StaticResource Shadows.Card.Default}">
+        Effect="{StaticResource Shadows.Card.Default}"
+        Cursor="Hand">
 
     <Border BorderBrush="{StaticResource Shadows.InnerHighlight.Default}"
             BorderThickness="0,1,0,0"
@@ -15,5 +16,16 @@
         <ContentPresenter x:Name="Body"
                           Margin="{StaticResource Spacing.Pad.Xl}" />
     </Border>
+
+    <Border.Style>
+        <Style TargetType="Border">
+            <Setter Property="Effect" Value="{StaticResource Shadows.Card.Default}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Effect" Value="{StaticResource Shadows.Hover.Lift}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Border.Style>
 
 </Border>

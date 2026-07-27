@@ -1,38 +1,70 @@
 <Border x:Class="BioCentri.App.Components.Nav.StatisticCard"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Background="{StaticResource Brushes.Ink.850}"
+        Background="{StaticResource Brushes.Surface.Card}"
         BorderBrush="{StaticResource Brushes.Border.Hairline}"
         BorderThickness="1"
         CornerRadius="{StaticResource Corners.Md}"
         Padding="{StaticResource Spacing.Pad.Lg}"
         SnapsToDevicePixels="True"
-        UseLayoutRounding="True">
+        UseLayoutRounding="True"
+        Cursor="Hand">
 
-    <StackPanel>
-        <TextBlock x:Name="LabelText"
-                   Text="Label"
-                   FontFamily="{StaticResource Typography.Sans}"
-                   FontSize="{StaticResource Typography.Size.Caption}"
-                   FontWeight="{StaticResource Typography.Weight.Medium}"
-                   Foreground="{StaticResource Brushes.Text.Muted}"
- />
+    <!-- Inner highlight (top edge) -->
+    <Border BorderBrush="{StaticResource Shadows.InnerHighlight.Default}"
+            BorderThickness="0,1,0,0"
+            CornerRadius="{StaticResource Corners.Md}">
+        <StackPanel>
+            <TextBlock x:Name="LabelText"
+                       Text="Label"
+                       FontFamily="{StaticResource Typography.Sans}"
+                       FontSize="{StaticResource Typography.Size.Caption}"
+                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                       Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                       Opacity="0.8" />
 
-        <TextBlock x:Name="ValueText"
-                   Text="—"
-                   FontFamily="{StaticResource Typography.Display}"
-                   FontSize="{StaticResource Typography.Size.H2}"
-                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
-                   Foreground="{StaticResource Brushes.Text.Primary}"
-                   Margin="0,4,0,0" />
+            <TextBlock x:Name="ValueText"
+                       Text="—"
+                       FontFamily="{StaticResource Typography.Display}"
+                       FontSize="{StaticResource Typography.Size.H2}"
+                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                       Foreground="{StaticResource Brushes.Text.Primary}"
+                       Margin="0,6,0,0" />
 
-        <TextBlock x:Name="DeltaText"
-                   Text=""
-                   FontFamily="{StaticResource Typography.Sans}"
-                   FontSize="{StaticResource Typography.Size.Small}"
-                   Foreground="{StaticResource Brushes.Accent.IndigoLight}"
-                   Margin="0,4,0,0"
-                   Visibility="Collapsed" />
-    </StackPanel>
+            <TextBlock x:Name="DeltaText"
+                       Text=""
+                       FontFamily="{StaticResource Typography.Sans}"
+                       FontSize="{StaticResource Typography.Size.Small}"
+                       Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                       Margin="0,6,0,0"
+                       Visibility="Collapsed" />
+        </StackPanel>
+    </Border>
+
+    <Border.Style>
+        <Style TargetType="Border">
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#000000"
+                                      BlurRadius="4"
+                                      ShadowDepth="0"
+                                      Opacity="0.2" />
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource Brushes.Surface.Raised}" />
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect Color="#000000"
+                                              BlurRadius="12"
+                                              ShadowDepth="2"
+                                              Opacity="0.35" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Border.Style>
 
 </Border>

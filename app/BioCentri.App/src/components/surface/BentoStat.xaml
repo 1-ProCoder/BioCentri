@@ -2,28 +2,40 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:motion="clr-namespace:BioCentri.App.Components.Motion"
-             x:Name="Root">
+             x:Name="Root"
+             Cursor="Hand">
     <motion:BorderTrace>
+        <motion:BorderTrace.Style>
+            <Style TargetType="motion:BorderTrace">
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Opacity" Value="0.92" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </motion:BorderTrace.Style>
         <StackPanel Margin="{StaticResource Spacing.Pad.Lg}">
             <TextBlock Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}"
                        FontFamily="{StaticResource Typography.Sans}"
                        FontSize="{StaticResource Typography.Size.Caption}"
                        FontWeight="{StaticResource Typography.Weight.SemiBold}"
-                       Foreground="{StaticResource Brushes.Accent.IndigoLight}" />
+                       Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                       TextOptions.TextFormattingMode="Display" />
 
             <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}}"
                        FontFamily="{StaticResource Typography.Display}"
                        FontSize="{StaticResource Typography.Size.Display}"
                        FontWeight="{StaticResource Typography.Weight.SemiBold}"
                        Foreground="{StaticResource Brushes.Text.Primary}"
-                       Margin="0,8,0,0"
-                       TextTrimming="CharacterEllipsis" />
+                       Margin="0,10,0,0"
+                       TextTrimming="CharacterEllipsis"
+                       TextOptions.TextFormattingMode="Display" />
 
             <TextBlock Text="{Binding Caption, RelativeSource={RelativeSource AncestorType=UserControl}}"
                        FontFamily="{StaticResource Typography.Sans}"
                        FontSize="{StaticResource Typography.Size.Small}"
                        Foreground="{StaticResource Brushes.Text.Muted}"
-                       Margin="0,4,0,0"
+                       Margin="0,6,0,0"
                        TextWrapping="Wrap" />
         </StackPanel>
     </motion:BorderTrace>

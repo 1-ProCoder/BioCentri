@@ -3,9 +3,17 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:icon="clr-namespace:BioCentri.App.Components.Iconography"
       xmlns:nav="clr-namespace:BioCentri.App.Components.Nav"
-      Background="{StaticResource Brushes.Ink.900}"
       SnapsToDevicePixels="True"
       UseLayoutRounding="True">
+
+    <!-- Glass backdrop: Ink.900 at 85% opacity layered over a subtle gradient -->
+    <Grid.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#E50A0A0B" Offset="0.0" />
+            <GradientStop Color="#EB0A0A0B" Offset="0.5" />
+            <GradientStop Color="#E00A0A0B" Offset="1.0" />
+        </LinearGradientBrush>
+    </Grid.Background>
 
     <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
@@ -17,14 +25,14 @@
     <!-- Brand block -->
     <StackPanel Grid.Row="0"
                 Orientation="Horizontal"
-                Margin="20,18,20,8"
+                Margin="20,20,20,12"
                 VerticalAlignment="Center">
-        <Border Width="32"
-                Height="32"
-                CornerRadius="8"
+        <Border Width="36"
+                Height="36"
+                CornerRadius="10"
                 Background="{StaticResource Brushes.Accent.Gradient}"
                 Effect="{StaticResource Elevation.Accent.Glow}">
-            <icon:Icon IconSize="18"
+            <icon:Icon IconSize="20"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        GeometryKey="Icons.Shell.Logo"
@@ -38,13 +46,14 @@
                        FontFamily="{StaticResource Typography.Display}"
                        FontSize="{StaticResource Typography.Size.Large}"
                        FontWeight="{StaticResource Typography.Weight.SemiBold}"
-                       Foreground="{StaticResource Brushes.Text.Primary}" />
+                       Foreground="{StaticResource Brushes.Text.Primary}"
+                       TextOptions.TextFormattingMode="Display" />
             <TextBlock x:Name="BrandSubText"
-                       Text="Local-first"
+                       Text="Local-first security"
                        FontFamily="{StaticResource Typography.Sans}"
                        FontSize="{StaticResource Typography.Size.Caption}"
                        Foreground="{StaticResource Brushes.Accent.IndigoLight}"
-                       Margin="0,2,0,0"
+                       Margin="0,3,0,0"
                        Visibility="Visible" />
         </StackPanel>
     </StackPanel>
@@ -53,26 +62,27 @@
     <Border Grid.Row="1"
             BorderBrush="{StaticResource Brushes.Border.HairlineSoft}"
             BorderThickness="0,1,0,0"
-            Margin="16,4,16,12" />
+            Margin="16,4,16,14" />
 
     <!-- Section eyebrow + nav items -->
     <StackPanel Grid.Row="2"
                 Orientation="Vertical"
-                Margin="12,0,12,0">
+                Margin="10,0,10,0">
         <TextBlock x:Name="NavLabel"
-                   Text="NAVIGATION"
+                   Text="Navigation"
                    FontFamily="{StaticResource Typography.Sans}"
                    FontSize="{StaticResource Typography.Size.Caption}"
                    FontWeight="{StaticResource Typography.Weight.SemiBold}"
                    Foreground="{StaticResource Brushes.Text.Muted}"
-                   Margin="12,4,0,8" />
+                   Margin="14,4,0,10"
+                   Opacity="0.6" />
         <StackPanel x:Name="ItemsHost"
                     Orientation="Vertical" />
     </StackPanel>
 
-    <!-- Bottom: brand mini + collapse -->
+    <!-- Bottom: online indicator + collapse -->
     <Grid Grid.Row="3"
-          Margin="16,4,16,16">
+          Margin="16,8,16,18">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
@@ -81,13 +91,21 @@
         <StackPanel Grid.Column="0"
                     Orientation="Horizontal"
                     VerticalAlignment="Center">
-            <Border Width="6"
-                    Height="6"
-                    CornerRadius="3"
+            <!-- Pulse dot -->
+            <Border Width="7"
+                    Height="7"
+                    CornerRadius="4"
                     Background="{StaticResource Brushes.Status.Success}"
-                    Margin="0,0,10,0" />
+                    Margin="0,0,10,0">
+                <Border.Effect>
+                    <DropShadowEffect Color="#34D399"
+                                      BlurRadius="6"
+                                      ShadowDepth="0"
+                                      Opacity="0.6" />
+                </Border.Effect>
+            </Border>
             <TextBlock x:Name="HealthText"
-                       Text="Online"
+                       Text="All systems operational"
                        FontFamily="{StaticResource Typography.Sans}"
                        FontSize="{StaticResource Typography.Size.Small}"
                        FontWeight="{StaticResource Typography.Weight.Medium}"
@@ -97,7 +115,7 @@
 
         <Border Grid.Column="1"
                 x:Name="ToggleButton"
-                Background="Transparent"
+                Background="{StaticResource Brushes.Subtle.Surface}"
                 BorderBrush="{StaticResource Brushes.Border.Hairline}"
                 BorderThickness="1"
                 CornerRadius="{StaticResource Corners.Pill}"
