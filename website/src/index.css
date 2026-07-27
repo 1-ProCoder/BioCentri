@@ -1,0 +1,355 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────
+   FONTS  — preloaded in index.html, this just sets defaults
+───────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-ink-950 text-white font-sans antialiased;
+    font-feature-settings: 'ss01', 'cv01', 'cv11';
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: rgba(129, 140, 248, 0.28);
+    color: #fff;
+  }
+
+  /* Custom scrollbar — minimal, dark */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 255, 255, 0.14); }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TYPOGRAPHY UTILITIES
+───────────────────────────────────────────────────────────── */
+@layer utilities {
+  .font-display {
+    font-family: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.025em;
+  }
+
+  /* ─── Gradient text variants ─── */
+  .text-gradient {
+    background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.55) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .text-gradient-violet {
+    background: linear-gradient(135deg, #c7d2fe 0%, #818cf8 48%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .text-gradient-cyan {
+    background: linear-gradient(135deg, #a5f3fc 0%, #67e8f9 40%, #818cf8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .text-gradient-emerald {
+    background: linear-gradient(135deg, #6ee7b7 0%, #34d399 55%, #10b981 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Animated gradient text */
+  .text-gradient-animated {
+    background: linear-gradient(135deg, #c7d2fe, #818cf8, #a78bfa, #67e8f9, #c7d2fe);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradient-shift 6s ease infinite;
+  }
+
+  /* ─── Mono numeric ─── */
+  .font-mono-num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SURFACE UTILITIES
+───────────────────────────────────────────────────────────── */
+@layer utilities {
+  /* Subtle glassmorphism */
+  .glass {
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  /* Stronger glass — for modal-weight surfaces */
+  .glass-strong {
+    background-color: rgba(255, 255, 255, 0.032);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.10),
+      0 40px 100px -30px rgba(0, 0, 0, 0.6),
+      0 1px 0 rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  /* Focal card — high-contrast dark surface with accent glow from top */
+  .focal {
+    background:
+      radial-gradient(120% 80% at 50% 0%, rgba(129, 140, 248, 0.07) 0%, transparent 60%),
+      linear-gradient(180deg, #0e0e14 0%, #09090c 100%);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.09),
+      0 40px 120px -40px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Lifted card — adds depth shadow for hero-level surfaces */
+  .card-elevated {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 4px 6px -1px rgba(0, 0, 0, 0.3),
+      0 60px 120px -30px rgba(0, 0, 0, 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  }
+
+  /* Indigo glow shadow */
+  .glow-indigo {
+    box-shadow: 0 0 40px -10px rgba(129, 140, 248, 0.35);
+  }
+
+  .glow-indigo-sm {
+    box-shadow: 0 0 16px -4px rgba(129, 140, 248, 0.4);
+  }
+
+  .glow-emerald {
+    box-shadow: 0 0 40px -10px rgba(52, 211, 153, 0.3);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TEXTURE & BACKGROUND UTILITIES
+───────────────────────────────────────────────────────────── */
+@layer utilities {
+  /* Tactile film-grain noise */
+  .noise {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1   0 0 0 0 1   0 0 0 0 1   0 0 0 0.055 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  /* Hairline grid */
+  .grid-faint {
+    background-image:
+      linear-gradient(to right,  rgba(255, 255, 255, 0.038) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.038) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  /* Isometric cyber grid */
+  .grid-iso {
+    background-image:
+      linear-gradient(60deg,  rgba(165, 180, 252, 0.14) 1px, transparent 1px),
+      linear-gradient(-60deg, rgba(165, 180, 252, 0.14) 1px, transparent 1px),
+      linear-gradient(0deg,   rgba(129, 140, 248, 0.08) 1px, transparent 1px);
+    background-size: 64px 36px;
+  }
+
+  /* Topography (face-scan ridges) */
+  .topography {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800' preserveAspectRatio='none'><g fill='none' stroke='%23818cf8' stroke-width='0.7' stroke-opacity='0.065'><path d='M 0 90 Q 300 30, 600 95 T 1200 110'/><path d='M 0 150 Q 300 100, 600 160 T 1200 145'/><path d='M 0 220 Q 300 170, 600 225 T 1200 215'/><path d='M 0 290 Q 300 245, 600 300 T 1200 280'/><path d='M 0 360 Q 300 320, 600 370 T 1200 350'/><path d='M 0 430 Q 300 380, 600 440 T 1200 420'/><path d='M 0 500 Q 300 460, 600 510 T 1200 490'/><path d='M 0 570 Q 300 525, 600 580 T 1200 555'/><path d='M 0 640 Q 300 600, 600 650 T 1200 625'/><path d='M 0 710 Q 300 670, 600 720 T 1200 695'/></g></svg>");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
+
+  /* Animated gradient border */
+  .border-trace {
+    background-image: linear-gradient(
+      90deg,
+      rgba(129, 140, 248, 0.0)  0%,
+      rgba(129, 140, 248, 0.65) 20%,
+      rgba(167, 139, 250, 0.65) 38%,
+      rgba(103, 232, 249, 0.5)  54%,
+      rgba(129, 140, 248, 0.65) 72%,
+      rgba(52,  211, 153, 0.5)  88%,
+      rgba(129, 140, 248, 0.0)  100%
+    );
+    background-size: 200% 100%;
+  }
+
+  /* Diagonal glare */
+  .glare {
+    background: linear-gradient(105deg,
+      rgba(255, 255, 255, 0)    0%,
+      rgba(255, 255, 255, 0)    36%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0)    64%,
+      rgba(255, 255, 255, 0)    100%
+    );
+  }
+
+  /* Holographic conic reticle rings */
+  .reticle-ring {
+    background: conic-gradient(
+      from 0deg,
+      rgba(165, 180, 252, 0.0)  0deg,
+      rgba(165, 180, 252, 0.60) 30deg,
+      rgba(165, 180, 252, 0.0)  100deg,
+      rgba(165, 180, 252, 0.55) 265deg,
+      rgba(165, 180, 252, 0.0)  360deg
+    );
+  }
+  .reticle-ring-rev {
+    background: conic-gradient(
+      from 0deg,
+      rgba(103, 232, 249, 0.0)  0deg,
+      rgba(103, 232, 249, 0.40) 55deg,
+      rgba(103, 232, 249, 0.0)  175deg,
+      rgba(103, 232, 249, 0.35) 295deg,
+      rgba(103, 232, 249, 0.0)  360deg
+    );
+  }
+  .reticle-ring-slow {
+    background: conic-gradient(
+      from 0deg,
+      rgba(52, 211, 153, 0.0)   0deg,
+      rgba(52, 211, 153, 0.25)  80deg,
+      rgba(52, 211, 153, 0.0)   200deg,
+      rgba(52, 211, 153, 0.20)  320deg,
+      rgba(52, 211, 153, 0.0)   360deg
+    );
+  }
+
+  /* Section dividers */
+  .section-divider {
+    height: 1px;
+    background: radial-gradient(
+      ellipse 60% 100% at 50% 50%,
+      rgba(255, 255, 255, 0.10) 0%,
+      transparent 100%
+    );
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CUSTOM CURSOR
+───────────────────────────────────────────────────────────── */
+@layer utilities {
+  /* Hide native cursor globally when custom cursor is active */
+  .cursor-none,
+  .cursor-none * {
+    cursor: none !important;
+  }
+
+  /* Custom cursor elements */
+  .cursor-dot {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: rgba(129, 140, 248, 0.9);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+  }
+
+  .cursor-ring {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(129, 140, 248, 0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+  }
+
+  .cursor-ring.hover {
+    width: 56px;
+    height: 56px;
+    border-color: rgba(129, 140, 248, 0.8);
+  }
+
+  /* Clip-path reveal utility */
+  .clip-reveal {
+    animation: clip-reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes clip-reveal {
+    from { clip-path: inset(100% 0 0 0); opacity: 0; }
+    to { clip-path: inset(0% 0 0 0); opacity: 1; }
+  }
+
+  /* Animated gradient border */
+  @keyframes gradient-border {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .gradient-border-animated {
+    background-size: 200% 200%;
+    animation: gradient-border 3s ease infinite;
+  }
+
+  /* Card lift on hover */
+  .card-lift {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .card-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Consistent body text dim */
+  .prose-dim {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   FOCUS STATES — accessible, on-brand
+───────────────────────────────────────────────────────────── */
+@layer base {
+  :focus-visible {
+    outline: 2px solid rgba(129, 140, 248, 0.7);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   REDUCED MOTION — system preference respected globally
+───────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

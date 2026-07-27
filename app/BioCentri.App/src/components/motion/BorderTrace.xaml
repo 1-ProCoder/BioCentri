@@ -1,0 +1,15 @@
+<UserControl x:Class="BioCentri.App.Components.Motion.BorderTrace"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root">
+    <Border x:Name="Host"
+            BorderBrush="{StaticResource Brushes.Border.Hairline}"
+            BorderThickness="{StaticResource Border.Thin}"
+            CornerRadius="{StaticResource Corners.Lg}"
+            Background="{StaticResource Brushes.Surface.Card}"
+            SnapsToDevicePixels="True"
+            UseLayoutRounding="True">
+        <ContentPresenter x:Name="Body"
+                          Content="{Binding Content, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+    </Border>
+</UserControl>

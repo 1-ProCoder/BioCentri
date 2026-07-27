@@ -1,0 +1,65 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <!--
+        Typography.xaml
+        =================
+        Font family tokens (Inter, Plus Jakarta Sans) and a precise size
+        scale. WPF does not have variable fonts at runtime via static
+        resources, so we expose Doubles for sizes and Thickness for tracking.
+
+        Font binaries are deliberately NOT shipped yet (Decision 6 — fonts
+        are added in Milestone 2 alongside splash art). The keys below
+        fall back gracefully through `,`-separated FontFamily chains, so
+        the app renders today with Segoe UI / system defaults.
+    -->
+
+    <!-- ============================================================== -->
+    <!-- Font families                                                   -->
+    <!-- Each FontFamily chain: brand → brand fallback → system fallback -->
+    <!-- ============================================================== -->
+    <FontFamily x:Key="Typography.Sans">Inter, Segoe UI, ui-sans-serif, system-ui</FontFamily>
+    <FontFamily x:Key="Typography.Display">Plus Jakarta Sans, Inter, Segoe UI Variable Display, ui-sans-serif, system-ui</FontFamily>
+    <FontFamily x:Key="Typography.Monospace">JetBrains Mono, Consolas, ui-monospace, monospace</FontFamily>
+
+    <!-- ============================================================== -->
+    <!-- Size scale (matches website's Tailwind scale, 4-px gutter)       -->
+    <!-- ============================================================== -->
+    <sys:Double x:Key="Typography.Size.Caption">12</sys:Double>
+    <sys:Double x:Key="Typography.Size.Small">   14</sys:Double>
+    <sys:Double x:Key="Typography.Size.Body">    16</sys:Double>
+    <sys:Double x:Key="Typography.Size.Large">   18</sys:Double>
+    <sys:Double x:Key="Typography.Size.H4">      20</sys:Double>
+    <sys:Double x:Key="Typography.Size.H3">      24</sys:Double>
+    <sys:Double x:Key="Typography.Size.H2">      32</sys:Double>
+    <sys:Double x:Key="Typography.Size.H1">      44</sys:Double>
+    <sys:Double x:Key="Typography.Size.Display">64</sys:Double>
+
+    <!-- ============================================================== -->
+    <!-- Line heights                                                    -->
+    <!-- ============================================================== -->
+    <sys:Double x:Key="Typography.LineHeight.Tight">   1.15</sys:Double>
+    <sys:Double x:Key="Typography.LineHeight.Default"> 1.40</sys:Double>
+    <sys:Double x:Key="Typography.LineHeight.Loose">   1.60</sys:Double>
+
+    <!-- ============================================================== -->
+    <!-- Letter spacing (Tracking). Tailwind uses em; WPF resources use     -->
+    <!-- Double (in pixels). 0.x em × font-size ≈ px.                       -->
+    <!-- ============================================================== -->
+    <sys:Double x:Key="Typography.Tracking.Tightest">     -0.045</sys:Double>
+    <sys:Double x:Key="Typography.Tracking.Tight">        -0.025</sys:Double>
+    <sys:Double x:Key="Typography.Tracking.Default">       0.000</sys:Double>
+    <sys:Double x:Key="Typography.Tracking.Wide">          0.025</sys:Double>
+
+    <!-- ============================================================== -->
+    <!-- Font weights                                                    -->
+    <!-- WPF uses FontWeight as a struct (static values). These are names. -->
+    <!-- ============================================================== -->
+    <FontWeight x:Key="Typography.Weight.Regular">  Normal</FontWeight>
+    <FontWeight x:Key="Typography.Weight.Medium">   Medium</FontWeight>
+    <FontWeight x:Key="Typography.Weight.SemiBold"> SemiBold</FontWeight>
+    <FontWeight x:Key="Typography.Weight.Bold">     Bold</FontWeight>
+
+</ResourceDictionary>

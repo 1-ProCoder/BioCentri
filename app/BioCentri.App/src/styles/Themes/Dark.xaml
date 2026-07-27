@@ -1,0 +1,42 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Themes/Dark.xaml
+        =================
+        BioCentri ships a dark theme for v1. This dictionary:
+
+          1. Pulls in Tokens.xaml so it is self-contained when App.xaml
+             merges Dark.xaml directly. App.xaml will prefer to merge
+             Tokens.xaml THEN Dark.xaml — Theme files provide a single
+             rearrangable "skin" layer.
+          2. Sets the active Window/Surface brushes so MainWindow / Pages
+             that bind to `Brushes.Theme.Window.Background` resolve
+             correctly without hard-coded hex.
+    -->
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/src/styles/Tokens.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!-- Theme-resolved brushes. Components reference these instead of
+         raw `Brushes.Ink.*` so a future Light theme can swap selectors
+         without touching every page. -->
+    <SolidColorBrush x:Key="Brushes.Theme.Window.Background" Color="#060606" />
+    <SolidColorBrush x:Key="Brushes.Theme.Window.Foreground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="Brushes.Theme.Page.Background"   Color="#060606" />
+    <SolidColorBrush x:Key="Brushes.Theme.Card.Background"   Color="#0E0E12" />
+    <SolidColorBrush x:Key="Brushes.Theme.Card.Border"       Color="#1FFFFFFF" />
+    <SolidColorBrush x:Key="Brushes.Theme.Text.Primary"      Color="#FFFFFF" />
+    <SolidColorBrush x:Key="Brushes.Theme.Text.Muted"        Color="#A0FFFFFF" />
+
+    <!-- Status bar — read by MainWindow.xaml's bottom row (32px).          -->
+    <!-- Background matches the window/page base (#060606 = Ink.950).      -->
+    <!-- Foreground matches Brushes.Theme.Text.Muted so captions on the    -->
+    <!-- status bar read at the same emissive level as muted captions      -->
+    <!-- elsewhere. Read via DynamicResource from MainWindow.xaml.         -->
+    <SolidColorBrush x:Key="Brushes.Theme.StatusBar.Background" Color="#060606" />
+    <SolidColorBrush x:Key="Brushes.Theme.StatusBar.Foreground" Color="#A0FFFFFF" />
+
+</ResourceDictionary>

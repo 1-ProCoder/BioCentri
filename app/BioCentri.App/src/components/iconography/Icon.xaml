@@ -1,0 +1,19 @@
+<UserControl x:Class="BioCentri.App.Components.Iconography.Icon"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root">
+
+    <!-- Fill intentionally left unset (default transparent) — our icon
+         library is stroke-only at M2. A future filled-icon family lives
+         in the same Icon control with `Fill="{Binding Fill, ...}"` once
+         we add glyphs that need it. -->
+    <Path x:Name="IconPath"
+          Stretch="Uniform"
+          Stroke="{StaticResource Brushes.Text.Primary}"
+          StrokeThickness="1.6"
+          StrokeLineJoin="Round"
+          StrokeStartLineCap="Round"
+          StrokeEndLineCap="Round"
+          Data="{Binding Geometry, ElementName=Root}" />
+
+</UserControl>

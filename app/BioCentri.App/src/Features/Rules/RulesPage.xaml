@@ -1,0 +1,39 @@
+<Page x:Class="BioCentri.App.Features.Rules.RulesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:header="clr-namespace:BioCentri.App.Components.Nav"
+      xmlns:icon="clr-namespace:BioCentri.App.Components.Iconography"
+      xmlns:nav="clr-namespace:BioCentri.App.Components.Nav"
+      xmlns:feedback="clr-namespace:BioCentri.App.Components.Feedback"
+      xmlns:items="clr-namespace:BioCentri.App.Features.Rules"
+      Title="Rules"
+      Background="{StaticResource Brushes.Surface.Base}"
+      Foreground="{StaticResource Brushes.Text.Primary}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <header:PageHeader Grid.Row="0"
+                           Title="{Binding Title}"
+                           Subtitle="{Binding Subtitle}"
+                           Eyebrow="Automation" />
+
+        <Border Grid.Row="1"
+                Background="{StaticResource Brushes.Subtle.Surface}"
+                BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource Corners.Md}"
+                Padding="{StaticResource Spacing.Pad.Lg}"
+                Margin="32,0,32,32">
+            <Border.Effect>
+                <StaticResource ResourceKey="Elevation.1.Resting" />
+            </Border.Effect>
+            <feedback:EmptyState Title="No automation rules"
+                                 Subtitle="Rules schedule when protected apps require authentication. Add your first rule in Milestone 4."
+                                 IconKey="Icons.Route.Rules" />
+        </Border>
+    </Grid>
+</Page>

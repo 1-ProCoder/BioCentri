@@ -1,0 +1,21 @@
+# Build outputs
+bin/
+obj/
+
+# NuGet restore artifacts
+.nuget/
+*.nupkg
+*.snupkg
+*.lock.json.bak
+
+# Rider / VS caches
+.idea/
+.vs/
+*.user
+*.suo
+*.userprefs
+
+# MSBuild diagnostic logs
+msbuild.log
+msbuild.err
+*.binlog

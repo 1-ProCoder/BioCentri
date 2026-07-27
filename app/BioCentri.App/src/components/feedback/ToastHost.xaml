@@ -1,0 +1,26 @@
+<ItemsControl x:Class="BioCentri.App.Components.Feedback.ToastHost"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:toast="clr-namespace:BioCentri.App.Components.Feedback"
+              xmlns:vm="clr-namespace:BioCentri.App.Services"
+              VerticalAlignment="Bottom"
+              HorizontalAlignment="Right"
+              Margin="{StaticResource Spacing.Pad.Xl}"
+              IsHitTestVisible="True"
+              Focusable="False">
+
+    <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+            <StackPanel Orientation="Vertical"
+                        HorizontalAlignment="Right"
+                        SnapsToDevicePixels="True" />
+        </ItemsPanelTemplate>
+    </ItemsControl.ItemsPanel>
+
+    <ItemsControl.ItemTemplate>
+        <DataTemplate DataType="{x:Type vm:ToastViewModel}">
+            <toast:Toast />
+        </DataTemplate>
+    </ItemsControl.ItemTemplate>
+
+</ItemsControl>

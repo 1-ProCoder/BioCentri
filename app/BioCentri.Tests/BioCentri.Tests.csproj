@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <RootNamespace>BioCentri.Tests</RootNamespace>
+    <AssemblyName>BioCentri.Tests</AssemblyName>
+    <OutputType>Library</OutputType>
+    <UseWPF>false</UseWPF>
+    <UseWindowsForms>false</UseWindowsForms>
+    <IsTestProject>true</IsTestProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);CA1031;CA1805;CA1822;CS1591;CA1707</NoWarn>
+    <Version>0.5.0</Version>
+  </PropertyGroup>
+
+  <!-- xUnit + fluent assertions for headless auth-service tests.
+       References BioCentri.Core (IHelloService + enums) and
+       BioCentri.App (BiometricAuthService, IDispatcher, IToastService,
+       ShellState — all consumed via InternalsVisibleTo). -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.6.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BioCentri.Core\BioCentri.Core.csproj" />
+    <ProjectReference Include="..\BioCentri.App\BioCentri.App.csproj" />
+  </ItemGroup>
+
+</Project>

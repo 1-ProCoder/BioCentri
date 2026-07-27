@@ -1,0 +1,34 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Themes/HighContrast.xaml
+        ========================
+        Honours Windows High Contrast accessibility settings. We do NOT
+        invent our own HC palette — we route to SystemColors so the user
+        gets the colours their Windows session is configured for.
+        Activated at Milestone 7 when `SystemParameters.HighContrast` is
+        wired into App.xaml.cs.
+    -->
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/src/styles/Tokens.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <SolidColorBrush x:Key="Brushes.Theme.Window.Background"
+                     Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+    <SolidColorBrush x:Key="Brushes.Theme.Window.Foreground"
+                     Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
+    <SolidColorBrush x:Key="Brushes.Theme.Page.Background"
+                     Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+    <SolidColorBrush x:Key="Brushes.Theme.Card.Background"
+                     Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
+    <SolidColorBrush x:Key="Brushes.Theme.Card.Border"
+                     Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}" />
+    <SolidColorBrush x:Key="Brushes.Theme.Text.Primary"
+                     Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
+    <SolidColorBrush x:Key="Brushes.Theme.Text.Muted"
+                     Color="{DynamicResource {x:Static SystemColors.GrayTextColorKey}}" />
+
+</ResourceDictionary>

@@ -1,0 +1,7 @@
+=== BioCentri runtime launch probe ===
+Start: 2026-07-24T21:48:08.8214203+01:00
+Launching: C:\Users\Princ\BioCentri\app\BioCentri.App\bin\Debug\net8.0-windows10.0.19041.0\BioCentri.App.exe
+Launched PID 22472
+Probe end at 12187ms: alive=True exitedEarly=False
+Killed after probe window
+End: 2026-07-24T21:48:21.1616126+01:00

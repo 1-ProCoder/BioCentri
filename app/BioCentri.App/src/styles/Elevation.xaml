@@ -1,0 +1,50 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Elevation.xaml
+        =================
+        A 5-tier shadow ladder so cards / panels / modals share a coherent
+        hierarchy without authoring their own DropShadowEffect inline.
+        Tokens: Elevation.0 (flat) through Elevation.4 (modal).
+        The Accent halo is for hovered/selected states.
+    -->
+
+    <DropShadowEffect x:Key="Elevation.0.Flat"
+                      Color="#000000"
+                      Opacity="0.00"
+                      BlurRadius="0"
+                      ShadowDepth="0" />
+
+    <DropShadowEffect x:Key="Elevation.1.Resting"
+                      Color="#000000"
+                      Opacity="0.25"
+                      BlurRadius="20"
+                      ShadowDepth="0" />
+
+    <DropShadowEffect x:Key="Elevation.2.Hover"
+                      Color="#000000"
+                      Opacity="0.35"
+                      BlurRadius="32"
+                      ShadowDepth="2" />
+
+    <DropShadowEffect x:Key="Elevation.3.Lifted"
+                      Color="#000000"
+                      Opacity="0.40"
+                      BlurRadius="48"
+                      ShadowDepth="6" />
+
+    <DropShadowEffect x:Key="Elevation.4.Modal"
+                      Color="#000000"
+                      Opacity="0.55"
+                      BlurRadius="64"
+                      ShadowDepth="20" />
+
+    <DropShadowEffect x:Key="Elevation.Accent.Glow"
+                      Color="#52818CF8"
+                      Opacity="0.45"
+                      BlurRadius="40"
+                      ShadowDepth="0" />
+
+</ResourceDictionary>

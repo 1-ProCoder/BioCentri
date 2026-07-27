@@ -1,0 +1,169 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Brushes.xaml
+        =================
+        Visual token: every SolidColorBrush, LinearGradientBrush, and DrawingBrush
+        BioCentri uses lives here. The website's Tailwind palette maps 1:1 onto
+        these WPF resource keys (see IMPLEMENTATION_PLAN.md §4).
+
+        Naming: Brushes.<Theme>.<Sub>.
+        Examples:  Brushes.Ink.950,  Brushes.Accent.Violet,  Brushes.Text.Primary.
+
+        This file is loaded by Tokens.xaml via MergedDictionaries and must not
+        define anything that depends on another token.
+    -->
+
+    <!-- ============================================================== -->
+    <!-- Ink palette (matches website's tailwind.config.js `ink` tokens)  -->
+    <!-- ============================================================== -->
+    <SolidColorBrush x:Key="Brushes.Ink.950" Color="#060606" />
+    <SolidColorBrush x:Key="Brushes.Ink.900" Color="#0A0A0B" />
+    <SolidColorBrush x:Key="Brushes.Ink.850" Color="#0E0E12" />
+    <SolidColorBrush x:Key="Brushes.Ink.800" Color="#131318" />
+    <SolidColorBrush x:Key="Brushes.Ink.700" Color="#1A1A21" />
+    <SolidColorBrush x:Key="Brushes.Ink.600" Color="#23232C" />
+    <SolidColorBrush x:Key="Brushes.Ink.500" Color="#2F2F3A" />
+    <SolidColorBrush x:Key="Brushes.Ink.400" Color="#3D3D49" />
+
+    <!-- Most common surface aliases — readable variable names -->
+    <SolidColorBrush x:Key="Brushes.Surface.Base"    Color="#060606" /><!-- @@alias Ink.950  -->
+    <SolidColorBrush x:Key="Brushes.Surface.Card"    Color="#0E0E12" /><!-- @@alias Ink.850  -->
+    <SolidColorBrush x:Key="Brushes.Surface.Sunken"  Color="#0A0A0B" /><!-- @@alias Ink.900  -->
+    <SolidColorBrush x:Key="Brushes.Surface.Raised"  Color="#1A1A21" /><!-- @@alias Ink.700  -->
+
+    <!-- ============================================================== -->
+    <!-- Accent palette                                                    -->
+    <!-- ============================================================== -->
+    <SolidColorBrush x:Key="Brushes.Accent.Indigo"   Color="#818CF8" />
+    <SolidColorBrush x:Key="Brushes.Accent.IndigoLight" Color="#C7D2FE" />
+    <SolidColorBrush x:Key="Brushes.Accent.VioletLight" Color="#C4B5FD" />
+    <SolidColorBrush x:Key="Brushes.Accent.Emerald" Color="#34D399" />
+
+    <!-- Indigo→violet gradient (matches .text-gradient-violet) -->
+    <LinearGradientBrush x:Key="Brushes.Accent.Gradient"
+                         StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#C7D2FE" Offset="0.0" />
+        <GradientStop Color="#818CF8" Offset="0.55" />
+        <GradientStop Color="#C4B5FD" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <!-- ============================================================== -->
+    <!-- Text gradients (matches .text-gradient, .text-gradient-violet)   -->
+    <!-- ============================================================== -->
+    <LinearGradientBrush x:Key="Brushes.Text.Primary"
+                         StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFFFFF" Offset="0.0" />
+        <GradientStop Color="#A0FFFFFF" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brushes.Text.Violet"
+                         StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#C7D2FE" Offset="0.0" />
+        <GradientStop Color="#818CF8" Offset="0.55" />
+        <GradientStop Color="#C4B5FD" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <!-- ============================================================== -->
+    <!-- Text.Muted — 60% white solid. Used for secondary copy / captions  -->
+    <!-- / sub-labels / muted icon strokes. Consumers: most pages, all    -->
+    <!-- feedback + nav components, and 3 TryFindResource sites in .cs    -->
+    <!-- (SegmentedControl.xaml.cs:96, SidebarItem.xaml.cs:120, 121).     -->
+    <!-- Aligned with the transparent-white overlay convention used by    -->
+    <!-- Brushes.Glass.* / Brushes.Border.Hairline., and matches the      -->
+    <!-- theme-resolved Brushes.Theme.Text.Muted in Dark.xaml so the      -->
+    <!-- primitive and theme-resolved names read identically.             -->
+    <!-- ============================================================== -->
+    <SolidColorBrush x:Key="Brushes.Text.Muted" Color="#A0FFFFFF" />
+
+    <!-- ============================================================== -->
+    <!-- Hairline / subtle borders (used by glass, focal, divider)         -->
+    <!-- ============================================================== -->
+    <SolidColorBrush x:Key="Brushes.Border.Hairline" Color="#10FFFFFF" />
+    <SolidColorBrush x:Key="Brushes.Border.HairlineStrong" Color="#14FFFFFF" />
+    <SolidColorBrush x:Key="Brushes.Border.HairlineSoft"   Color="#0FFFFFFF" />
+    <SolidColorBrush x:Key="Brushes.Border.HairlineInner"  Color="#1AFFFFFF" />
+
+    <!-- ============================================================== -->
+    <!-- Selection highlight (matches ::selection rgba(129,140,248,.32))   -->
+    <!-- ============================================================== -->
+    <SolidColorBrush x:Key="Brushes.Selection" Color="#52818CF8" />
+
+    <!-- ============================================================== -->
+    <!-- Semantic (success / warn / danger). Used sparingly.               -->
+    <!-- ============================================================== -->
+    <SolidColorBrush x:Key="Brushes.Status.Success" Color="#34D399" />
+    <SolidColorBrush x:Key="Brushes.Status.Warn"    Color="#FBBF24" />
+    <SolidColorBrush x:Key="Brushes.Status.Danger"  Color="#F87171" />
+
+    <!-- ============================================================== -->
+    <!-- Reticle ring (matches .reticle-ring conic) — used in Milestone 3 -->
+    <!-- ============================================================== -->
+    <DrawingBrush x:Key="Brushes.Reticle.Indigo"
+                  TileMode="None"
+                  RenderOptions.CachingHint="Reuse"
+                  Viewport="0,0 1,1"
+                  ViewportUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing>
+                    <GeometryDrawing.Brush>
+                        <RadialGradientBrush Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                            <GradientStop Color="#00818CF8" Offset="0.0" />
+                            <GradientStop Color="#00818CF8" Offset="1.0" />
+                        </RadialGradientBrush>
+                    </GeometryDrawing.Brush>
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0 1,1" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <!-- ============================================================== -->
+    <!-- Atmosphere textures                                                -->
+    <!--                                                                  -->
+    <!-- Brushes.Noise is intentionally OMITTED at Milestone 1 because   -->
+    <!-- the binary texture asset lands in M2 with splash artwork. M1     -->
+    <!-- surfaces are flat-black-on-dark to keep the run clean. The       -->
+    <!-- plan calls for re-introducing this brush in M2 once              -->
+    <!-- src/assets/textures/noise.png is committed.                      -->
+    <!-- ============================================================== -->
+
+    <!-- ============================================================== -->
+    <!-- Border-trace animated gradient (matches .border-trace)           -->
+    <!-- ============================================================== -->
+    <LinearGradientBrush x:Key="Brushes.BorderTrace"
+                         StartPoint="0,0" EndPoint="1,0"
+                         SpreadMethod="Repeat"
+                         MappingMode="RelativeToBoundingBox">
+        <GradientStop Color="#00818CF8" Offset="0.0" />
+        <GradientStop Color="#99818CF8" Offset="0.18" />
+        <GradientStop Color="#9934D399" Offset="0.36" />
+        <GradientStop Color="#00818CF8" Offset="0.54" />
+        <GradientStop Color="#99818CF8" Offset="0.72" />
+        <GradientStop Color="#9934D399" Offset="0.90" />
+        <GradientStop Color="#00818CF8" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <!-- ============================================================== -->
+    <!-- Glass surface — used by GlassSurface component (M2+)             -->
+    <!-- ============================================================== -->
+    <SolidColorBrush x:Key="Brushes.Glass.Tint"
+                     Color="#08FFFFFF" />
+    <SolidColorBrush x:Key="Brushes.GlassStrong.Tint"
+                     Color="#09FFFFFF" />
+
+    <!-- ============================================================== -->
+    <!-- Focal card gradient (matches .focal mix in index.css)             -->
+    <!-- ============================================================== -->
+    <LinearGradientBrush x:Key="Brushes.Focal.Background"
+                         StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#0E0E12" Offset="0" />
+        <GradientStop Color="#0A0A0B" Offset="1" />
+    </LinearGradientBrush>
+
+</ResourceDictionary>

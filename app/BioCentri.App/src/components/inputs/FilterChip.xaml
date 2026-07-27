@@ -1,0 +1,43 @@
+<Border x:Class="BioCentri.App.Components.Inputs.FilterChip"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        CornerRadius="{StaticResource Corners.Pill}"
+        Padding="14,6"
+        Cursor="Hand"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True">
+
+    <Border.Style>
+        <Style TargetType="Border">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{StaticResource Brushes.Border.Hairline}" />
+            <Setter Property="BorderThickness" Value="{StaticResource Border.Thin}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=Border}}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource Brushes.Accent.Gradient}" />
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Border.Style>
+
+    <TextBlock x:Name="LabelText"
+               Text="Chip"
+               FontFamily="{StaticResource Typography.Sans}"
+               FontSize="{StaticResource Typography.Size.Small}"
+               FontWeight="{StaticResource Typography.Weight.Medium}"
+               Foreground="{StaticResource Brushes.Text.Muted}"
+               VerticalAlignment="Center">
+        <TextBlock.Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource Brushes.Text.Muted}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=Border}}" Value="True">
+                        <Setter Property="Foreground" Value="{StaticResource Brushes.Text.Primary}" />
+                        <Setter Property="FontWeight" Value="{StaticResource Typography.Weight.SemiBold}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </TextBlock.Style>
+    </TextBlock>
+</Border>

@@ -1,0 +1,152 @@
+<UserControl x:Class="BioCentri.App.Components.Auth.AuthenticationOverlay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ico="clr-namespace:BioCentri.App.Components.Iconography"
+             mc:Ignorable="d"
+             d:DesignWidth="1280"
+             d:DesignHeight="820">
+
+    <!--
+        AuthenticationOverlay.xaml
+        ===========================
+        Full-shell modal that appears while a Windows Hello biometric
+        challenge is in flight. Stacks as the topmost Grid child of
+        MainWindow so it covers sidebar, top-bar, status bar, and any
+        DialogHost overlays.
+
+        Visual discipline:
+          * Fade-in :  0→1 in 300ms (Motion.Duration.Normal) with the
+                       out-expo cubic-bezier that mirrors
+                       website/src/motion.js.
+          * Fade-out:  1→0 in 220ms (Motion.Duration.Snappy), same curve.
+          * Triggered by a DataTrigger on IsVisible so the XAML drives
+            its own animation; the code-behind stays empty per the
+            MVVM rule.
+    -->
+    <UserControl.Resources>
+
+        <!--
+            Fade-in : 0→1 over Motion.Duration.Normal (300ms)
+            Fade-out: 1→0 over Motion.Duration.Snappy (220ms)
+
+            Easings live in /styles/Motion.cs at M2 (per Motion.xaml +
+            Transitions.xaml comments — this baml resolver can't
+            register SplineEase in resource-dictionary contexts). For
+            Milestone 4 the eases are dropped; the linear fade still
+            reads premium at these durations.
+        -->
+        <Storyboard x:Key="Animations.Auth.FadeIn">
+            <DoubleAnimation Storyboard.TargetName="AuthRoot"
+                             Storyboard.TargetProperty="Opacity"
+                             To="1"
+                             Duration="0:0:0.300"/>
+        </Storyboard>
+
+        <Storyboard x:Key="Animations.Auth.FadeOut">
+            <DoubleAnimation Storyboard.TargetName="AuthRoot"
+                             Storyboard.TargetProperty="Opacity"
+                             To="0"
+                             Duration="0:0:0.220"/>
+        </Storyboard>
+
+        <Style x:Key="AuthRootStyle" TargetType="Grid">
+            <Setter Property="Opacity" Value="0"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsVisible}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource Animations.Auth.FadeIn}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource Animations.Auth.FadeOut}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="AuthCardStyle" TargetType="Border">
+            <Setter Property="Background"    Value="{DynamicResource Brushes.Surface.Card}"/>
+            <Setter Property="BorderBrush"   Value="{DynamicResource Brushes.Border.HairlineStrong}"/>
+            <Setter Property="BorderThickness" Value="{StaticResource Border.Thin}"/>
+            <Setter Property="CornerRadius"  Value="{StaticResource Corners.Lg}"/>
+            <Setter Property="Padding"       Value="{StaticResource Spacing.Pad.Xl}"/>
+            <Setter Property="MinWidth"      Value="360"/>
+            <Setter Property="MaxWidth"      Value="420"/>
+            <Setter Property="Effect"        Value="{StaticResource Shadows.Card.Focal}"/>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid x:Name="AuthRoot"
+          Style="{StaticResource AuthRootStyle}"
+          Background="{StaticResource Brushes.Scrim}"
+          Visibility="{Binding Visibility}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Row="1"
+                Grid.Column="1"
+                Style="{StaticResource AuthCardStyle}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+
+            <StackPanel HorizontalAlignment="Center">
+                <Grid Width="56" Height="56"
+                      HorizontalAlignment="Center"
+                      Margin="0,0,0,16">
+                    <Ellipse Stroke="{DynamicResource Brushes.Accent.Indigo}"
+                             StrokeThickness="2"
+                             Opacity="0.4"/>
+                    <!--
+                        Icons.Status.Protected is the existing key in
+                        Icons.xaml that semantically matches the challenge
+                        surface (a locked shield glyph); the previous
+                        dashboard glyph was a visual mistake.
+                    -->
+                    <ico:Icon IconSize="32"
+                              GeometryKey="Icons.Status.Protected"
+                              Stroke="{DynamicResource Brushes.Accent.IndigoLight}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
+                </Grid>
+
+                <TextBlock Text="Verifying identity…"
+                           FontFamily="{StaticResource Typography.Display}"
+                           FontSize="{StaticResource Typography.Size.H3}"
+                           FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                           Foreground="{StaticResource Brushes.Text.Primary}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,8"/>
+
+                <TextBlock x:Name="AppNameText"
+                           Text="{Binding AppName}"
+                           FontFamily="{StaticResource Typography.Sans}"
+                           FontSize="{StaticResource Typography.Size.Caption}"
+                           Foreground="{StaticResource Brushes.Text.Muted}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,24"/>
+
+                <Button Content="Cancel"
+                        Command="{Binding CancelCommand}"
+                        HorizontalAlignment="Center"
+                        MinWidth="120"
+                        Padding="16,8"
+                        Background="Transparent"
+                        BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                        Foreground="{StaticResource Brushes.Text.Primary}"
+                        FontFamily="{StaticResource Typography.Sans}"
+                        FontSize="{StaticResource Typography.Size.Body}"
+                        Cursor="Hand"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

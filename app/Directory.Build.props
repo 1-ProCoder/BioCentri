@@ -1,0 +1,40 @@
+<Project>
+
+  <!-- Common properties for every project under BioCentri. -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CA1822;CA1716</NoWarn>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+
+    <Company>BioCentri</Company>
+    <Authors>BioCentri</Authors>
+    <Product>BioCentri</Product>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Copyright>Copyright (c) BioCentri</Copyright>
+    <RepositoryUrl>https://github.com/biocentri/biocentri</RepositoryUrl>
+
+    <!--
+        Privacy/network guard lives in DOCS, not in an analyzer:
+        docs/DECISIONS.md Decision 8 + a CI grep for System.Net.*
+        references in app/src is the actual enforcement.
+        Suppressing CA1054 here would NOT stop HttpClient usage; it
+        would only silence Uri-as-string warnings. Keep this honest.
+    -->
+
+    <!-- WPF / XAML -->
+    <UseWPF Condition="'$(UseWPF)' == ''">false</UseWPF>
+  </PropertyGroup>
+
+  <!-- Common package versions, resolved by every project that opts in. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+</Project>

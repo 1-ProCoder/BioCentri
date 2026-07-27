@@ -1,0 +1,44 @@
+<UserControl x:Class="BioCentri.App.Components.Motion.ReticleRing"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root">
+    <Grid Width="220" Height="220"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center">
+        <Grid.RenderTransform>
+            <RotateTransform x:Name="RingRotate" Angle="0" CenterX="110" CenterY="110" />
+        </Grid.RenderTransform>
+
+        <!-- Outer ring stroke -->
+        <Ellipse Stroke="{StaticResource Brushes.Accent.Indigo}"
+                 StrokeThickness="{StaticResource Stroke.Thin}"
+                 Opacity="0.55"
+                 Width="200" Height="200" />
+
+        <!-- Inner ring stroke -->
+        <Ellipse Stroke="{StaticResource Brushes.Accent.IndigoLight}"
+                 StrokeThickness="{StaticResource Stroke.Thin}"
+                 Opacity="0.40"
+                 Width="140" Height="140" />
+
+        <!-- Crosshair lines -->
+        <Line X1="110" Y1="0"   X2="110" Y2="40"
+              Stroke="{StaticResource Brushes.Accent.IndigoLight}"
+              StrokeThickness="{StaticResource Stroke.Thin}" />
+        <Line X1="110" Y1="180" X2="110" Y2="220"
+              Stroke="{StaticResource Brushes.Accent.IndigoLight}"
+              StrokeThickness="{StaticResource Stroke.Thin}" />
+        <Line X1="0"   Y1="110" X2="40"  Y2="110"
+              Stroke="{StaticResource Brushes.Accent.IndigoLight}"
+              StrokeThickness="{StaticResource Stroke.Thin}" />
+        <Line X1="180" Y1="110" X2="220" Y2="110"
+              Stroke="{StaticResource Brushes.Accent.IndigoLight}"
+              StrokeThickness="{StaticResource Stroke.Thin}" />
+
+        <!-- Centre dot -->
+        <Ellipse Fill="{StaticResource Brushes.Accent.Indigo}"
+                 Width="6" Height="6"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center" />
+    </Grid>
+</UserControl>

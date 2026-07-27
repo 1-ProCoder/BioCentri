@@ -1,0 +1,41 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--        Tokens.xaml
+        =================
+        Root for the primitive dictionaries. Indirectly loaded by the
+        application through the *active* theme dictionary — App.xaml
+        MergedDictionaries contains exactly one theme (currently
+        Themes/Dark.xaml), and each theme file itself MergedDictionaries
+        this Tokens.xaml. So the live load chain is:
+
+            App.xaml  →  Themes/Dark.xaml  →  Tokens.xaml  →  primitives
+
+        Theme files are siblings, not children, of Tokens. Themes may
+        add their own brush keys (Brushes.Theme.*) without colliding
+        with the primitives merged from this file.
+
+    -->
+
+    <ResourceDictionary.MergedDictionaries>
+
+        <!-- 1. Brushes first. Typography + Spacing + Shadows consume none,
+                but keeping them before component styles is the convention. -->
+        <ResourceDictionary Source="pack://application:,,,/src/styles/Brushes.xaml" />
+
+        <!-- 2. Typography. Independent. -->
+        <ResourceDictionary Source="pack://application:,,,/src/styles/Typography.xaml" />
+
+        <!-- 3. Spacing. Independent. -->
+        <ResourceDictionary Source="pack://application:,,,/src/styles/Spacing.xaml" />
+
+        <!-- 4. Shadows. Consumes Brushes.Accent.Indigo. Reorder-safe. -->
+        <ResourceDictionary Source="pack://application:,,,/src/styles/Shadows.xaml" />
+
+        <!-- 5. Motion. Independent. -->
+        <ResourceDictionary Source="pack://application:,,,/src/styles/Motion.xaml" />
+
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

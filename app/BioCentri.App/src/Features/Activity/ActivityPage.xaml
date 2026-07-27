@@ -1,0 +1,94 @@
+<Page x:Class="BioCentri.App.Features.Activity.ActivityPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:header="clr-namespace:BioCentri.App.Components.Nav"
+      xmlns:icon="clr-namespace:BioCentri.App.Components.Iconography"
+      xmlns:nav="clr-namespace:BioCentri.App.Components.Nav"
+      xmlns:items="clr-namespace:BioCentri.App.Features.Activity"
+      xmlns:feedback="clr-namespace:BioCentri.App.Components.Feedback"
+      Title="Activity"
+      Background="{StaticResource Brushes.Surface.Base}"
+      Foreground="{StaticResource Brushes.Text.Primary}">
+
+    <Page.Resources>
+        <CollectionViewSource x:Key="GroupedEvents"
+                              Source="{Binding Events}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="Group" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <header:PageHeader Grid.Row="0"
+                           Title="{Binding Title}"
+                           Subtitle="{Binding Subtitle}"
+                           Eyebrow="Audit Log" />
+
+        <ItemsControl Grid.Row="1"
+                      ItemsSource="{Binding Stats}"
+                      Margin="32,8,32,16">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="4" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type items:ActivityStatRow}">
+                    <header:StatisticCard Label="{Binding Label}"
+                                          Value="{Binding Value}"
+                                          Delta="{Binding Caption}"
+                                          Margin="{StaticResource Spacing.Pad.Sm}" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <ScrollViewer Grid.Row="2"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Padding="32,0,32,32">
+
+            <ItemsControl ItemsSource="{Binding Source={StaticResource GroupedEvents}}">
+                <ItemsControl.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="GroupItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="GroupItem">
+                                            <StackPanel Margin="0,16,0,0">
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontFamily="{StaticResource Typography.Sans}"
+                                                           FontSize="{StaticResource Typography.Size.Caption}"
+                                                           FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                                           Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                                                           Margin="0,0,0,12" />
+                                                <ItemsPresenter />
+                                            </StackPanel>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </ItemsControl.GroupStyle>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type items:ActivityTimelineRow}">
+                        <feedback:TimelineEntry
+                            Title="{Binding Title}"
+                            Detail="{Binding Detail}"
+                            Timestamp="{Binding Timestamp}"
+                            Severity="{Binding Severity}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</Page>

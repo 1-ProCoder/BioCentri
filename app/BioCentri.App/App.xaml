@@ -1,0 +1,70 @@
+<Application x:Class="BioCentri.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:items="clr-namespace:BioCentri.App.Features.ProtectedApps"
+             xmlns:conv="clr-namespace:BioCentri.App.Styles"
+             ShutdownMode="OnMainWindowClose">
+
+    <!--
+        Merged dictionary discipline
+        =============================
+        Only ONE theme dictionary is merged at runtime:
+
+          * Themes/Dark.xaml       in v1 (the only working theme)
+
+        Themes/Dark.xaml itself merges Tokens.xaml, which transitively
+        loads Brushes / Typography / Spacing / Shadows / Motion. So
+        App.xaml stays clean and the theme can be swapped wholesale
+        (M7 wires Themes/HighContrast.xaml in when the user enables
+        system High Contrast).
+
+        Themes/HighContrast.xaml exists at M1 as a deferred file — it
+        is intentionally NOT merged here. The M7 hook swaps Dark for
+        HighContrast at App.OnStartup when SystemParameters.HighContrast
+        is true.
+
+        Adding a NEW primitive dictionary? Add it inside Tokens.xaml's
+        MergedDictionaries block. Never add it directly to App.xaml,
+        or the theme layering breaks.
+    -->
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+
+                <!-- Active theme (only one per session; HighContrast swaps in at M7). -->
+                <ResourceDictionary Source="pack://application:,,,/src/styles/Themes/Dark.xaml" />
+
+                <!-- Dark.xaml internally merges Tokens.xaml which loads the
+                     primitives. The dictionaries below add M2 primitives
+                     that the primitives dictionary did not need. Tokens.xaml
+                     is reached indirectly via Dark.xaml so it stays out of
+                     this list. -->
+                <ResourceDictionary Source="pack://application:,,,/src/styles/Corners.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/src/styles/Elevation.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/src/styles/FieldStyles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/src/styles/Icons.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/src/styles/Transitions.xaml" />
+
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Milestone 4: value converters used by ProtectedAppsPage
+                 and AppPicker XAML bindings. Resource keys are short
+                 (BoolToVisibility, CountToVisibility, etc.) so the
+                 StaticResource extension reads naturally everywhere. -->
+            <conv:BoolToVisibilityConverter    x:Key="BoolToVisibility" />
+            <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
+            <conv:StringToVisibilityConverter  x:Key="StringToVisibility" />
+            <conv:CountToVisibilityConverter   x:Key="CountToVisibility" />
+        </ResourceDictionary>
+
+        <!-- Milestone 4: DataTemplate-by-DataType wiring so the shell
+             DialogHost automatically renders AppPickerView when
+             IDialogService.ShowAsync passes an AppPickerViewModel. The
+             VM ↔ View binding is structural; one entry per dialog VM. -->
+        <DataTemplate DataType="{x:Type items:AppPickerViewModel}">
+            <items:AppPickerView />
+        </DataTemplate>
+    </Application.Resources>
+
+</Application>

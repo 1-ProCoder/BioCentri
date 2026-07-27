@@ -1,0 +1,52 @@
+<Border x:Class="BioCentri.App.Components.Nav.SidebarItem"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:icon="clr-namespace:BioCentri.App.Components.Iconography"
+        x:Name="Root"
+        Background="Transparent"
+        BorderBrush="Transparent"
+        BorderThickness="0,0,0,1"
+        CornerRadius="{StaticResource Corners.Pill}"
+        Padding="0,4,0,4"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True"
+        Cursor="Hand"
+        MouseLeftButtonUp="OnSelected"
+        AutomationProperties.Name="{Binding Title}">
+
+    <Grid x:Name="Container" VerticalAlignment="Center">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3" />
+            <ColumnDefinition Width="32" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Rectangle x:Name="SelectionStripe"
+                   Grid.Column="0"
+                   Width="3"
+                   Height="20"
+                   Margin="0,0,4,0"
+                   Fill="{StaticResource Brushes.Accent.Indigo}"
+                   Opacity="0"
+                   VerticalAlignment="Center" />
+
+        <icon:Icon x:Name="LeadingIcon"
+                   Grid.Column="1"
+                   IconSize="20"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,12,0"
+                   GeometryKey="Icons.Route.Dashboard"
+                   Stroke="{StaticResource Brushes.Text.Muted}" />
+
+        <TextBlock x:Name="TitleText"
+                   Grid.Column="2"
+                   Text="Title"
+                   FontFamily="{StaticResource Typography.Sans}"
+                   FontSize="{StaticResource Typography.Size.Body}"
+                   FontWeight="{StaticResource Typography.Weight.Medium}"
+                   Foreground="{StaticResource Brushes.Text.Muted}"
+                   VerticalAlignment="Center" />
+    </Grid>
+
+</Border>

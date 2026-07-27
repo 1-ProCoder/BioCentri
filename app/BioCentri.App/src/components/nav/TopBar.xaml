@@ -1,0 +1,99 @@
+<Grid x:Class="BioCentri.App.Components.Nav.TopBar"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:icon="clr-namespace:BioCentri.App.Components.Iconography"
+      xmlns:nav="clr-namespace:BioCentri.App.Components.Nav"
+      xmlns:inputs="clr-namespace:BioCentri.App.Components.Inputs"
+      Background="{StaticResource Brushes.Surface.Base}"
+      SnapsToDevicePixels="True"
+      UseLayoutRounding="True">
+
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+    </Grid.ColumnDefinitions>
+
+    <Border BorderBrush="{StaticResource Brushes.Border.HairlineSoft}"
+            BorderThickness="0,0,0,1" />
+
+    <!-- Left: route label (eyebrow + title) -->
+    <StackPanel Grid.Column="0"
+                Orientation="Vertical"
+                VerticalAlignment="Center"
+                Margin="32,0,0,0">
+        <TextBlock x:Name="EyebrowText"
+                   Text="BioCentri"
+                   FontFamily="{StaticResource Typography.Sans}"
+                   FontSize="{StaticResource Typography.Size.Caption}"
+                   FontWeight="{StaticResource Typography.Weight.Medium}"
+                   Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                   Margin="0,0,0,2" />
+        <TextBlock x:Name="TitleText"
+                   Text="Dashboard"
+                   FontFamily="{StaticResource Typography.Display}"
+                   FontSize="{StaticResource Typography.Size.H3}"
+                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                   Foreground="{StaticResource Brushes.Text.Primary}" />
+    </StackPanel>
+
+    <!-- Right: search affordance + status pill + more -->
+    <StackPanel Grid.Column="1"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,0,24,0">
+
+        <!-- Search affordance -->
+        <Border Background="{StaticResource Brushes.Ink.850}"
+                BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource Corners.Pill}"
+                Padding="12,6"
+                Margin="0,0,16,0"
+                Width="240">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <icon:Icon Grid.Column="0"
+                           IconSize="14"
+                           VerticalAlignment="Center"
+                           Margin="0,0,8,0"
+                           GeometryKey="Icons.Action.Search"
+                           Stroke="{StaticResource Brushes.Text.Muted}" />
+                <TextBlock Grid.Column="1"
+                           Text="Search"
+                           FontFamily="{StaticResource Typography.Sans}"
+                           FontSize="{StaticResource Typography.Size.Small}"
+                           Foreground="{StaticResource Brushes.Text.Muted}"
+                           VerticalAlignment="Center"
+                           IsHitTestVisible="False" />
+                <Border Grid.Column="2"
+                        Background="{StaticResource Brushes.Ink.700}"
+                        CornerRadius="3"
+                        Padding="4,2"
+                        VerticalAlignment="Center"
+                        Margin="8,0,0,0">
+                    <TextBlock Text="⌘ K"
+                               FontFamily="{StaticResource Typography.Monospace}"
+                               FontSize="{StaticResource Typography.Size.Caption}"
+                               Foreground="{StaticResource Brushes.Text.Muted}" />
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Status pill -->
+        <nav:StatusPill x:Name="StatusDisplay"
+                        Label="BioCentri Online"
+                        Status="Active"
+                        Margin="0,0,16,0" />
+
+        <!-- More menu -->
+        <icon:Icon IconSize="18"
+                   GeometryKey="Icons.Action.More"
+                   Stroke="{StaticResource Brushes.Text.Muted}"
+                   VerticalAlignment="Center" />
+    </StackPanel>
+</Grid>

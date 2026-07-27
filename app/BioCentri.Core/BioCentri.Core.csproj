@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <RootNamespace>BioCentri.Core</RootNamespace>
+    <AssemblyName>BioCentri.Core</AssemblyName>
+    <OutputType>Library</OutputType>
+    <UseWPF>false</UseWPF>
+    <UseWindowsForms>false</UseWindowsForms>
+    <NoWarn>$(NoWarn);CA1031;CA1805</NoWarn>
+    <Version>0.5.0</Version>
+    <FileVersion>0.1.0.0</FileVersion>
+    <InformationalVersion>0.5.0+milestone.5</InformationalVersion>
+  </PropertyGroup>
+
+  <!-- WinRT projection for Windows.Security.Credentials.UI.UserConsentVerifier
+       is available via the TargetFramework (net8.0-windows10.0.19041.0) itself;
+       no separate NuGet package is needed in .NET 8+. -->
+
+</Project>

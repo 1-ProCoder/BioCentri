@@ -1,0 +1,9 @@
+<UserControl x:Class="BioCentri.App.Components.Motion.HologramFloat"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root">
+    <Grid>
+        <ContentPresenter x:Name="Body"
+                          Content="{Binding Content, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+    </Grid>
+</UserControl>

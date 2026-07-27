@@ -1,0 +1,49 @@
+<StackPanel x:Class="BioCentri.App.Components.Nav.PageHeader"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            Orientation="Vertical"
+            Margin="0">
+
+    <!-- WPF does not have a LetterSpacing property on TextBlock. The
+         website's `tracking-tight` map onto WPF via the Typography
+         attached-property in System.Windows.Documents (OpenType feature
+         tracking) at M5 — for M2 we render un-spaced and lean on the
+         smaller caption size + weight for the eyebrow's contract. -->
+    <TextBlock x:Name="EyebrowText"
+               Text=""
+               FontFamily="{StaticResource Typography.Sans}"
+               FontSize="{StaticResource Typography.Size.Caption}"
+               FontWeight="{StaticResource Typography.Weight.Medium}"
+               Foreground="{StaticResource Brushes.Accent.Indigo}"
+               Margin="{StaticResource Spacing.Pad.Md}" />
+
+    <DockPanel LastChildFill="True">
+
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center"
+                    DockPanel.Dock="Left">
+
+            <TextBlock x:Name="TitleText"
+                       Text="Title"
+                       FontFamily="{StaticResource Typography.Display}"
+                       FontSize="{StaticResource Typography.Size.H1}"
+                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                       Foreground="{StaticResource Brushes.Text.Primary}"
+                       Margin="{StaticResource Spacing.Pad.Md}" />
+
+            <TextBlock x:Name="SubtitleText"
+                       Text="Subtitle"
+                       FontFamily="{StaticResource Typography.Sans}"
+                       FontSize="{StaticResource Typography.Size.Large}"
+                       Foreground="{StaticResource Brushes.Text.Muted}"
+                       TextWrapping="Wrap"
+                       MaxWidth="720"
+                       Margin="{StaticResource Spacing.Pad.Md}" />
+        </StackPanel>
+
+        <ContentPresenter x:Name="TrailingActionsHost"
+                          DockPanel.Dock="Right"
+                          VerticalAlignment="Top"
+                          HorizontalAlignment="Right" />
+    </DockPanel>
+
+</StackPanel>

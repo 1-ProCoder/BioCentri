@@ -1,0 +1,247 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <RootNamespace>BioCentri.App</RootNamespace>
+    <!-- Emitted assembly name follows the project name so XAML
+         clr-namespace aliases (`assembly=BioCentri.App`) resolve
+         without per-file edits. The shipped binary is `BioCentri.App.exe`. -->
+    <AssemblyName>BioCentri.App</AssemblyName>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>false</UseWindowsForms>
+    <EnableDefaultApplicationDefinition>true</EnableDefaultApplicationDefinition>
+    <!-- The WPF SDK's recursive '**\*.xaml' Page glob is suppressed.
+         Explicit Page entries below are the only source. This avoids
+         NETSDK1022 duplicate-items and lets us keep a definitive list
+         of XAML files that compile into the assembly (subset decisions
+         documented in docs/DECISIONS.md). -->
+    <EnableDefaultPageItems>false</EnableDefaultPageItems>
+    <Version>0.5.0</Version>
+    <FileVersion>0.1.0.0</FileVersion>
+    <InformationalVersion>0.5.0+milestone.5</InformationalVersion>
+  </PropertyGroup>
+
+  <!--
+    M1 packages are deliberately dep-light because the offline NuGet cache
+    on the build machine does not carry Wpf.Ui 3.0.5 or
+    Microsoft.Extensions.DependencyInjection 8.x. The plan's locked package
+    list (Wpf.Ui + M.E.DI + CommunityToolkit.Mvvm) is restored at Milestone 2+
+    — see docs/DECISIONS.md Decision 9.
+  -->
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
+    <!-- Milestone 6: tray icon. The modern community fork of
+         Hardcodet.NotifyIcon.Wpf (H.NotifyIcon.Wpf) targets net8.0-windows. -->
+    <!-- Milestone 6: WMI process monitoring (System.Management for
+         ManagementEventWatcher / Win32_ProcessStartTrace). -->
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+
+  <!-- Milestone 5: reference BioCentri.Core so App can inject
+       IHelloService (the pure WinRT adapter) into BiometricAuthService. -->
+  <ItemGroup>
+    <ProjectReference Include="..\BioCentri.Core\BioCentri.Core.csproj" />
+  </ItemGroup>
+
+  <!-- Explicit Page includes. Listing the resource dictionaries and
+       the shell Window explicitly ensures their .g.cs is generated,
+       paired with EnableDefaultPageItems=false above. -->
+  <ItemGroup>
+    <Page Include="src/windows/MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/styles/Tokens.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/styles/Brushes.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/styles/Typography.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/styles/Spacing.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/styles/Shadows.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/styles/Motion.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/styles/Themes/Dark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/styles/Themes/HighContrast.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/styles/Corners.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/styles/Elevation.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/styles/FieldStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/styles/Icons.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/styles/Transitions.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/iconography/Icon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/surface/FocalCard.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/surface/BentoStat.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/feedback/EmptyState.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/feedback/LoadingState.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/feedback/Toast.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/feedback/ToastHost.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/feedback/DialogHost.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/auth/AuthenticationOverlay.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/nav/Sidebar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/nav/SidebarItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/nav/TopBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/nav/PageHeader.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/nav/StatusPill.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/nav/SettingsRow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/nav/ListTile.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/nav/StatisticCard.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/inputs/ToggleSwitch.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/inputs/SegmentedControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/inputs/FilterChip.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/feedback/TimelineEntry.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/motion/HologramFloat.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/motion/ReticleRing.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/components/motion/BorderTrace.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/Features/Dashboard/DashboardPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/Features/ProtectedApps/ProtectedAppsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/Features/ProtectedApps/AppPickerView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/Features/Rules/RulesPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/features/activity/ActivityPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/Features/Settings/SettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/features/about/AboutPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src/Features/Diagnostics/DiagnosticsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <!-- Explicit manifest include so the SDK ships app.manifest with
+       longPathAware enabled. See Decision 9 followups. -->
+  <ItemGroup>
+    <Manifest Include="app.manifest" />
+  </ItemGroup>
+
+  <!-- Theme / motion dictionaries are loaded explicitly via App.xaml
+       MergedDictionaries so authoring of the load order stays obvious. -->
+
+</Project>

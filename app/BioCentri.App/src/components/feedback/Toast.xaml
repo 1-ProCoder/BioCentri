@@ -1,0 +1,66 @@
+<Border x:Class="BioCentri.App.Components.Feedback.Toast"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:icon="clr-namespace:BioCentri.App.Components.Iconography"
+        Background="{StaticResource Brushes.Ink.700}"
+        BorderBrush="{StaticResource Brushes.Border.Hairline}"
+        BorderThickness="1"
+        CornerRadius="{StaticResource Corners.Md}"
+        Padding="{StaticResource Spacing.Pad.Md}"
+        MinWidth="320"
+        MaxWidth="480"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True"
+        Effect="{StaticResource Elevation.3.Lifted}">
+
+    <DockPanel LastChildFill="True">
+        <Border x:Name="SeverityStripe"
+                DockPanel.Dock="Left"
+                Width="3"
+                Margin="0,0,12,0"
+                CornerRadius="{StaticResource Corners.Sm}"
+                VerticalAlignment="Stretch"
+                Background="{StaticResource Brushes.Status.Success}" />
+
+        <icon:Icon x:Name="LeadingIcon"
+                   DockPanel.Dock="Left"
+                   IconSize="18"
+                   VerticalAlignment="Top"
+                   Margin="0,2,12,0"
+                   GeometryKey="Icons.Status.Info"
+                   Stroke="{StaticResource Brushes.Text.Primary}" />
+
+        <Button x:Name="CloseButton"
+                DockPanel.Dock="Right"
+                VerticalAlignment="Top"
+                Margin="{StaticResource Spacing.Pad.Md}"
+                Padding="{StaticResource Spacing.Pad.Xs}"
+                Background="Transparent"
+                BorderBrush="Transparent"
+                Click="OnCloseClicked"
+                ToolTip="Dismiss"
+                AutomationProperties.Name="Dismiss notification">
+            <icon:Icon IconSize="14" GeometryKey="Icons.Action.Close"
+                       Stroke="{StaticResource Brushes.Text.Muted}" />
+        </Button>
+
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock x:Name="TitleText"
+                       Text="Title"
+                       FontFamily="{StaticResource Typography.Sans}"
+                       FontSize="{StaticResource Typography.Size.Body}"
+                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                       Foreground="{StaticResource Brushes.Text.Primary}"
+                       TextTrimming="CharacterEllipsis" />
+            <TextBlock x:Name="DescriptionText"
+                       Text=""
+                       FontFamily="{StaticResource Typography.Sans}"
+                       FontSize="{StaticResource Typography.Size.Small}"
+                       Foreground="{StaticResource Brushes.Text.Muted}"
+                       TextWrapping="Wrap"
+                       Margin="0,4,0,0"
+                       Visibility="Collapsed" />
+        </StackPanel>
+    </DockPanel>
+
+</Border>

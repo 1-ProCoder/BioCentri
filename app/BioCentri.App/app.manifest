@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Minimal M1 manifest. The WPF/.NET 8 SDK produces a default manifest with
+    PerMonitorV2 DPI awareness already, so this file only adds the bit the
+    SDK default lacks: longPathAware. TrustInfo / assemblyIdentity / asInvoker
+    are inherited from the SDK default.
+-->
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+  <application xmlns="urn:schemas-microsoft-com:asm.v3">
+    <windowsSettings>
+      <longPathAware xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">true</longPathAware>
+    </windowsSettings>
+  </application>
+</assembly>

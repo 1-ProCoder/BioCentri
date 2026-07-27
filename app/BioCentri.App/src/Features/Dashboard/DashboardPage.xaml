@@ -1,0 +1,143 @@
+<Page x:Class="BioCentri.App.Features.Dashboard.DashboardPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:header="clr-namespace:BioCentri.App.Components.Nav"
+      xmlns:icon="clr-namespace:BioCentri.App.Components.Iconography"
+      xmlns:motion="clr-namespace:BioCentri.App.Components.Motion"
+      xmlns:surface="clr-namespace:BioCentri.App.Components.Surface"
+      xmlns:feedback="clr-namespace:BioCentri.App.Components.Feedback"
+      Title="Dashboard"
+      Background="{StaticResource Brushes.Surface.Base}"
+      Foreground="{StaticResource Brushes.Text.Primary}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  Padding="32,32,32,64">
+
+        <StackPanel>
+            <header:PageHeader Title="{Binding Title}"
+                               Subtitle="{Binding Subtitle}"
+                               Eyebrow="BioCentri" />
+
+            <!-- Hero: greeting + status + HologramFloat-wrapped logo with ReticleRing behind -->
+            <surface:FocalCard Margin="{StaticResource Spacing.Pad.Md}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="{Binding GreetingLine}"
+                                   FontFamily="{StaticResource Typography.Display}"
+                                   FontSize="{StaticResource Typography.Size.Display}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                   Foreground="{StaticResource Brushes.Text.Primary}" />
+                        <TextBlock Text="{Binding StatusLine}"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Large}"
+                                   Foreground="{StaticResource Brushes.Text.Muted}"
+                                   Margin="0,8,0,0"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <!-- Logo seat: ReticleRing ornament behind, HologramFloat wraps the logo -->
+                    <Grid Grid.Column="1" Width="220" Height="220"
+                          HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <motion:ReticleRing HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                        <motion:HologramFloat HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Width="100" Height="100">
+                            <Border Width="100" Height="100"
+                                    CornerRadius="50"
+                                    Background="{StaticResource Brushes.Accent.Gradient}"
+                                    Effect="{StaticResource Elevation.Accent.Glow}">
+                                <icon:Icon IconSize="44"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           GeometryKey="Icons.Shell.Logo"
+                                           Stroke="White"
+                                           StrokeThickness="2.2" />
+                            </Border>
+                        </motion:HologramFloat>
+                    </Grid>
+                </Grid>
+            </surface:FocalCard>
+
+            <!-- BentoStats grid: 3 cols × 2 rows, asymmetric spans per M3 design language -->
+            <TextBlock Text="At a glance"
+                       FontFamily="{StaticResource Typography.Sans}"
+                       FontSize="{StaticResource Typography.Size.Caption}"
+                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                       Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                       Margin="12,32,12,8" />
+
+            <Grid Margin="0,0,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Row 0: WIDE stat (spans 2 cols) + SMALL stat (col 2) -->
+                <surface:BentoStat Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                   Label="Protected apps"
+                                   Value="{Binding Stats[0].Value}"
+                                   Caption="{Binding Stats[0].Caption}"
+                                   Margin="{StaticResource Spacing.Pad.Sm}" />
+
+                <surface:BentoStat Grid.Row="0" Grid.Column="2"
+                                   Label="Active rules"
+                                   Value="{Binding Stats[2].Value}"
+                                   Caption="{Binding Stats[2].Caption}"
+                                   Margin="{StaticResource Spacing.Pad.Sm}" />
+
+                <!-- Row 1: SMALL stat (col 0) + WIDE stat (spans 2 cols) -->
+                <surface:BentoStat Grid.Row="1" Grid.Column="0"
+                                   Label="Session start"
+                                   Value="{Binding Stats[3].Value}"
+                                   Caption="{Binding Stats[3].Caption}"
+                                   Margin="{StaticResource Spacing.Pad.Sm}" />
+
+                <surface:BentoStat Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                   Label="Hello challenges"
+                                   Value="{Binding Stats[1].Value}"
+                                   Caption="{Binding Stats[1].Caption}"
+                                   Margin="{StaticResource Spacing.Pad.Sm}" />
+            </Grid>
+
+            <!-- Recent activity placeholder list -->
+            <TextBlock Text="Recent activity"
+                       FontFamily="{StaticResource Typography.Sans}"
+                       FontSize="{StaticResource Typography.Size.Caption}"
+                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                       Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                       Margin="12,32,12,8" />
+
+            <Border Background="{StaticResource Brushes.Subtle.Surface}"
+                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Corners.Md}"
+                    Padding="{StaticResource Spacing.Pad.Lg}">
+                <Border.Effect>
+                    <StaticResource ResourceKey="Elevation.1.Resting" />
+                </Border.Effect>
+                <feedback:EmptyState Title="No challenges yet"
+                                     Subtitle="When BioCentri gates an app for you, the events will appear here. Activity is fully on-device."
+                                     IconKey="Icons.Route.Activity" />
+            </Border>
+
+            <TextBlock Text="{Binding ReadinessLine}"
+                       FontFamily="{StaticResource Typography.Sans}"
+                       FontSize="{StaticResource Typography.Size.Small}"
+                       Foreground="{StaticResource Brushes.Text.Muted}"
+                       TextWrapping="Wrap"
+                       Margin="0,32,0,0" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

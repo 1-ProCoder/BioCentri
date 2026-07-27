@@ -1,0 +1,334 @@
+<!doctype html>
+<!--
+  BioCentri OG image — source of truth.
+
+  This file is rendered to /website/public/og.png via a headless Chromium
+  capture. If the design ever needs to change, edit this file and re-run
+  the capture command (see /website/README.md or handoff note).
+
+  Canvas: 1200 x 630 (Twitter / OG / LinkedIn standard).
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Reset + base */
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        width: 1200px;
+        height: 630px;
+        background: #08080b;
+        color: #e8e8ec;
+        font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* Background: subtle grid + indigo glow */
+      .bg-grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+        background-size: 48px 48px;
+        -webkit-mask-image: radial-gradient(ellipse at 25% 35%, rgba(0, 0, 0, 0.55), transparent 70%);
+                mask-image: radial-gradient(ellipse at 25% 35%, rgba(0, 0, 0, 0.55), transparent 70%);
+      }
+      .bg-glow {
+        position: absolute;
+        left: 55%;
+        top: -120px;
+        height: 720px;
+        width: 820px;
+        background: radial-gradient(circle at center, rgba(99, 102, 241, 0.30), rgba(99, 102, 241, 0) 70%);
+        filter: blur(80px);
+      }
+
+      /* Layout */
+      .container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 70px;
+        padding: 70px 90px;
+        height: 100%;
+      }
+      .left { width: 58%; z-index: 2; }
+      .right { width: 42%; z-index: 2; }
+
+      /* Brand mark */
+      .brand-row { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+      .brand-row svg { width: 38px; height: 38px; color: #ffffff; }
+      .brand-name { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: #ffffff; }
+
+      /* Eyebrow pill */
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #c7c7cc;
+        padding: 8px 16px;
+        border-radius: 9999px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .pill .pulse {
+        width: 6px; height: 6px;
+        background: #34d399;
+        border-radius: 9999px;
+        box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.15);
+      }
+
+      h1 {
+        font-size: 54px;
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        color: #ffffff;
+        margin: 14px 0 18px 0;
+      }
+      .gradient {
+        background: linear-gradient(180deg, #ffffff 0%, #c7c7cc 100%);
+        -webkit-background-clip: text;
+                background-clip: text;
+        color: transparent;
+      }
+      p.tagline {
+        font-size: 19px;
+        line-height: 1.55;
+        color: #c7c7cc;
+        margin: 0;
+        max-width: 540px;
+        font-weight: 400;
+      }
+
+      /* Mockup window */
+      .mockup {
+        background: rgba(28, 28, 30, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 30px 80px rgba(99, 102, 241, 0.18);
+        backdrop-filter: blur(8px);
+      }
+      .titlebar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 18px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .dots { display: flex; gap: 6px; }
+      .dots span { width: 10px; height: 10px; border-radius: 9999px; }
+      .dots .red    { background: rgba(248, 113, 113, 0.7); }
+      .dots .amber  { background: rgba(251, 191, 36, 0.7); }
+      .dots .green  { background: rgba(52, 211, 153, 0.7); }
+      .mockup .wordmark {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.22em;
+        color: #8e8e93;
+      }
+      .mockup .body { padding: 24px 26px 26px 26px; }
+
+      .eyebrow {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.22em;
+        color: #8e8e93;
+      }
+      .heading {
+        font-size: 22px;
+        font-weight: 600;
+        color: #ffffff;
+        margin: 4px 0 14px 0;
+      }
+
+      .app-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(255, 255, 255, 0.025);
+        border-radius: 10px;
+        margin-bottom: 8px;
+      }
+      .app-row > .left-side { display: flex; align-items: center; }
+      .app-icon {
+        width: 32px; height: 32px;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 700;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+      }
+      .app-icon.c { background: linear-gradient(to bottom right, #fb7185, #fb923c); }
+      .app-icon.d { background: linear-gradient(to bottom right, #818cf8, #a78bfa); }
+      .app-icon.s { background: linear-gradient(to bottom right, #38bdf8, #3b82f6); }
+
+      .app-info { flex: 1; margin-left: 12px; }
+      .app-name { font-size: 15px; color: #ffffff; font-weight: 500; line-height: 1.2; }
+      .app-meta { font-size: 11px; color: #8e8e93; margin-top: 2px; }
+
+      .badge-locked {
+        background: rgba(52, 211, 153, 0.12);
+        color: #6ee7b7;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        font-size: 10px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+      }
+
+      .hello-row {
+        margin-top: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 12px;
+      }
+      .hello-side { display: flex; align-items: center; gap: 12px; }
+      .fp-icon {
+        width: 32px; height: 32px;
+        border-radius: 9999px;
+        background: rgba(99, 102, 241, 0.18);
+        color: #a5b4fc;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .hello-title { font-size: 14px; color: #ffffff; font-weight: 500; line-height: 1.2; }
+      .hello-sub { font-size: 11px; color: #8e8e93; margin-top: 2px; }
+
+      .active-pill {
+        background: rgba(52, 211, 153, 0.10);
+        border: 1px solid rgba(52, 211, 153, 0.25);
+        color: #6ee7b7;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+    <div class="container">
+      <div class="left">
+        <div class="brand-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3l8 3.5v6c0 4.5-3.5 8-8 9.5-4.5-1.5-8-5-8-9.5v-6L12 3z" />
+            <path d="M9 12.6l2 2 4-4.2" />
+          </svg>
+          <span class="brand-name">BioCentri</span>
+        </div>
+        <div class="pill">
+          <span class="pulse"></span>
+          Now in development
+        </div>
+        <h1>
+          Protect your&nbsp;<span class="gradient">Windows&nbsp;apps</span><br />
+          with biometric security.
+        </h1>
+        <p class="tagline">
+          Privacy-focused. Local-first. Built on Windows Hello for the apps that
+          hold the parts of your life you don&apos;t want to share.
+        </p>
+      </div>
+      <div class="right">
+        <div class="mockup">
+          <div class="titlebar">
+            <div class="dots">
+              <span class="red"></span><span class="amber"></span><span class="green"></span>
+            </div>
+            <div class="wordmark">BioCentri</div>
+            <div style="width: 60px;"></div>
+          </div>
+          <div class="body">
+            <div class="eyebrow">Dashboard</div>
+            <div class="heading">Protected applications</div>
+
+            <div class="app-row">
+              <div class="left-side">
+                <div class="app-icon c">C</div>
+                <div class="app-info">
+                  <div class="app-name">Chrome</div>
+                  <div class="app-meta">Browser</div>
+                </div>
+              </div>
+              <div class="badge-locked">Locked</div>
+            </div>
+
+            <div class="app-row">
+              <div class="left-side">
+                <div class="app-icon d">D</div>
+                <div class="app-info">
+                  <div class="app-name">Discord</div>
+                  <div class="app-meta">Communications</div>
+                </div>
+              </div>
+              <div class="badge-locked">Locked</div>
+            </div>
+
+            <div class="app-row">
+              <div class="left-side">
+                <div class="app-icon s">S</div>
+                <div class="app-info">
+                  <div class="app-name">Steam</div>
+                  <div class="app-meta">Games</div>
+                </div>
+              </div>
+              <div class="badge-locked">Locked</div>
+            </div>
+
+            <div class="hello-row">
+              <div class="hello-side">
+                <div class="fp-icon">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12a7 7 0 0 1 14 0"/>
+                    <path d="M8 12a4 4 0 0 1 8 0c0 2-.5 4-1 6"/>
+                    <path d="M12 12v6"/>
+                    <path d="M9 17c-.7-1.6-1-3.2-1-5"/>
+                    <path d="M15.6 14c.3 1 .2 2-.3 3"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="hello-title">Windows Hello</div>
+                  <div class="hello-sub">Face &middot; Fingerprint &middot; PIN</div>
+                </div>
+              </div>
+              <div class="active-pill">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+                Active
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

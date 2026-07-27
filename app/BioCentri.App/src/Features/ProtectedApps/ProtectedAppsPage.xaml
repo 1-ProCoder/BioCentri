@@ -1,0 +1,155 @@
+<Page x:Class="BioCentri.App.Features.ProtectedApps.ProtectedAppsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:header="clr-namespace:BioCentri.App.Components.Nav"
+      xmlns:feedback="clr-namespace:BioCentri.App.Components.Feedback"
+      xmlns:icon="clr-namespace:BioCentri.App.Components.Iconography"
+      xmlns:items="clr-namespace:BioCentri.App.Features.ProtectedApps"
+      Title="Protected Apps"
+      Background="{StaticResource Brushes.Surface.Base}"
+      Foreground="{StaticResource Brushes.Text.Primary}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />     <!-- header       -->
+            <RowDefinition Height="Auto" />     <!-- action row   -->
+            <RowDefinition Height="*" />        <!-- list area    -->
+        </Grid.RowDefinitions>
+
+        <header:PageHeader Grid.Row="0"
+                           Title="{Binding Title}"
+                           Subtitle="{Binding Subtitle}"
+                           Eyebrow="Applications" />
+
+        <!-- Action row : search + Add -->
+        <Grid Grid.Row="1" Margin="32,8,32,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBox Grid.Column="0"
+                     Background="{StaticResource Brushes.Subtle.Surface}"
+                     Foreground="{StaticResource Brushes.Text.Primary}"
+                     CaretBrush="{StaticResource Brushes.Accent.Indigo}"
+                     BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                     BorderThickness="1"
+                     Padding="12,8"
+                     FontFamily="{StaticResource Typography.Sans}"
+                     FontSize="{StaticResource Typography.Size.Small}"
+                     ToolTip="Filter the protected apps list (local filter — does not re-run discovery)." />
+
+            <Button Grid.Column="1"
+                    Padding="14,8"
+                    Margin="12,0,0,0"
+                    Background="{StaticResource Brushes.Accent.Indigo}"
+                    Foreground="White"
+                    FontFamily="{StaticResource Typography.Sans}"
+                    FontSize="{StaticResource Typography.Size.Small}"
+                    FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Command="{Binding AddCommand}"
+                    ToolTip="Open the discovery picker (registry Uninstall hive).">
+                <StackPanel Orientation="Horizontal">
+                    <icon:Icon IconSize="16"
+                               Stroke="White"
+                               StrokeThickness="2"
+                               GeometryKey="Icons.Action.Add"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="Add application"
+                               Margin="8,0,0,0"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- Body : empty state OR list -->
+        <Border Grid.Row="2"
+                Background="{StaticResource Brushes.Subtle.Surface}"
+                BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource Corners.Md}"
+                Padding="{StaticResource Spacing.Pad.Lg}"
+                Margin="32,0,32,32">
+            <Border.Effect>
+                <StaticResource ResourceKey="Elevation.1.Resting" />
+            </Border.Effect>
+
+            <Grid>
+                <!-- Empty state — only when nothing is protected -->
+                <feedback:EmptyState Title="No protected apps yet"
+                                     Subtitle="BioCentri gates each app behind Windows Hello once you toggle protection on. Click 'Add application' to pick one from the registry."
+                                     IconKey="Icons.Route.ProtectedApps"
+                                     Visibility="{Binding Protected.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=zero}" />
+
+                <!-- Protected list -->
+                <ListBox Background="Transparent"
+                         BorderThickness="0"
+                         ItemsSource="{Binding Protected}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         Visibility="{Binding Protected.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=nonzero}">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="0,0,0,8" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource Brushes.Surface.Base}"
+                                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                                    BorderThickness="1"
+                                    CornerRadius="{StaticResource Corners.Md}"
+                                    Padding="14,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <icon:Icon Grid.Column="0"
+                                               IconSize="22"
+                                               Stroke="{StaticResource Brushes.Accent.Indigo}"
+                                               StrokeThickness="1.6"
+                                               GeometryKey="{Binding IconKey}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,12,0" />
+
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding DisplayName}"
+                                                   FontFamily="{StaticResource Typography.Sans}"
+                                                   FontSize="{StaticResource Typography.Size.Body}"
+                                                   FontWeight="{StaticResource Typography.Weight.Medium}"
+                                                   Foreground="{StaticResource Brushes.Text.Primary}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding AddedUtc, StringFormat='Added {0:MMM d, yyyy}'}"
+                                                   FontFamily="{StaticResource Typography.Sans}"
+                                                   FontSize="{StaticResource Typography.Size.Small}"
+                                                   Foreground="{StaticResource Brushes.Text.Muted}" />
+                                    </StackPanel>
+
+                                    <Button Grid.Column="2"
+                                            Content="Unprotect"
+                                            Padding="14,6"
+                                            Background="{StaticResource Brushes.Subtle.Surface}"
+                                            Foreground="{StaticResource Brushes.Text.Primary}"
+                                            FontFamily="{StaticResource Typography.Sans}"
+                                            FontSize="{StaticResource Typography.Size.Small}"
+                                            FontWeight="{StaticResource Typography.Weight.Medium}"
+                                            BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                                            BorderThickness="1"
+                                            Cursor="Hand"
+                                            Command="{Binding DataContext.UnprotectCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                            CommandParameter="{Binding}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

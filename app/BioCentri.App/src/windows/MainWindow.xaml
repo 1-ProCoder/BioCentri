@@ -1,0 +1,145 @@
+<Window x:Class="BioCentri.App.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:nav="clr-namespace:BioCentri.App.Components.Nav"
+        xmlns:feedback="clr-namespace:BioCentri.App.Components.Feedback"
+        xmlns:icon="clr-namespace:BioCentri.App.Components.Iconography"
+        xmlns:wnd="clr-namespace:BioCentri.App.Windows"
+        xmlns:auth="clr-namespace:BioCentri.App.Components.Auth"
+        Title="BioCentri"
+        Width="1280"
+        Height="820"
+        MinWidth="960"
+        MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Brushes.Theme.Window.Background}"
+        Foreground="{DynamicResource Brushes.Theme.Window.Foreground}"
+        FontFamily="{StaticResource Typography.Sans}"
+        FontSize="{StaticResource Typography.Size.Body}"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+
+    <!--
+        Layer discipline (back → front)
+        ===============================
+          1. Sidebar (col 0)         + content column (col 1: topbar + frame + statusbar)
+          2. Toast host              — floats at bottom-right of the content area
+          3. Dialog overlay          — dimmer + presenter, sits above everything
+
+        DataContext:
+          Window.DataContext is set in code-behind to ShellViewModel which
+          exposes ShellState, NavigateCommand, and ToggleSidebarCommand.
+          Sidebar (DP:ShellState, DP:NavigateCommand) and TopBar (DP:ShellState)
+          take their ShellState from the same ShellViewModel via the
+          DataContext inheritance chain.
+
+        ToastHost and DialogOverlay receive their service-specific
+          DataContext explicitly in Initialize so they don't leak the
+          ShellViewModel into overlay semantics.
+    -->
+
+    <Window.Resources>
+        <wnd:BoolToGridLengthConverter x:Key="SidebarWidth" />
+    </Window.Resources>
+
+    <Grid x:Name="RootGrid">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="SidebarColumn"
+                              Width="{Binding ShellState.IsSidebarExpanded, Converter={StaticResource SidebarWidth}, FallbackValue=240}" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- (1) Sidebar column -->
+        <nav:Sidebar x:Name="Sidebar"
+                     Grid.Column="0"
+                     ShellState="{Binding ShellState}"
+                     NavigateCommand="{Binding NavigateCommand}" />
+
+        <!-- Content column: topbar + Frame PageHost + statusbar -->
+        <Grid Grid.Column="1">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="32" />
+            </Grid.RowDefinitions>
+
+            <nav:TopBar x:Name="TopBar"
+                        Grid.Row="0"
+                        ShellState="{Binding ShellState}" />
+
+            <Border Grid.Row="1"
+                    Background="{DynamicResource Brushes.Theme.Window.Background}"
+                    Padding="0">
+                <Frame x:Name="PageHost"
+                       NavigationUIVisibility="Hidden"
+                       JournalOwnership="OwnsJournal"
+                       Background="Transparent"
+                       Foreground="{DynamicResource Brushes.Theme.Window.Foreground}" />
+            </Border>
+
+            <!-- Status bar -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource Brushes.Theme.StatusBar.Background}"
+                    BorderBrush="{DynamicResource Brushes.Border.HairlineSoft}"
+                    BorderThickness="0,1,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="BioCentri open · no cloud · no telemetry"
+                               FontFamily="{StaticResource Typography.Sans}"
+                               FontSize="{StaticResource Typography.Size.Caption}"
+                               Foreground="{DynamicResource Brushes.Theme.StatusBar.Foreground}"
+                               VerticalAlignment="Center"
+                               Margin="12,0,0,0" />
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                Margin="0,0,12,0"
+                                VerticalAlignment="Center">
+                        <icon:Icon IconSize="12"
+                                   GeometryKey="Icons.Route.Diagnostics"
+                                   Stroke="{DynamicResource Brushes.Theme.StatusBar.Foreground}"
+                                   Margin="0,0,4,0" />
+                        <TextBlock Text="v0.2.0+milestone.2"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Caption}"
+                                   Foreground="{DynamicResource Brushes.Theme.StatusBar.Foreground}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+        </Grid>
+
+        <!-- (2) Toast host — bottom-right of the content column -->
+        <feedback:ToastHost x:Name="ToastLayer"
+                            Grid.Column="1"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Margin="0,0,0,40" />
+
+        <!-- (3) Dialog overlay — full window, dimmer + presenter -->
+        <feedback:DialogHost x:Name="DialogOverlay"
+                             Grid.Column="0"
+                             Grid.ColumnSpan="2" />
+
+        <!-- (4) Authentication overlay — topmost full-window overlay.
+                 Appears while BiometricAuthService is verifying the user
+                 for a protected-app launch. Stacks on top of DialogHost
+                 (later Z-order in the same Grid). Visibility is driven
+                 by ShellState.IsAuthenticationInProgress through
+                 AuthenticationOverlayViewModel. -->
+        <auth:AuthenticationOverlay x:Name="AuthOverlay"
+                                     Grid.Column="0"
+                                     Grid.ColumnSpan="2" />
+
+    </Grid>
+
+</Window>

@@ -1,0 +1,51 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <!--
+        Motion.xaml
+        =================
+        Easings, durations, and reusable keyframes that mirror
+        website/src/motion.js and the Tailwind animate.config block.
+
+        The website's `out-expo` curve is `cubic-bezier(0.16, 1, 0.3, 1)`.
+        Higher-fidelity Storyboards live next to the controls that use them,
+        in subsequent milestones — this file owns ONLY the primitives that
+        are safe to declare as static resources.
+
+        NOTE: Easings are NOT defined as XAML resources at M1. The WPF
+        baml resolver in this project's SDK refuses to register
+        `SplineEase` from the Animation namespace in a resource-dictionary
+        context (tried PresentationFramework and PresentationCore clr-
+        namespace aliases — both fail). Easings instead live in the C#
+        companion file `app/BioCentri.App/src/styles/Motion.cs`, where
+        animations can consume them via `{x:Static styles:Motion.OutExpo}`.
+        That file is created at M2 when animations start; M1 has no
+        animations yet, so the C# file is also deferred.
+    -->
+
+    <!-- ============================================================== -->
+    <!-- Durations in milliseconds (matches Tailwind's animate.* values) -->
+    <!-- ============================================================== -->
+    <sys:Double x:Key="Motion.Duration.Caret">    1000</sys:Double>
+    <sys:Double x:Key="Motion.Duration.Snappy">    220</sys:Double>
+    <sys:Double x:Key="Motion.Duration.Normal">    300</sys:Double>
+    <sys:Double x:Key="Motion.Duration.PageIn">    500</sys:Double>
+    <sys:Double x:Key="Motion.Duration.Hover">     500</sys:Double>
+    <sys:Double x:Key="Motion.Duration.Shimmer">  3000</sys:Double>
+    <sys:Double x:Key="Motion.Duration.Pulse">    2600</sys:Double>
+    <sys:Double x:Key="Motion.Duration.Reticle"> 12000</sys:Double>
+    <sys:Double x:Key="Motion.Duration.LaserSweep"> 8000</sys:Double>
+    <sys:Double x:Key="Motion.Duration.BorderTrace"> 4000</sys:Double>
+    <sys:Double x:Key="Motion.Duration.Hologram">   6000</sys:Double>
+    <sys:Double x:Key="Motion.Duration.PipelineDescend"> 5000</sys:Double>
+
+    <!-- ============================================================== -->
+    <!-- Reduced-motion flag — set true to globally freeze animations.   -->
+    <!-- Components read this from the App-level static and disable their -->
+    <!-- begin-time Storyboards accordingly.                             -->
+    <!-- ============================================================== -->
+    <sys:Boolean x:Key="Motion.RespectReducedMotion">false</sys:Boolean>
+
+</ResourceDictionary>

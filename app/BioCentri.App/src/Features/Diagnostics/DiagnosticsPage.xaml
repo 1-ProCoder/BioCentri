@@ -1,0 +1,88 @@
+<Page x:Class="BioCentri.App.Features.Diagnostics.DiagnosticsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:header="clr-namespace:BioCentri.App.Components.Nav"
+      xmlns:icon="clr-namespace:BioCentri.App.Components.Iconography"
+      xmlns:nav="clr-namespace:BioCentri.App.Components.Nav"
+      xmlns:items="clr-namespace:BioCentri.App.Features.Diagnostics"
+      Title="Diagnostics"
+      Background="{StaticResource Brushes.Surface.Base}"
+      Foreground="{StaticResource Brushes.Text.Primary}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  Padding="32,32,32,64">
+
+        <StackPanel>
+            <header:PageHeader Title="{Binding Title}"
+                               Subtitle="{Binding Subtitle}"
+                               Eyebrow="Environment" />
+
+            <!-- 4-up stat grid: OS / Hello / Runtime / Build -->
+            <ItemsControl ItemsSource="{Binding Readouts}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="4" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type items:DiagnosticsRow}">
+                        <nav:StatisticCard Label="{Binding Label}"
+                                           Value="{Binding Value}"
+                                           Delta="{Binding Caption}"
+                                           Margin="{StaticResource Spacing.Pad.Sm}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Recent signals list -->
+            <TextBlock Text="Recent signals"
+                       FontFamily="{StaticResource Typography.Sans}"
+                       FontSize="{StaticResource Typography.Size.Caption}"
+                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                       Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                       Margin="12,32,12,8" />
+
+            <ItemsControl ItemsSource="{Binding Signals}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type items:DiagnosticsSignalRow}">
+                        <Border Margin="0,0,0,8"
+                                Padding="14,10"
+                                Background="{StaticResource Brushes.Subtle.Surface}"
+                                BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                                BorderThickness="1"
+                                CornerRadius="{StaticResource Corners.Md}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0"
+                                        Background="{StaticResource Brushes.Surface.Card}"
+                                        BorderBrush="{StaticResource Brushes.Accent.Indigo}"
+                                        BorderThickness="1"
+                                        CornerRadius="{StaticResource Corners.Pill}"
+                                        Padding="10,3"
+                                        Margin="0,0,12,0"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Severity}"
+                                               FontFamily="{StaticResource Typography.Monospace}"
+                                               FontSize="{StaticResource Typography.Size.Caption}"
+                                               FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                               Foreground="{StaticResource Brushes.Accent.IndigoLight}" />
+                                </Border>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding Description}"
+                                           FontFamily="{StaticResource Typography.Sans}"
+                                           FontSize="{StaticResource Typography.Size.Small}"
+                                           Foreground="{StaticResource Brushes.Text.Muted}"
+                                           VerticalAlignment="Center"
+                                           TextWrapping="Wrap" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
