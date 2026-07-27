@@ -17,6 +17,7 @@ using BioCentri.App.Types.Services;
 using BioCentri.App.Windows;
 using BioCentri.Core.Interop;
 using BioCentri.Core.Services;
+// M7.1 pending: using Hardcodet.Wpf.TaskbarNotification;
 
 namespace BioCentri.App;
 
@@ -153,6 +154,13 @@ public partial class App : Application
             .AddSingleton<ActivityViewModel>(new ActivityViewModel())
             .AddSingleton<DashboardViewModel>(new DashboardViewModel());
 
+        // ---- TrayIcon VM (M7.1 pending) — pre-registered so the
+        //      DI slot is reserved. Tray icon activation is deferred:
+        //      H.NotifyIcon.Wpf 2.x namespace resolution fails on this
+        //      machine's offline NuGet cache (Decision 9). See docs/
+        //      INSTALLER.md § Tray Icon for the re-activation checklist.
+        host.AddSingleton<TrayIconViewModel>(new TrayIconViewModel());
+
         // ---- MainWindow last — constructor pulls no DI; Initialize()
         //      happens immediately after this block to wire DataContext.
         //      The AuthenticationOverlay cell inside MainWindow reads its
@@ -172,6 +180,22 @@ public partial class App : Application
         shell.Show();
 
         _lifecycle.MainWindowShown = true;
+
+        // ---- M7.1 pending: tray icon activation. The TrayIconViewModel
+        //      (Show / Hide / Pause / Settings / Quit) is registered in
+        //      DI and ready to bind. Once the offline NuGet cache
+        //      resolves H.NotifyIcon.Wpf 2.x (see Decision 9), uncomment
+        //      the block below to create the TaskbarIcon.
+        //
+        // var trayVm = host.Get<TrayIconViewModel>();
+        // trayVm.MainWindow = shell;
+        // _ = new Hardcodet.Wpf.TaskbarNotification.TaskbarIcon
+        // {
+        //     Icon = System.Drawing.Icon.ExtractAssociatedIcon(...),
+        //     ToolTipText = "BioCentri",
+        //     ContextMenu = /* WPF ContextMenu bound to trayVm.*Command */,
+        //     Visibility = System.Windows.Visibility.Visible,
+        // };
     }
 
     protected override void OnExit(ExitEventArgs e)

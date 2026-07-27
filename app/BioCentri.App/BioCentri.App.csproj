@@ -32,8 +32,9 @@
   -->
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
-    <!-- Milestone 6: tray icon. The modern community fork of
-         Hardcodet.NotifyIcon.Wpf (H.NotifyIcon.Wpf) targets net8.0-windows. -->
+    <!-- M7.1 pending: H.NotifyIcon.Wpf 2.x blocked by offline NuGet
+         cache (Decision 9). Re-add when cache syncs. TrayIconViewModel
+         is already registered in DI and ready to bind. -->
     <!-- Milestone 6: WMI process monitoring (System.Management for
          ManagementEventWatcher / Win32_ProcessStartTrace). -->
     <PackageReference Include="System.Management" Version="8.0.0" />
