@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using BioCentri.App.Features.About;
@@ -36,17 +35,9 @@ public partial class App : Application
     public ServiceHost Host { get; private set; } = null!;
 
     private IAppLifecycleService? _lifecycle;
-    private static readonly string TraceLog = Path.Combine(Path.GetTempPath(), "biocentri-startup-trace.log");
-
-    private static void Trace(string step)
-    {
-        try { File.AppendAllText(TraceLog, $"{DateTime.Now:HH:mm:ss.fff} {step}\n"); }
-        catch { /* diagnostic only — never let the trace itself crash */ }
-    }
 
     public App()
     {
-        Trace("App.ctor — entering");
         DispatcherUnhandledException += OnDispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
@@ -61,11 +52,9 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        Trace("OnStartup — base.OnStartup done");
 
         var dispatcher = Dispatcher;
         var host = new ServiceHost();
-        Trace("OnStartup — ServiceHost created");
 
         // ---- Order matters: each `AddSingleton` lays down a service
         //      the ones below depend on. The chain is linear and the
@@ -178,21 +167,15 @@ public partial class App : Application
 
         Host = host;
         _lifecycle = Host.Get<IAppLifecycleService>();
-        Trace("OnStartup — Host assigned, lifecycle ready");
 
         // Per Milestone-4 spec: ProcessWatcher MUST be running before
         // MainWindow.Show() so any process launches that race with the
         // initial render are still seen by the watcher.
-        Trace("OnStartup — about to start ProcessWatcher");
         Host.Get<ProcessWatcher>().Start();
-        Trace("OnStartup — ProcessWatcher.Start() done");
 
         MainWindow shell = Host.Get<MainWindow>();
-        Trace("OnStartup — MainWindow retrieved from DI");
         shell.Initialize(Host);
-        Trace("OnStartup — shell.Initialize() done");
         shell.Show();
-        Trace("OnStartup — shell.Show() done");
 
         _lifecycle.MainWindowShown = true;
 
@@ -228,7 +211,6 @@ public partial class App : Application
 
     private static void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        Trace($"CRASH (Dispatcher): {e.Exception}");
         // e.Exception.ToString() unwraps the full chain (message + all inner
         // exceptions + stack traces), unlike .Message which shows only the
         // top-level string (often a generic wrapper like "Cannot locate
@@ -243,7 +225,6 @@ public partial class App : Application
 
     private static void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
-        Trace($"CRASH (Domain): {e.ExceptionObject}");
         if (e.ExceptionObject is Exception ex)
         {
             MessageBox.Show(
