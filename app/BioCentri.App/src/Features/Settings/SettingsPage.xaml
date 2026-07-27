@@ -6,7 +6,7 @@
       xmlns:input="clr-namespace:BioCentri.App.Components.Inputs"
       xmlns:items="clr-namespace:BioCentri.App.Features.Settings"
       Title="Settings"
-      Background="{StaticResource Brushes.Surface.Base}"
+      Background="Transparent"
       Foreground="{StaticResource Brushes.Text.Primary}">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto"

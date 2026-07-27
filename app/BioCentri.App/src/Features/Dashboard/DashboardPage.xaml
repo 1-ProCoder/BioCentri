@@ -7,7 +7,7 @@
       xmlns:surface="clr-namespace:BioCentri.App.Components.Surface"
       xmlns:feedback="clr-namespace:BioCentri.App.Components.Feedback"
       Title="Dashboard"
-      Background="{StaticResource Brushes.Surface.Base}"
+      Background="Transparent"
       Foreground="{StaticResource Brushes.Text.Primary}">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto"
@@ -16,8 +16,7 @@
 
         <StackPanel>
             <header:PageHeader Title="{Binding Title}"
-                               Subtitle="{Binding Subtitle}"
-                               Eyebrow="BioCentri" />
+                               Subtitle="{Binding Subtitle}" />
 
             <!-- Hero: greeting + status + HologramFloat-wrapped logo with ReticleRing behind -->
             <surface:FocalCard Margin="{StaticResource Spacing.Pad.Md}">
@@ -28,17 +27,68 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0">
+                        <TextBlock Text="BIOCENTRI"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Caption}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                   Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                                   Opacity="0.85"
+                                   Margin="0,0,0,8" />
+
                         <TextBlock Text="{Binding GreetingLine}"
                                    FontFamily="{StaticResource Typography.Display}"
-                                   FontSize="{StaticResource Typography.Size.Display}"
+                                   FontSize="{StaticResource Typography.Size.H1}"
                                    FontWeight="{StaticResource Typography.Weight.SemiBold}"
-                                   Foreground="{StaticResource Brushes.Text.Primary}" />
+                                   Foreground="{StaticResource Brushes.Text.Violet}"
+                                   TextOptions.TextFormattingMode="Display" />
+
                         <TextBlock Text="{Binding StatusLine}"
                                    FontFamily="{StaticResource Typography.Sans}"
                                    FontSize="{StaticResource Typography.Size.Large}"
                                    Foreground="{StaticResource Brushes.Text.Muted}"
-                                   Margin="0,8,0,0"
-                                   TextWrapping="Wrap" />
+                                   Margin="0,14,0,0"
+                                   MaxWidth="540"
+                                   TextWrapping="Wrap"
+                                   LineHeight="26" />
+
+                        <!-- Quick badges — protected-apps CTA + biometrics status -->
+                        <StackPanel Orientation="Horizontal" Margin="0,22,0,0">
+                            <Border Background="{StaticResource Brushes.Glass.Tint}"
+                                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                                    BorderThickness="1"
+                                    CornerRadius="{StaticResource Corners.Pill}"
+                                    Padding="12,6"
+                                    Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="6" Height="6"
+                                             Fill="{StaticResource Brushes.Status.Success}"
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,8,0" />
+                                    <TextBlock Text="Windows Hello ready"
+                                               FontFamily="{StaticResource Typography.Sans}"
+                                               FontSize="{StaticResource Typography.Size.Caption}"
+                                               FontWeight="{StaticResource Typography.Weight.Medium}"
+                                               Foreground="{StaticResource Brushes.Text.Primary}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Background="{StaticResource Brushes.Glass.Tint}"
+                                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                                    BorderThickness="1"
+                                    CornerRadius="{StaticResource Corners.Pill}"
+                                    Padding="12,6">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="6" Height="6"
+                                             Fill="{StaticResource Brushes.Accent.Indigo}"
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,8,0" />
+                                    <TextBlock Text="Local-only · no telemetry"
+                                               FontFamily="{StaticResource Typography.Sans}"
+                                               FontSize="{StaticResource Typography.Size.Caption}"
+                                               FontWeight="{StaticResource Typography.Weight.Medium}"
+                                               Foreground="{StaticResource Brushes.Text.Primary}" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
                     </StackPanel>
 
                     <!-- Logo seat: ReticleRing ornament behind, HologramFloat wraps the logo -->

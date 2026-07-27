@@ -71,14 +71,59 @@
                         Grid.Row="0"
                         ShellState="{Binding State}" />
 
+            <!-- Premium backdrop: deep gradient with two soft radial glows that
+                 sit behind the routed Frame without bleeding past the column. -->
             <Border Grid.Row="1"
-                    Background="{DynamicResource Brushes.Theme.Window.Background}"
-                    Padding="0">
-                <Frame x:Name="PageHost"
-                       NavigationUIVisibility="Hidden"
-                       JournalOwnership="OwnsJournal"
-                       Background="Transparent"
-                       Foreground="{DynamicResource Brushes.Theme.Window.Foreground}" />
+                    Padding="0"
+                    ClipToBounds="True">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="{StaticResource Brushes.Ink.950}" Offset="0.0" />
+                        <GradientStop Color="{StaticResource Brushes.Ink.900}" Offset="0.5" />
+                        <GradientStop Color="{StaticResource Brushes.Ink.950}" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Border.Background>
+
+                <!-- Soft indigo aura (top-left) and emerald aura (bottom-right).
+                     They sit behind the Frame (negative margin allowed because
+                     ClipToBounds=true prevents any bleed). -->
+                <Grid>
+                    <Ellipse Width="640" Height="640"
+                             HorizontalAlignment="Left" VerticalAlignment="Top"
+                             Margin="-200,-280,0,0"
+                             IsHitTestVisible="False">
+                        <Ellipse.Fill>
+                            <RadialGradientBrush Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                                <GradientStop Color="{StaticResource Brushes.Accent.IndigoGlow}" Offset="0.0" />
+                                <GradientStop Color="Transparent" Offset="1.0" />
+                            </RadialGradientBrush>
+                        </Ellipse.Fill>
+                        <Ellipse.Effect>
+                            <BlurEffect Radius="120" />
+                        </Ellipse.Effect>
+                    </Ellipse>
+
+                    <Ellipse Width="520" Height="520"
+                             HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                             Margin="0,0,-160,-220"
+                             IsHitTestVisible="False">
+                        <Ellipse.Fill>
+                            <RadialGradientBrush Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                                <GradientStop Color="{StaticResource Brushes.Accent.EmeraldGlow}" Offset="0.0" />
+                                <GradientStop Color="Transparent" Offset="1.0" />
+                            </RadialGradientBrush>
+                        </Ellipse.Fill>
+                        <Ellipse.Effect>
+                            <BlurEffect Radius="140" />
+                        </Ellipse.Effect>
+                    </Ellipse>
+
+                    <Frame x:Name="PageHost"
+                           NavigationUIVisibility="Hidden"
+                           JournalOwnership="OwnsJournal"
+                           Background="Transparent"
+                           Foreground="{DynamicResource Brushes.Theme.Window.Foreground}" />
+                </Grid>
             </Border>
 
             <!-- Status bar -->

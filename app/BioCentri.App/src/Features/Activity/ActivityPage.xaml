@@ -7,7 +7,7 @@
       xmlns:items="clr-namespace:BioCentri.App.Features.Activity"
       xmlns:feedback="clr-namespace:BioCentri.App.Components.Feedback"
       Title="Activity"
-      Background="{StaticResource Brushes.Surface.Base}"
+      Background="Transparent"
       Foreground="{StaticResource Brushes.Text.Primary}">
 
     <Page.Resources>

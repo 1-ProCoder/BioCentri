@@ -42,6 +42,12 @@
     <SolidColorBrush x:Key="Brushes.Accent.VioletLight" Color="#C4B5FD" />
     <SolidColorBrush x:Key="Brushes.Accent.Emerald" Color="#34D399" />
 
+    <!-- Glow variants — alpha-channel tokens for soft radial backdrops.
+         Used by MainWindow atmosphere glow ellipses and any future "ambient
+         light" effects so design tokens own the colour, not in-place hex. -->
+    <SolidColorBrush x:Key="Brushes.Accent.IndigoGlow"  Color="#40818CF8" />
+    <SolidColorBrush x:Key="Brushes.Accent.EmeraldGlow" Color="#3034D399" />
+
     <!-- Indigo→violet gradient (matches .text-gradient-violet) -->
     <LinearGradientBrush x:Key="Brushes.Accent.Gradient"
                          StartPoint="0,0" EndPoint="1,1">

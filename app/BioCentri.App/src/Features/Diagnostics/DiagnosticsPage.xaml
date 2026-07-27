@@ -6,7 +6,7 @@
       xmlns:nav="clr-namespace:BioCentri.App.Components.Nav"
       xmlns:items="clr-namespace:BioCentri.App.Features.Diagnostics"
       Title="Diagnostics"
-      Background="{StaticResource Brushes.Surface.Base}"
+      Background="Transparent"
       Foreground="{StaticResource Brushes.Text.Primary}">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto"

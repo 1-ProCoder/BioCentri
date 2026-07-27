@@ -7,7 +7,7 @@
       xmlns:surface="clr-namespace:BioCentri.App.Components.Surface"
       xmlns:items="clr-namespace:BioCentri.App.Features.About"
       Title="About"
-      Background="{StaticResource Brushes.Surface.Base}"
+      Background="Transparent"
       Foreground="{StaticResource Brushes.Text.Primary}">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto"
