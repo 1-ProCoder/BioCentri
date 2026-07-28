@@ -164,7 +164,15 @@ public sealed class BiometricAuthService : IBiometricAuthService
         catch (Exception ex)
         {
             Debug.WriteLine($"[BiometricAuthService] {appName} threw {ex.GetType().Name}: {ex.Message}");
-            tcs.TrySetResult(AuthOutcome.Error);
+            // If our timeout fired but the caller's token didn't,
+            // surface Timeout (not Error) so the audit log can tell
+            // 'user walked away' from a genuine crash. The adapter's
+            // own OCE catch normally returns UserCancelled, but if it
+            // ever bubbles here we still preserve the semantic.
+            var outcome = (cts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+                ? AuthOutcome.Timeout
+                : AuthOutcome.Error;
+            tcs.TrySetResult(outcome);
             return tcs.Task.Result;
         }
         finally
