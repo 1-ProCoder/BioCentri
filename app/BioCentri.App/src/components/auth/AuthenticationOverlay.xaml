@@ -31,22 +31,32 @@
             Fade-in : 0→1 over Motion.Duration.Normal (300ms)
             Fade-out: 1→0 over Motion.Duration.Snappy (220ms)
 
+            TARGETING NOTE: these storyboards are FIRES from
+            AuthRootStyle's DataTrigger (below). WPF forbids
+            Storyboard.TargetName on any animation referenced from a
+            Style trigger — the TargetName has no scope to resolve.
+            We deliberately OMIT TargetName so the storyboard targets
+            the styled element itself (AuthRoot, the Grid that wears
+            AuthRootStyle). The previous TargetName="AuthRoot" caused
+            the well-known InvalidOperationException surfaces as
+            "A Storyboard tree in a Style cannot specify a TargetName"
+            and a misleading "Cannot find resource named
+            'TimelineSeverity'" XamlParseException during visual-tree
+            build. Removed at the crash fix.
+
             Easings live in /styles/Motion.cs at M2 (per Motion.xaml +
-            Transitions.xaml comments — this baml resolver can't
-            register SplineEase in resource-dictionary contexts). For
-            Milestone 4 the eases are dropped; the linear fade still
+            Transitions.xaml comments — baml can't register SplineEase
+            in resource-dictionary contexts). The linear fade still
             reads premium at these durations.
         -->
         <Storyboard x:Key="Animations.Auth.FadeIn">
-            <DoubleAnimation Storyboard.TargetName="AuthRoot"
-                             Storyboard.TargetProperty="Opacity"
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
                              To="1"
                              Duration="0:0:0.300"/>
         </Storyboard>
 
         <Storyboard x:Key="Animations.Auth.FadeOut">
-            <DoubleAnimation Storyboard.TargetName="AuthRoot"
-                             Storyboard.TargetProperty="Opacity"
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
                              To="0"
                              Duration="0:0:0.220"/>
         </Storyboard>
