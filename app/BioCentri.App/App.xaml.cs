@@ -191,21 +191,104 @@ public partial class App : Application
 
         _lifecycle.MainWindowShown = true;
 
-        // ---- M7.1 pending: tray icon activation. The TrayIconViewModel
-        //      (Show / Hide / Pause / Settings / Quit) is registered in
-        //      DI and ready to bind. Once the offline NuGet cache
-        //      resolves H.NotifyIcon.Wpf 2.x (see Decision 9), uncomment
-        //      the block below to create the TaskbarIcon.
+        // ---------------- Milestone 7+ defence-in-depth ----------------
+        // Smoke-test the documented design-system keys at startup. WPF's
+        // MarkupCompilePass1 does NOT validate StaticResource keys — a
+        // missing reference (e.g. Typography.Size.Title) silently compiles,
+        // and only surfaces as a XamlParseException when the offending
+        // template is loaded by the runtime. That 'late' failure is what
+        // produced the long chain of 'Cannot find resource named
+        // Elevation.2.Resting / Timeline2.Resting / TimelineSeverity /
+        // Brushes.Text.Muted' popups during M4 debugging. Unconditional:
+        // a Release build with a missing key silently fails the same way
+        // as DEBUG, so the smoke test is always on. Cost <1ms at startup.
         //
-        // var trayVm = host.Get<TrayIconViewModel>();
-        // trayVm.MainWindow = shell;
-        // _ = new Hardcodet.Wpf.TaskbarNotification.TaskbarIcon
-        // {
-        //     Icon = System.Drawing.Icon.ExtractAssociatedIcon(...),
-        //     ToolTipText = "BioCentri",
-        //     ContextMenu = /* WPF ContextMenu bound to trayVm.*Command */,
-        //     Visibility = System.Windows.Visibility.Visible,
-        // };
+        // FindResource throws ResourceReferenceKeyNotFoundException here,
+        // failing fast on F5 (and in Release) if anyone deletes or renames
+        // a token without updating every consumer. The list is curated for
+        // high-impact keys; designers adding a new token SHOULD add it here
+        // so future typos land at startup instead of mid-click.
+        try
+        {
+            AssertCriticalResourceKeys();
+        }
+        catch (Exception ex)
+        {
+            // Re-raise as InvalidOperationException with a single actionable
+            // line — much easier for a developer to grep than wading through
+            // the native ResourceReferenceKeyNotFoundException text.
+            throw new InvalidOperationException(
+                "BioCentri startup smoke-test FAILED \u2014 a design-system " +
+                "token is referenced by some *.xaml but never defined. " +
+                "Add the missing key to the matching style/<Name>.xaml and " +
+                "rebuild.\n\n" + ex.Message, ex);
+        }
+    }
+
+    /// <summary>
+    /// Fail-loud startup smoke test. Each <see cref="Application.FindResource(object)"/>
+    /// throws immediately if the key is undefined, so the app exits before
+    /// the user ever sees a runtime popup storm.
+    /// </summary>
+    private static void AssertCriticalResourceKeys()
+    {
+        var required = new[]
+        {
+            // Typography (M6+ additions)
+            "Typography.Sans", "Typography.Display", "Typography.Monospace",
+            "Typography.Size.Caption", "Typography.Size.Small", "Typography.Size.Body",
+            "Typography.Size.Large", "Typography.Size.H4", "Typography.Size.Title",
+            "Typography.Size.H3", "Typography.Size.H2", "Typography.Size.H1",
+            "Typography.Size.Display",
+            "Typography.Weight.Regular", "Typography.Weight.Medium",
+            "Typography.Weight.SemiBold", "Typography.Weight.Bold",
+
+            // Brush surfaces (heavily used by every page)
+            "Brushes.Surface.Base", "Brushes.Surface.Card", "Brushes.Surface.Sunken",
+            "Brushes.Surface.Raised",
+            "Brushes.Text.Primary", "Brushes.Text.Muted", "Brushes.Text.Violet",
+            "Brushes.Accent.Indigo", "Brushes.Accent.IndigoLight",
+            "Brushes.Accent.VioletLight", "Brushes.Accent.Emerald",
+            "Brushes.Accent.IndigoGlow", "Brushes.Accent.EmeraldGlow",
+            "Brushes.Accent.Gradient",
+            "Brushes.Border.Hairline", "Brushes.Border.HairlineStrong",
+            "Brushes.Border.HairlineSoft", "Brushes.Border.HairlineInner",
+            "Brushes.Glass.Tint", "Brushes.GlassStrong.Tint",
+            "Brushes.Scrim", "Brushes.Subtle.Surface", "Brushes.Selection",
+            "Brushes.Status.Success", "Brushes.Status.Warn", "Brushes.Status.Danger",
+
+            // Elevation ladder (each tier referenced somewhere)
+            "Elevation.0.Flat", "Elevation.1.Resting", "Elevation.2.Resting",
+            "Elevation.2.Hover", "Elevation.3.Lifted", "Elevation.4.Modal",
+            "Elevation.Accent.Glow",
+
+            // Shadows
+            "Shadows.Card.Default", "Shadows.Card.Focal", "Shadows.Hover.Lift",
+            "Shadows.Accent.Glow", "Shadows.InnerHighlight.Default",
+
+            // Spacing recipes
+            "Spacing.Pad.Xxs", "Spacing.Pad.Xs", "Spacing.Pad.Sm", "Spacing.Pad.Md",
+            "Spacing.Pad.Lg", "Spacing.Pad.Xl", "Spacing.Pad.Xxl",
+
+            // Corner radii
+            "Corners.None", "Corners.Xs", "Corners.Sm", "Corners.Md",
+            "Corners.Lg", "Corners.Xl", "Corners.Pill",
+
+            // Borders / strokes
+            "Border.Thin", "Stroke.Thin", "Stroke.Thick",
+
+            // Colors (GradientStops need Color, not Brush)
+            "Colors.Ink.950", "Colors.Ink.900",
+            "Colors.Accent.IndigoGlow", "Colors.Accent.EmeraldGlow",
+        };
+
+        var app = Application.Current;
+        foreach (var key in required)
+        {
+            // FindResource throws ResourceReferenceKeyNotFoundException
+            // immediately if 'key' isn't in the merged dictionary chain.
+            _ = app.FindResource(key);
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -248,14 +331,42 @@ public partial class App : Application
 
     private static void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        // Mark handled unconditionally so the dispatcher continues.
+        // CRITICAL: NEVER swallow markup / parsing exceptions.
+        //
+        // When a XamlParseException is marked Handled, WPF continues
+        // to drive the render loop on a broken visual tree. The BAML
+        // string-pool reader state has been corrupted by the first
+        // failure; subsequent render passes then read adjacent / wrong
+        // entries from the string pool and emit phantom 'Cannot find
+        // resource named X' exceptions where X is a random internal
+        // WPF class name (TimelineSeverity, Timeline2.Resting,
+        // Elevation.2.Resting, Typography.Size.Title, Corners.Base,
+        // Brushes.Text.Muted, ...). Those keys do not actually exist
+        // anywhere in the source — they were never referenced, just
+        // emitted by BAML after the corruption. The real underlying
+        // error is upstream and masked by the loop.
+        //
+        // Letting XamlParseException propagate (e.Handled = false)
+        // preserves the original inner-exception type + message +
+        // stack so the user (or the sidecar log) reports the actual
+        // root cause ONCE — no cascading popup storm, no BAML
+        // desynchronisation.
+        if (e.Exception is System.Windows.Markup.XamlParseException)
+        {
+            TryWriteSidecarLog(e.Exception);
+            e.Handled = false;
+            return;
+        }
+
+        // For non-markup exceptions (e.g. NullReferenceException from
+        // a code bug, IO error, dispatcher-level problem) mark handled
+        // and debounce identical re-fires within 1500ms so a per-tick
+        // bug doesn't modal-exhaust the App via cascading popups.
         e.Handled = true;
 
         var fingerprint = ComputeFingerprint(e.Exception);
         var now = DateTime.UtcNow;
 
-        // If the same exception re-fires within the debounce window,
-        // silently swallow it. Same garbage, same UI — just keep going.
         if (_lastShownFingerprint is not null
             && string.Equals(_lastShownFingerprint, fingerprint, StringComparison.Ordinal)
             && (now - _lastShownAtUtc) < LoopBreakWindow)
@@ -266,6 +377,8 @@ public partial class App : Application
         _lastShownFingerprint = fingerprint;
         _lastShownAtUtc = now;
 
+        TryWriteSidecarLog(e.Exception);
+
         // e.Exception.ToString() unwraps the full chain (message + all inner
         // exceptions + stack traces), unlike .Message which shows only the
         // top-level string (often a generic wrapper like "Cannot locate
@@ -275,6 +388,34 @@ public partial class App : Application
             "BioCentri",
             MessageBoxButton.OK,
             MessageBoxImage.Error);
+    }
+
+    /// <summary>
+    /// Persist the current unhandled exception to %TEMP%/biocentri-xaml-error-*.log
+    /// so the diagnostic is recoverable across crashes. Tagged with type +
+    /// message + full ToString() (which unwraps the InnerException chain).
+    /// The companion scripts/diag_clean_build_probe.ps1 grep-reads this
+    /// on startup to surface stale exceptions from a prior crash.
+    /// </summary>
+    private static void TryWriteSidecarLog(Exception ex)
+    {
+        try
+        {
+            var logPath = System.IO.Path.Combine(
+                System.IO.Path.GetTempPath(),
+                $"biocentri-xaml-error-{DateTime.UtcNow:yyyyMMddHHmmssfff}.log");
+            System.IO.File.WriteAllText(
+                logPath,
+                $"Timestamp: {DateTime.UtcNow:O}\n" +
+                $"Exception type: {ex.GetType().FullName}\n" +
+                $"Message: {ex.Message}\n" +
+                $"\n--- ToString() (includes InnerException chain + stack) ---\n{ex}\n");
+        }
+        catch
+        {
+            // logging must never throw — it runs from inside the
+            // exception handler itself.
+        }
     }
 
     /// <summary>
