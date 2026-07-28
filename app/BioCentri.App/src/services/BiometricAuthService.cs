@@ -125,18 +125,22 @@ public sealed class BiometricAuthService : IBiometricAuthService
         var tcs = new TaskCompletionSource<AuthOutcome>(TaskCreationOptions.RunContinuationsAsynchronously);
         _pending[appName] = tcs;
 
+        // Linked CTS owns the 60s timeout policy. Declared OUTSIDE
+        // the try so both the post-await intercept AND the catch
+        // block can read IsCancellationRequested. `using` guarantees
+        // Dispose when the method returns regardless of which path
+        // runs. The adapter forwards the token to the WinRT async so
+        // OS-side cancellation still works if the user clicks Cancel
+        // on the overlay (ShellState.AuthenticationCancelRequested
+        // → OnShellStateCancelRequested → tcs.TrySetResult, which is
+        // idempotent if our timeout also fires).
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cts.CancelAfter(AuthTimeout);
+        Debug.WriteLine($"[BiometricAuthService] Prompt initiated for {appName}");
+
         try
         {
             var message = $"Verify your identity to launch {appName}.";
-            // Linked CTS owns the 60s timeout policy. The adapter
-            // forwards the token to the WinRT async, so OS-side
-            // cancellation still works if the user clicks Cancel on
-            // the overlay (ShellState.AuthenticationCancelRequested
-            // → OnShellStateCancelRequested → tcs.TrySetResult,
-            // which is idempotent if our timeout also fires).
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            cts.CancelAfter(AuthTimeout);
-            Debug.WriteLine($"[BiometricAuthService] Prompt initiated for {appName}");
 
             // Marshal the WinRT call onto the WPF STA thread.
             var helloResult = await _dispatcher.InvokeAsync(async () =>
@@ -164,12 +168,14 @@ public sealed class BiometricAuthService : IBiometricAuthService
         catch (Exception ex)
         {
             Debug.WriteLine($"[BiometricAuthService] {appName} threw {ex.GetType().Name}: {ex.Message}");
-            // If our timeout fired but the caller's token didn't,
-            // surface Timeout (not Error) so the audit log can tell
-            // 'user walked away' from a genuine crash. The adapter's
-            // own OCE catch normally returns UserCancelled, but if it
-            // ever bubbles here we still preserve the semantic.
-            var outcome = (cts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+            // Surface Timeout only when the exception IS the
+            // cancellation AND our timeout is the source (caller's
+            // token didn't fire). Otherwise a coincidental
+            // NullReferenceException + simultaneous timeout would be
+            // misclassified as Timeout and hide a real bug.
+            var outcome = (ex is OperationCanceledException
+                        && cts.IsCancellationRequested
+                        && !cancellationToken.IsCancellationRequested)
                 ? AuthOutcome.Timeout
                 : AuthOutcome.Error;
             tcs.TrySetResult(outcome);
