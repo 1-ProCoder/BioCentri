@@ -6,6 +6,7 @@
       xmlns:motion="clr-namespace:BioCentri.App.Components.Motion"
       xmlns:surface="clr-namespace:BioCentri.App.Components.Surface"
       xmlns:feedback="clr-namespace:BioCentri.App.Components.Feedback"
+      xmlns:items="clr-namespace:BioCentri.App.Features.Dashboard"
       Title="Dashboard"
       Background="Transparent"
       Foreground="{StaticResource Brushes.Text.Primary}">
@@ -18,41 +19,50 @@
             <header:PageHeader Title="{Binding Title}"
                                Subtitle="{Binding Subtitle}" />
 
-            <!-- Hero: greeting + status + HologramFloat-wrapped logo with ReticleRing behind -->
+            <!-- System Protection Active — polished hero card -->
             <surface:FocalCard Margin="{StaticResource Spacing.Pad.Md}">
                 <Grid>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="BIOCENTRI"
-                                   FontFamily="{StaticResource Typography.Sans}"
-                                   FontSize="{StaticResource Typography.Size.Caption}"
-                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
-                                   Foreground="{StaticResource Brushes.Accent.IndigoLight}"
-                                   Opacity="0.85"
-                                   Margin="0,0,0,8" />
+                    <!-- Shield medallion -->
+                    <Border Grid.Column="0"
+                            Width="88" Height="88"
+                            CornerRadius="44"
+                            Background="{StaticResource Brushes.Accent.Gradient}"
+                            Effect="{StaticResource Elevation.Accent.Glow}"
+                            VerticalAlignment="Center"
+                            Margin="0,0,24,0">
+                        <icon:Icon IconSize="38"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   GeometryKey="Icons.Route.ProtectedApps"
+                                   Stroke="White"
+                                   StrokeThickness="2.2" />
+                    </Border>
 
-                        <TextBlock Text="{Binding GreetingLine}"
+                    <!-- Headline + status copy -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="System Protection Active"
                                    FontFamily="{StaticResource Typography.Display}"
-                                   FontSize="{StaticResource Typography.Size.H1}"
+                                   FontSize="{StaticResource Typography.Size.H2}"
                                    FontWeight="{StaticResource Typography.Weight.SemiBold}"
-                                   Foreground="{StaticResource Brushes.Text.Violet}"
+                                   Foreground="{StaticResource Brushes.Text.Primary}"
                                    TextOptions.TextFormattingMode="Display" />
 
                         <TextBlock Text="{Binding StatusLine}"
                                    FontFamily="{StaticResource Typography.Sans}"
-                                   FontSize="{StaticResource Typography.Size.Large}"
+                                   FontSize="{StaticResource Typography.Size.Body}"
                                    Foreground="{StaticResource Brushes.Text.Muted}"
-                                   Margin="0,14,0,0"
-                                   MaxWidth="540"
+                                   Margin="0,8,0,0"
+                                   MaxWidth="640"
                                    TextWrapping="Wrap"
-                                   LineHeight="26" />
+                                   LineHeight="22" />
 
-                        <!-- Quick badges — protected-apps CTA + biometrics status -->
-                        <StackPanel Orientation="Horizontal" Margin="0,22,0,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
                             <Border Background="{StaticResource Brushes.Glass.Tint}"
                                     BorderBrush="{StaticResource Brushes.Border.Hairline}"
                                     BorderThickness="1"
@@ -91,130 +101,174 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <!-- Logo seat: ReticleRing ornament behind, HologramFloat wraps the logo -->
-                    <Grid Grid.Column="1" Width="220" Height="220"
-                          HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <motion:ReticleRing HorizontalAlignment="Center"
-                                            VerticalAlignment="Center" />
-                        <motion:HologramFloat HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Width="100" Height="100">
-                            <Border Width="100" Height="100"
-                                    CornerRadius="50"
-                                    Background="{StaticResource Brushes.Accent.Gradient}"
-                                    Effect="{StaticResource Elevation.Accent.Glow}">
-                                <icon:Icon IconSize="44"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           GeometryKey="Icons.Shell.Logo"
-                                           Stroke="White"
-                                           StrokeThickness="2.2" />
-                            </Border>
-                        </motion:HologramFloat>
-                    </Grid>
+                    <!-- Reticle ornament -->
+                    <motion:ReticleRing Grid.Column="2"
+                                        Width="220" Height="220"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center" />
                 </Grid>
             </surface:FocalCard>
 
-            <!-- BentoStats grid: 3 cols × 2 rows, asymmetric spans per M3 design language -->
-            <TextBlock Text="At a glance"
+            <!-- 4-col stat tiles -->
+            <ItemsControl ItemsSource="{Binding Stats}" Margin="0,20,0,0">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="4" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type items:DashboardStatRow}">
+                        <header:StatisticCard Label="{Binding Label}"
+                                              Value="{Binding Value}"
+                                              Delta="{Binding Caption}"
+                                              Margin="{StaticResource Spacing.Pad.Sm}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Recent Activity — table format -->
+            <TextBlock Text="Recent Activity"
                        FontFamily="{StaticResource Typography.Sans}"
                        FontSize="{StaticResource Typography.Size.Caption}"
                        FontWeight="{StaticResource Typography.Weight.SemiBold}"
                        Foreground="{StaticResource Brushes.Accent.IndigoLight}"
-                       Margin="12,32,12,8" />
-
-            <Grid Margin="0,0,0,4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <!-- Row 0: WIDE stat (spans 2 cols) + SMALL stat (col 2) -->
-                <surface:BentoStat Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                                   Label="Protected apps"
-                                   Value="{Binding Stats[0].Value}"
-                                   Caption="{Binding Stats[0].Caption}"
-                                   Margin="{StaticResource Spacing.Pad.Sm}" />
-
-                <surface:BentoStat Grid.Row="0" Grid.Column="2"
-                                   Label="Active rules"
-                                   Value="{Binding Stats[2].Value}"
-                                   Caption="{Binding Stats[2].Caption}"
-                                   Margin="{StaticResource Spacing.Pad.Sm}" />
-
-                <!-- Row 1: SMALL stat (col 0) + WIDE stat (spans 2 cols) -->
-                <surface:BentoStat Grid.Row="1" Grid.Column="0"
-                                   Label="Session start"
-                                   Value="{Binding Stats[3].Value}"
-                                   Caption="{Binding Stats[3].Caption}"
-                                   Margin="{StaticResource Spacing.Pad.Sm}" />
-
-                <surface:BentoStat Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
-                                   Label="Hello challenges"
-                                   Value="{Binding Stats[1].Value}"
-                                   Caption="{Binding Stats[1].Caption}"
-                                   Margin="{StaticResource Spacing.Pad.Sm}" />
-            </Grid>
-
-            <!-- Recent activity placeholder list -->
-            <TextBlock Text="Recent activity"
-                       FontFamily="{StaticResource Typography.Sans}"
-                       FontSize="{StaticResource Typography.Size.Caption}"
-                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
-                       Foreground="{StaticResource Brushes.Accent.IndigoLight}"
-                       Margin="12,32,12,8" />
+                       Margin="0,32,0,8" />
 
             <Border Background="{StaticResource Brushes.GlassStrong.Tint}"
                     BorderBrush="{StaticResource Brushes.Border.HairlineInner}"
                     BorderThickness="1"
                     CornerRadius="{StaticResource Corners.Md}"
-                    Padding="{StaticResource Spacing.Pad.Lg}">
+                    Padding="0">
                 <Border.Effect>
                     <StaticResource ResourceKey="Elevation.1.Resting" />
                 </Border.Effect>
+
+                <!-- Column header row -->
                 <Grid>
-                    <feedback:EmptyState Title="No challenges yet"
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0"
+                            Background="{StaticResource Brushes.Glass.Tint}"
+                            BorderBrush="{StaticResource Brushes.Border.HairlineSoft}"
+                            BorderThickness="0,0,0,1"
+                            Padding="20,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" MinWidth="160" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Time"
+                                       FontFamily="{StaticResource Typography.Sans}"
+                                       FontSize="{StaticResource Typography.Size.Caption}"
+                                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                       Foreground="{StaticResource Brushes.Text.Muted}"
+                                       Width="100" />
+                            <TextBlock Grid.Column="1" Text="Application"
+                                       FontFamily="{StaticResource Typography.Sans}"
+                                       FontSize="{StaticResource Typography.Size.Caption}"
+                                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                       Foreground="{StaticResource Brushes.Text.Muted}" />
+                            <TextBlock Grid.Column="2" Text="Event"
+                                       FontFamily="{StaticResource Typography.Sans}"
+                                       FontSize="{StaticResource Typography.Size.Caption}"
+                                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                       Foreground="{StaticResource Brushes.Text.Muted}" />
+                            <TextBlock Grid.Column="3" Text="Status"
+                                       FontFamily="{StaticResource Typography.Sans}"
+                                       FontSize="{StaticResource Typography.Size.Caption}"
+                                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                       Foreground="{StaticResource Brushes.Text.Muted}" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Rows -->
+                    <feedback:EmptyState Grid.Row="1"
+                                         Title="No challenges yet"
                                          Subtitle="When BioCentri gates an app for you, the events will appear here. Activity is fully on-device."
                                          IconKey="Icons.Route.Activity"
                                          Visibility="{Binding Recent.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=zero}" />
-                    <ItemsControl ItemsSource="{Binding Recent}"
+                    <ItemsControl Grid.Row="1"
+                                  ItemsSource="{Binding Recent}"
                                   Visibility="{Binding Recent.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=nonzero}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="0,0,0,10">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <Ellipse Grid.Column="0" Width="8" Height="8"
-                                             VerticalAlignment="Center"
-                                             Margin="0,0,12,0"
-                                             Fill="{StaticResource Brushes.Accent.Indigo}" />
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding Title}"
-                                                   FontFamily="{StaticResource Typography.Sans}"
-                                                   FontSize="{StaticResource Typography.Size.Body}"
-                                                   FontWeight="{StaticResource Typography.Weight.Medium}"
-                                                   Foreground="{StaticResource Brushes.Text.Primary}" />
-                                        <TextBlock Text="{Binding Detail}"
+                                <Border BorderBrush="{StaticResource Brushes.Border.HairlineSoft}"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="20,12">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" MinWidth="160" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding Timestamp, StringFormat='{}{0:hh:mm tt}'}"
+                                                   Width="100"
+                                                   FontFamily="{StaticResource Typography.Monospace}"
+                                                   FontSize="{StaticResource Typography.Size.Small}"
+                                                   Foreground="{StaticResource Brushes.Text.Muted}"
+                                                   VerticalAlignment="Center" />
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Title}"
+                                                       FontFamily="{StaticResource Typography.Sans}"
+                                                       FontSize="{StaticResource Typography.Size.Body}"
+                                                       FontWeight="{StaticResource Typography.Weight.Medium}"
+                                                       Foreground="{StaticResource Brushes.Text.Primary}" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding Event}"
                                                    FontFamily="{StaticResource Typography.Sans}"
                                                    FontSize="{StaticResource Typography.Size.Small}"
                                                    Foreground="{StaticResource Brushes.Text.Muted}"
-                                                   TextWrapping="Wrap" />
-                                    </StackPanel>
-                                    <TextBlock Grid.Column="2"
-                                               Text="{Binding Timestamp, StringFormat='{}{0:HH:mm}'}"
-                                               FontFamily="{StaticResource Typography.Monospace}"
-                                               FontSize="{StaticResource Typography.Size.Caption}"
-                                               Foreground="{StaticResource Brushes.Text.Muted}"
-                                               VerticalAlignment="Center" />
-                                </Grid>
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <Border Grid.Column="3"
+                                                Background="{StaticResource Brushes.Subtle.Surface}"
+                                                BorderThickness="1"
+                                                CornerRadius="{StaticResource Corners.Pill}"
+                                                Padding="10,3">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="BorderBrush" Value="{StaticResource Brushes.Status.Success}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Blocked">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource Brushes.Status.Danger}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Info">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource Brushes.Accent.IndigoLight}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock Text="{Binding Status}"
+                                                       FontFamily="{StaticResource Typography.Sans}"
+                                                       FontSize="{StaticResource Typography.Size.Caption}"
+                                                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                                       Foreground="{StaticResource Brushes.Status.Success}"
+                                                       TextAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="{StaticResource Brushes.Status.Success}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Blocked">
+                                                                <Setter Property="Foreground" Value="{StaticResource Brushes.Status.Danger}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Info">
+                                                                <Setter Property="Foreground" Value="{StaticResource Brushes.Accent.IndigoLight}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Border>
+                                    </Grid>
+                                </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

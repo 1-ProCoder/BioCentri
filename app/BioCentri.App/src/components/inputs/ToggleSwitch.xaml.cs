@@ -13,6 +13,11 @@ namespace BioCentri.App.Components.Inputs;
 /// activation of the row is delegated to focus-forwarding on the
 /// inner ToggleButton (Tab will hit it; Space/Enter activates; the
 /// visual track is also the click target).
+///
+/// Compact-row usage: set <see cref="IsLabelVisible"/> = false to
+/// collapse the label/description stack so the control collapses to
+/// just the toggle. Used by the Protected Apps table (M7+) and any
+/// other dense row that doesn't need its own caption.
 /// </summary>
 public partial class ToggleSwitch : Border
 {
@@ -32,6 +37,14 @@ public partial class ToggleSwitch : Border
             nameof(Description), typeof(string), typeof(ToggleSwitch),
             new PropertyMetadata(string.Empty, OnDescriptionChanged));
 
+    /// <summary>Defaults to <c>true</c> (preserves every existing
+    /// caller). Set <c>False</c> in DataTemplates where you want
+    /// just the switch with no label.</summary>
+    public static readonly DependencyProperty IsLabelVisibleProperty =
+        DependencyProperty.Register(
+            nameof(IsLabelVisible), typeof(bool), typeof(ToggleSwitch),
+            new PropertyMetadata(true, OnIsLabelVisibleChanged));
+
     public bool IsChecked
     {
         get => (bool)GetValue(IsCheckedProperty);
@@ -48,6 +61,12 @@ public partial class ToggleSwitch : Border
     {
         get => (string)GetValue(DescriptionProperty);
         set => SetValue(DescriptionProperty, value);
+    }
+
+    public bool IsLabelVisible
+    {
+        get => (bool)GetValue(IsLabelVisibleProperty);
+        set => SetValue(IsLabelVisibleProperty, value);
     }
 
     public ToggleSwitch()
@@ -73,5 +92,11 @@ public partial class ToggleSwitch : Border
             t.Text = v;
             t.Visibility = string.IsNullOrWhiteSpace(v) ? Visibility.Collapsed : Visibility.Visible;
         }
+    }
+
+    private static void OnIsLabelVisibleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is ToggleSwitch s && s.LabelHost is { } panel)
+            panel.Visibility = (bool)e.NewValue ? Visibility.Visible : Visibility.Collapsed;
     }
 }

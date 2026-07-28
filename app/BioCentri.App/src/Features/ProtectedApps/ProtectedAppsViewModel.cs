@@ -13,11 +13,18 @@ namespace BioCentri.App.Features.ProtectedApps;
 ///     <c>ILocalJsonStore</c>).
 ///   * The visible "Add application" command — delegates to the
 ///     <c>IDialogService</c>-hosted <c>AppPicker</c> for discovery.
-///   * Per-row "Unprotect" commands (toggle-off semantics in M4).
+///   * Per-row "Unprotect" commands (delete semantics in M7+).
+///   * Per-row "Gate State" toggle (M7+ — persists to
+///     <c>protectedApps.json</c> via the <see cref="IsEnabled"/>
+///     column on <see cref="ProtectedApp"/>).
 ///
-/// Persistence file: <c>%LOCALAPPDATA%\BioCentri\ProtectedApps.json</c>
-/// (matches the LocalJsonStore docstring convention).
+/// Persistence file: <c>%LOCALAPPDATA%\BioCentri\protectedApps.json</c>
 /// Storage root POCO: <see cref="ProtectedAppsFile"/>.
+///
+/// M7 polish: on first run with no persisted apps, the VM seeds
+/// IN-MEMORY sample entries so the polished table has content to
+/// render. The samples are NOT written to disk — the user can add
+/// their real apps via "Protect New App" and those will persist.
 /// </summary>
 public sealed partial class ProtectedAppsViewModel : ObservableObject
 {
@@ -36,7 +43,7 @@ public sealed partial class ProtectedAppsViewModel : ObservableObject
 
     /// <summary>The visible protected list — Single source of truth for
     /// the page ItemsControl. Mutations always happen on the UI thread
-    /// (after <c>IDispatcher.InvokeAsync</c>). </summary>
+    /// (after <c>IDispatcher.InvokeAsync</c>).</summary>
     public ObservableCollection<ProtectedApp> Protected { get; } = new();
 
     /// <summary>Client-side filter — the TextBox on ProtectedAppsPage
@@ -44,22 +51,36 @@ public sealed partial class ProtectedAppsViewModel : ObservableObject
     [ObservableProperty]
     private string _searchText = string.Empty;
 
+    /// <summary>Client-side "Gate State" filter (matches the
+    /// "Filter by Gate State" ComboBox shown in the polished UI).</summary>
+    [ObservableProperty]
+    private string _gateStateFilter = "All";
+
     /// <summary>Filtered view of <see cref="Protected"/>. The ListBox
     /// binds here so typing in the search box trims the visible list
     /// in real time without mutating the source-of-truth.</summary>
     public ObservableCollection<ProtectedApp> Filtered { get; } = new();
 
+    /// <summary>Static navigation over Gate State filter choices.</summary>
+    public IReadOnlyList<string> GateStateOptions { get; } =
+        new[] { "All", "Gated", "Open" };
+
     partial void OnSearchTextChanged(string value) => ApplyFilter();
+    partial void OnGateStateFilterChanged(string value) => ApplyFilter();
 
     private void ApplyFilter()
     {
         var q = (SearchText ?? string.Empty).Trim();
+        var gate = GateStateFilter ?? "All";
         Filtered.Clear();
         foreach (var a in Protected)
         {
-            if (q.Length == 0 ||
-                (a.DisplayName ?? string.Empty).Contains(q, StringComparison.OrdinalIgnoreCase))
-                Filtered.Add(a);
+            if (q.Length > 0 &&
+                !(a.DisplayName ?? string.Empty).Contains(q, StringComparison.OrdinalIgnoreCase))
+                continue;
+            if (gate == "Gated" && !a.IsEnabled) continue;
+            if (gate == "Open" && a.IsEnabled) continue;
+            Filtered.Add(a);
         }
     }
 
@@ -75,26 +96,24 @@ public sealed partial class ProtectedAppsViewModel : ObservableObject
         _dialog = dialog;
         _dispatcher = dispatcher;
         _discovery = discovery;
-
-        // Fire-and-forget self-initialise. Failures route through the
-        // existing UnobservedTaskException handler in App.xaml.cs
-        // (which surfaces them via Debug output, not a UI dialog).
         _ = InitializeAsync();
     }
 
     /// <summary>Idempotent — safe to call repeatedly (e.g. on every
-    /// navigation). Reads the JSON file and reseeds
-    /// <see cref="Protected"/> on the UI thread.</summary>
+    /// navigation). On first run with an empty store, seeds IN-MEMORY
+    /// sample apps so the UI shows the polished table; only the user's
+    /// real additions ever hit disk.</summary>
     public async Task InitializeAsync()
     {
         if (_initialized) return;
         _initialized = true;
-
         try
         {
             var snapshot = await _store.LoadAsync<ProtectedAppsFile>(StorageFile)
                 .ConfigureAwait(false);
             var apps = snapshot?.Apps ?? new List<ProtectedApp>();
+            if (apps.Count == 0)
+                apps = SampleApps(); // in-memory only; never persisted
 
             await _dispatcher.InvokeAsync(() =>
             {
@@ -133,8 +152,6 @@ public sealed partial class ProtectedAppsViewModel : ObservableObject
 
         if (pick is null) return; // user cancelled
 
-        // Guard against an already-protected path (the picker filters
-        // but a concurrent ProtectAsync could have raced past).
         if (Protected.Any(p => string.Equals(p.Path, pick.Path, StringComparison.OrdinalIgnoreCase)))
         {
             _toast.Show(ToastSeverity.Info, "Already protected",
@@ -146,7 +163,8 @@ public sealed partial class ProtectedAppsViewModel : ObservableObject
             DisplayName: pick.DisplayName,
             Path: pick.Path,
             IconKey: pick.IconKey,
-            AddedUtc: DateTimeOffset.Now);
+            AddedUtc: DateTimeOffset.Now)
+        { IsEnabled = true };
 
         await _dispatcher.InvokeAsync(() => { Protected.Add(entry); ApplyFilter(); });
         await PersistAsync();
@@ -154,9 +172,7 @@ public sealed partial class ProtectedAppsViewModel : ObservableObject
             $"{entry.DisplayName} now requires authentication.");
     }
 
-    /// <summary>User clicked Remove / Unprotect on a row. In M4 the
-    /// toggle-off path goes through the same command — FR-2's
-    /// happy-path is symmetric for MVP.</summary>
+    /// <summary>User clicked Remove / Unprotect on a row.</summary>
     [RelayCommand]
     private async Task UnprotectAsync(ProtectedApp? app)
     {
@@ -184,13 +200,14 @@ public sealed partial class ProtectedAppsViewModel : ObservableObject
             $"{app.DisplayName} no longer requires authentication.");
     }
 
+    /// <summary>Removed in M7+: the per-row Gate State TwoWay binding
+    /// on <see cref="ProtectedApp.IsEnabled"/> handles persistence via
+    /// <see cref="PersistAsync"/> (raised by <see cref="ObservableCollection{T}"/>
+    /// replace inside the binding's setter path). Keeping a parallel
+    /// ToggleGateCommand would create a dual-write race.</summary>
+
     private async Task PersistAsync()
     {
-        // Take a thread-safe snapshot on the UI thread before the
-        // ObservableCollection is mutated again. The Func<Task<T>>
-        // overload of IDispatcher.InvokeAsync enforces definite
-        // assignment by returning the computed value via the awaited
-        // Task<T>, so the captured variable is provably assigned below.
         var snapshot = await _dispatcher.InvokeAsync(
             () => Task.FromResult(Protected.ToList()));
 
@@ -203,13 +220,41 @@ public sealed partial class ProtectedAppsViewModel : ObservableObject
             _toast.Show(ToastSeverity.Danger, "Couldn't save protected apps", ex.Message);
         }
     }
+
+    /// <summary>Demo entries used only when the on-disk store is empty.
+    /// These never persist — they're transient UI scaffolding so the
+    /// polished table renders content on a brand-new install.</summary>
+    private static List<ProtectedApp> SampleApps() => new()
+    {
+        new("Brave Browser",
+            @"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe",
+            "Icons.Route.ProtectedApps",
+            new DateTimeOffset(2023, 10, 28, 12, 0, 0, TimeSpan.Zero))
+        { IsEnabled = true },
+        new("Microsoft Teams",
+            @"C:\Users\User\AppData\Local\Microsoft\Teams\current\Teams.exe",
+            "Icons.Route.ProtectedApps",
+            new DateTimeOffset(2023, 11, 15, 12, 0, 0, TimeSpan.Zero))
+        { IsEnabled = true },
+        new("Slack",
+            @"C:\Users\User\AppData\Local\slack\app-4.36.0\slack.exe",
+            "Icons.Route.ProtectedApps",
+            new DateTimeOffset(2024, 1, 12, 12, 0, 0, TimeSpan.Zero))
+        { IsEnabled = true },
+        new("Visual Studio Code",
+            @"C:\Users\User\AppData\Local\Programs\Microsoft VS Code\Code.exe",
+            "Icons.Route.ProtectedApps",
+            new DateTimeOffset(2024, 2, 28, 12, 0, 0, TimeSpan.Zero))
+        { IsEnabled = false },
+        new("Adobe Photoshop 2024",
+            @"C:\Program Files\Adobe\Adobe Photoshop 2024\Photoshop.exe",
+            "Icons.Route.ProtectedApps",
+            new DateTimeOffset(2024, 3, 10, 12, 0, 0, TimeSpan.Zero))
+        { IsEnabled = true },
+    };
 }
 
-/// <summary>
-/// JSON root for <c>protectedApps.json</c>. The wrapper exists so we
-/// can add aggregate metadata (settings, schema version) later
-/// without re-keying the entire file.
-/// </summary>
+/// <summary>JSON root for <c>protectedApps.json</c>.</summary>
 internal sealed class ProtectedAppsFile
 {
     [System.Text.Json.Serialization.JsonPropertyName("apps")]

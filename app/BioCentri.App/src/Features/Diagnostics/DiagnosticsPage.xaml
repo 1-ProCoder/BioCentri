@@ -14,11 +14,61 @@
                   Padding="32,32,32,64">
 
         <StackPanel>
-            <header:PageHeader Title="{Binding Title}"
-                               Subtitle="{Binding Subtitle}"
-                               Eyebrow="Environment" />
+            <!-- Title row -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-            <!-- 4-up stat grid: OS / Hello / Runtime / Build -->
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="BIOCENTRI"
+                               FontFamily="{StaticResource Typography.Sans}"
+                               FontSize="{StaticResource Typography.Size.Caption}"
+                               FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                               Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                               Opacity="0.85" />
+                    <TextBlock Text="System Diagnostics and Probes"
+                               FontFamily="{StaticResource Typography.Display}"
+                               FontSize="{StaticResource Typography.Size.H1}"
+                               FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                               Foreground="{StaticResource Brushes.Text.Primary}"
+                               TextOptions.TextFormattingMode="Display"
+                               Margin="0,4,0,0" />
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        VerticalAlignment="Bottom"
+                        Padding="14,9"
+                        Background="{StaticResource Brushes.Accent.Indigo}"
+                        Foreground="White"
+                        FontFamily="{StaticResource Typography.Sans}"
+                        FontSize="{StaticResource Typography.Size.Small}"
+                        FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Command="{Binding ProbeCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <icon:Icon IconSize="14"
+                                   Stroke="White"
+                                   StrokeThickness="2.2"
+                                   GeometryKey="Icons.Action.Add"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text="Re-probe System"
+                                   Margin="8,0,0,0"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <!-- Environment cards -->
+            <TextBlock Text="Environment"
+                       FontFamily="{StaticResource Typography.Sans}"
+                       FontSize="{StaticResource Typography.Size.Caption}"
+                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                       Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                       Margin="0,32,0,8" />
+
             <ItemsControl ItemsSource="{Binding Readouts}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -27,21 +77,97 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type items:DiagnosticsRow}">
-                        <nav:StatisticCard Label="{Binding Label}"
-                                           Value="{Binding Value}"
-                                           Delta="{Binding Caption}"
-                                           Margin="{StaticResource Spacing.Pad.Sm}" />
+                        <Border Background="{StaticResource Brushes.Surface.Card}"
+                                BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                                BorderThickness="1"
+                                CornerRadius="{StaticResource Corners.Md}"
+                                Padding="20,16"
+                                Margin="{StaticResource Spacing.Pad.Sm}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Label}"
+                                           FontFamily="{StaticResource Typography.Sans}"
+                                           FontSize="{StaticResource Typography.Size.Caption}"
+                                           FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                           Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                                           Margin="0,0,0,8" />
+                                <TextBlock Text="{Binding Value}"
+                                           FontFamily="{StaticResource Typography.Display}"
+                                           FontSize="{StaticResource Typography.Size.Body}"
+                                           FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                           Foreground="{StaticResource Brushes.Text.Primary}"
+                                           TextWrapping="Wrap"
+                                           TextOptions.TextFormattingMode="Display" />
+                                <TextBlock Text="{Binding Caption}"
+                                           FontFamily="{StaticResource Typography.Sans}"
+                                           FontSize="{StaticResource Typography.Size.Caption}"
+                                           Foreground="{StaticResource Brushes.Text.Muted}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,6,0,0" />
+                            </StackPanel>
+                        </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <!-- Recent signals list -->
+            <!-- Console Log Stream -->
+            <TextBlock Text="Console Log Stream"
+                       FontFamily="{StaticResource Typography.Sans}"
+                       FontSize="{StaticResource Typography.Size.Caption}"
+                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                       Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                       Margin="0,32,0,8" />
+
+            <Border Background="#FF06080C"
+                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Corners.Md}"
+                    Padding="16">
+                <ItemsControl ItemsSource="{Binding LogStream}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type items:ConsoleLogEntry}">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="{Binding Timestamp}"
+                                           FontFamily="Consolas, Courier New, Monospace"
+                                           FontSize="{StaticResource Typography.Size.Caption}"
+                                           Foreground="#FF6B7280"
+                                           Width="160"
+                                           VerticalAlignment="Center" />
+                                <Border Background="Transparent"
+                                        BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                                        CornerRadius="2"
+                                        Padding="6,1"
+                                        Margin="0,0,12,0"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Severity}"
+                                               FontFamily="Consolas, Courier New, Monospace"
+                                               FontSize="{StaticResource Typography.Size.Caption}"
+                                               FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                               Foreground="#FFA78BFA" />
+                                </Border>
+                                <TextBlock Text="|"
+                                           FontFamily="Consolas, Courier New, Monospace"
+                                           Foreground="#FF3F3F46"
+                                           Margin="0,0,12,0"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Description}"
+                                           FontFamily="Consolas, Courier New, Monospace"
+                                           FontSize="{StaticResource Typography.Size.Small}"
+                                           Foreground="#FFE4E4E7"
+                                           TextWrapping="Wrap"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+
+            <!-- Recent signals -->
             <TextBlock Text="Recent signals"
                        FontFamily="{StaticResource Typography.Sans}"
                        FontSize="{StaticResource Typography.Size.Caption}"
                        FontWeight="{StaticResource Typography.Weight.SemiBold}"
                        Foreground="{StaticResource Brushes.Accent.IndigoLight}"
-                       Margin="12,32,12,8" />
+                       Margin="0,32,0,8" />
 
             <ItemsControl ItemsSource="{Binding Signals}">
                 <ItemsControl.ItemTemplate>

@@ -160,7 +160,9 @@ public partial class App : Application
         //      are parameterless and match BioCentri.App/src/Features/...
         //      The M5-strict event-subscription wiring is documented in
         //      DECISIONS.md and re-introduced when those milestones launch.
-        host.AddSingleton<DiagnosticsViewModel>(new DiagnosticsViewModel())
+        host.AddSingleton<DiagnosticsViewModel>(new DiagnosticsViewModel(
+            host.Get<IBiometricAuthService>(),
+            host.Get<IDispatcher>()))
             .AddSingleton<ActivityViewModel>(new ActivityViewModel(host.Get<ILocalJsonStore>()))
             .AddSingleton<DashboardViewModel>(new DashboardViewModel(host.Get<ILocalJsonStore>()));
 

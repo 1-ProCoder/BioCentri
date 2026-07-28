@@ -3,7 +3,6 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:header="clr-namespace:BioCentri.App.Components.Nav"
       xmlns:icon="clr-namespace:BioCentri.App.Components.Iconography"
-      xmlns:nav="clr-namespace:BioCentri.App.Components.Nav"
       xmlns:feedback="clr-namespace:BioCentri.App.Components.Feedback"
       xmlns:inputs="clr-namespace:BioCentri.App.Components.Inputs"
       xmlns:items="clr-namespace:BioCentri.App.Types"
@@ -11,90 +10,124 @@
       Background="Transparent"
       Foreground="{StaticResource Brushes.Text.Primary}">
 
-    <Grid x:Name="Root">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />     <!-- header       -->
+            <RowDefinition Height="Auto" />     <!-- composer row -->
+            <RowDefinition Height="*" />        <!-- table        -->
         </Grid.RowDefinitions>
 
-        <header:PageHeader Grid.Row="0"
-                           Title="{Binding Title}"
-                           Subtitle="{Binding Subtitle}"
-                           Eyebrow="Automation" />
+        <!-- Title row -->
+        <Grid Grid.Row="0" Margin="32,32,32,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-        <!-- Add-rule composer. Translucent so the glow bleeds through. -->
-        <Border Grid.Row="1"
-                Background="{StaticResource Brushes.GlassStrong.Tint}"
-                BorderBrush="{StaticResource Brushes.Border.HairlineInner}"
-                BorderThickness="1"
-                CornerRadius="{StaticResource Corners.Md}"
-                Padding="20,16"
-                Margin="32,8,32,16">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0"
-                         Text="{Binding NewRuleName, UpdateSourceTrigger=PropertyChanged}"
-                         Background="{StaticResource Brushes.Subtle.Surface}"
-                         Foreground="{StaticResource Brushes.Text.Primary}"
-                         CaretBrush="{StaticResource Brushes.Accent.Indigo}"
-                         BorderBrush="{StaticResource Brushes.Border.Hairline}"
-                         BorderThickness="1"
-                         Padding="12,8"
-                         Margin="0,0,8,0"
-                         FontFamily="{StaticResource Typography.Sans}"
-                         FontSize="{StaticResource Typography.Size.Small}"
-                         ToolTip="Short rule name, e.g. 'Discord after 22:00'." />
-                <TextBox Grid.Column="1"
-                         Text="{Binding NewRuleTrigger, UpdateSourceTrigger=PropertyChanged}"
-                         Background="{StaticResource Brushes.Subtle.Surface}"
-                         Foreground="{StaticResource Brushes.Text.Primary}"
-                         CaretBrush="{StaticResource Brushes.Accent.Indigo}"
-                         BorderBrush="{StaticResource Brushes.Border.Hairline}"
-                         BorderThickness="1"
-                         Padding="12,8"
-                         Margin="0,0,8,0"
-                         FontFamily="{StaticResource Typography.Sans}"
-                         FontSize="{StaticResource Typography.Size.Small}"
-                         ToolTip="Schedule or trigger copy e.g. 'After 22:00'." />
-                <TextBox Grid.Column="2"
-                         Text="{Binding NewRuleDescription, UpdateSourceTrigger=PropertyChanged}"
-                         Background="{StaticResource Brushes.Subtle.Surface}"
-                         Foreground="{StaticResource Brushes.Text.Primary}"
-                         CaretBrush="{StaticResource Brushes.Accent.Indigo}"
-                         BorderBrush="{StaticResource Brushes.Border.Hairline}"
-                         BorderThickness="1"
-                         Padding="12,8"
-                         Margin="0,0,8,0"
-                         FontFamily="{StaticResource Typography.Sans}"
-                         FontSize="{StaticResource Typography.Size.Small}"
-                         ToolTip="Optional longer note about what this rule does." />
-                <Button Grid.Column="3"
-                        Content="Add rule"
-                        Padding="16,8"
-                        Background="{StaticResource Brushes.Accent.Indigo}"
-                        Foreground="White"
-                        FontFamily="{StaticResource Typography.Sans}"
-                        FontSize="{StaticResource Typography.Size.Small}"
-                        FontWeight="{StaticResource Typography.Weight.SemiBold}"
-                        BorderThickness="0"
-                        Cursor="Hand"
-                        Command="{Binding AddCommand}" />
-            </Grid>
-        </Border>
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock Text="BIOCENTRI"
+                           FontFamily="{StaticResource Typography.Sans}"
+                           FontSize="{StaticResource Typography.Size.Caption}"
+                           FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                           Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                           Opacity="0.85" />
+                <TextBlock Text="Automation Rules Configuration"
+                           FontFamily="{StaticResource Typography.Display}"
+                           FontSize="{StaticResource Typography.Size.H1}"
+                           FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                           Foreground="{StaticResource Brushes.Text.Primary}"
+                           TextOptions.TextFormattingMode="Display"
+                           Margin="0,4,0,0" />
+            </StackPanel>
 
-        <!-- Body : empty state OR list -->
+            <Button Grid.Column="1"
+                    Padding="16,9"
+                    Background="{StaticResource Brushes.Accent.Indigo}"
+                    Foreground="White"
+                    FontFamily="{StaticResource Typography.Sans}"
+                    FontSize="{StaticResource Typography.Size.Small}"
+                    FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Command="{Binding AddCommand}"
+                    ToolTip="Add a new automation rule.">
+                <StackPanel Orientation="Horizontal">
+                    <icon:Icon IconSize="14"
+                               Stroke="White"
+                               StrokeThickness="2.2"
+                               GeometryKey="Icons.Action.Add"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="Create New Rule"
+                               Margin="8,0,0,0"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- Composer row -->
+        <Grid Grid.Row="1" Margin="32,0,32,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBox Grid.Column="0"
+                     Text="{Binding NewRuleName, UpdateSourceTrigger=PropertyChanged}"
+                     Tag="Rule name (e.g. Secure Browser)"
+                     Background="{StaticResource Brushes.Subtle.Surface}"
+                     Foreground="{StaticResource Brushes.Text.Primary}"
+                     CaretBrush="{StaticResource Brushes.Accent.Indigo}"
+                     BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                     BorderThickness="1"
+                     Padding="12,8"
+                     Margin="0,0,8,0"
+                     FontFamily="{StaticResource Typography.Sans}"
+                     FontSize="{StaticResource Typography.Size.Small}" />
+            <TextBox Grid.Column="1"
+                     Text="{Binding NewRuleTarget, UpdateSourceTrigger=PropertyChanged}"
+                     Tag="Target app (e.g. Brave)"
+                     Background="{StaticResource Brushes.Subtle.Surface}"
+                     Foreground="{StaticResource Brushes.Text.Primary}"
+                     CaretBrush="{StaticResource Brushes.Accent.Indigo}"
+                     BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                     BorderThickness="1"
+                     Padding="12,8"
+                     Margin="0,0,8,0"
+                     FontFamily="{StaticResource Typography.Sans}"
+                     FontSize="{StaticResource Typography.Size.Small}" />
+            <TextBox Grid.Column="2"
+                     Text="{Binding NewRuleTrigger, UpdateSourceTrigger=PropertyChanged}"
+                     Tag="Schedule (e.g. All Day)"
+                     Background="{StaticResource Brushes.Subtle.Surface}"
+                     Foreground="{StaticResource Brushes.Text.Primary}"
+                     CaretBrush="{StaticResource Brushes.Accent.Indigo}"
+                     BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                     BorderThickness="1"
+                     Padding="12,8"
+                     Margin="0,0,8,0"
+                     FontFamily="{StaticResource Typography.Sans}"
+                     FontSize="{StaticResource Typography.Size.Small}" />
+            <Button Grid.Column="3"
+                    Content="Add"
+                    Padding="20,8"
+                    Background="{StaticResource Brushes.Accent.Indigo}"
+                    Foreground="White"
+                    FontFamily="{StaticResource Typography.Sans}"
+                    FontSize="{StaticResource Typography.Size.Small}"
+                    FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Command="{Binding AddCommand}" />
+        </Grid>
+
+        <!-- Table -->
         <Border Grid.Row="2"
                 Background="{StaticResource Brushes.GlassStrong.Tint}"
                 BorderBrush="{StaticResource Brushes.Border.HairlineInner}"
                 BorderThickness="1"
                 CornerRadius="{StaticResource Corners.Md}"
-                Padding="{StaticResource Spacing.Pad.Lg}"
                 Margin="32,0,32,32">
             <Border.Effect>
                 <StaticResource ResourceKey="Elevation.1.Resting" />
@@ -106,82 +139,148 @@
                                      IconKey="Icons.Route.Rules"
                                      Visibility="{Binding Rules.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=zero}" />
 
-                <ListBox Background="Transparent"
-                         BorderThickness="0"
-                         ItemsSource="{Binding Rules}"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                         Visibility="{Binding Rules.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=nonzero}">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            <Setter Property="Padding" Value="0" />
-                            <Setter Property="Margin" Value="0,0,0,8" />
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type items:Rule}">
-                            <Border Background="{StaticResource Brushes.Glass.Tint}"
-                                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
-                                    BorderThickness="1"
-                                    CornerRadius="{StaticResource Corners.Md}"
-                                    Padding="14,12">
+                <Grid Visibility="{Binding Rules.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=nonzero}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Column header -->
+                    <Border Grid.Row="0"
+                            Background="{StaticResource Brushes.Glass.Tint}"
+                            BorderBrush="{StaticResource Brushes.Border.HairlineSoft}"
+                            BorderThickness="0,0,0,1"
+                            Padding="20,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Rule Name"
+                                       FontFamily="{StaticResource Typography.Sans}"
+                                       FontSize="{StaticResource Typography.Size.Caption}"
+                                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                       Foreground="{StaticResource Brushes.Text.Muted}" />
+                            <TextBlock Grid.Column="1" Text="Target App"
+                                       FontFamily="{StaticResource Typography.Sans}"
+                                       FontSize="{StaticResource Typography.Size.Caption}"
+                                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                       Foreground="{StaticResource Brushes.Text.Muted}" />
+                            <TextBlock Grid.Column="2" Text="Condition"
+                                       FontFamily="{StaticResource Typography.Sans}"
+                                       FontSize="{StaticResource Typography.Size.Caption}"
+                                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                       Foreground="{StaticResource Brushes.Text.Muted}" />
+                            <TextBlock Grid.Column="3" Text="Schedule"
+                                       FontFamily="{StaticResource Typography.Sans}"
+                                       FontSize="{StaticResource Typography.Size.Caption}"
+                                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                       Foreground="{StaticResource Brushes.Text.Muted}" />
+                            <TextBlock Grid.Column="4" Text="Status"
+                                       FontFamily="{StaticResource Typography.Sans}"
+                                       FontSize="{StaticResource Typography.Size.Caption}"
+                                       FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                       Foreground="{StaticResource Brushes.Text.Muted}"
+                                       Width="80"
+                                       TextAlignment="Center" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Rows -->
+                    <ListBox Grid.Row="1"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             ItemsSource="{Binding Rules}"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             Padding="0">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="20,12" />
+                                <Setter Property="Margin" Value="0" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border BorderBrush="{StaticResource Brushes.Border.HairlineSoft}"
+                                                    BorderThickness="0,0,0,1"
+                                                    Background="{TemplateBinding Background}">
+                                                <ContentPresenter />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type items:Rule}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <icon:Icon Grid.Column="0"
-                                               IconSize="22"
-                                               Stroke="{StaticResource Brushes.Accent.Indigo}"
-                                               StrokeThickness="1.6"
-                                               GeometryKey="Icons.Route.Rules"
-                                               VerticalAlignment="Center"
-                                               Margin="0,0,12,0" />
-
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <icon:Icon IconSize="20"
+                                                   Stroke="{StaticResource Brushes.Accent.Indigo}"
+                                                   StrokeThickness="1.6"
+                                                   GeometryKey="Icons.Route.Rules"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,12,0" />
                                         <TextBlock Text="{Binding Name}"
                                                    FontFamily="{StaticResource Typography.Sans}"
                                                    FontSize="{StaticResource Typography.Size.Body}"
                                                    FontWeight="{StaticResource Typography.Weight.Medium}"
                                                    Foreground="{StaticResource Brushes.Text.Primary}"
+                                                   VerticalAlignment="Center"
                                                    TextTrimming="CharacterEllipsis" />
-                                        <TextBlock FontFamily="{StaticResource Typography.Sans}"
-                                                   FontSize="{StaticResource Typography.Size.Small}"
-                                                   Foreground="{StaticResource Brushes.Text.Muted}"
-                                                   TextWrapping="Wrap">
-                                            <Run Text="{Binding TriggerText, Mode=OneWay}" />
-                                            <Run Text=" — " />
-                                            <Run Text="{Binding Description, Mode=OneWay}" />
-                                        </TextBlock>
                                     </StackPanel>
 
-                                    <inputs:ToggleSwitch Grid.Column="2"
-                                                         IsChecked="{Binding IsEnabled}"
-                                                         Margin="0,0,12,0"
-                                                         VerticalAlignment="Center"
-                                                         AutomationProperties.Name="Toggle rule enabled" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Description}"
+                                               FontFamily="{StaticResource Typography.Sans}"
+                                               FontSize="{StaticResource Typography.Size.Small}"
+                                               Foreground="{StaticResource Brushes.Text.Primary}"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" />
 
-                                    <Button Grid.Column="3"
-                                            Content="Delete"
-                                            Padding="14,6"
-                                            Background="{StaticResource Brushes.Subtle.Surface}"
-                                            Foreground="{StaticResource Brushes.Text.Primary}"
-                                            FontFamily="{StaticResource Typography.Sans}"
-                                            FontSize="{StaticResource Typography.Size.Small}"
-                                            FontWeight="{StaticResource Typography.Weight.Medium}"
-                                            BorderBrush="{StaticResource Brushes.Border.Hairline}"
-                                            BorderThickness="1"
-                                            Cursor="Hand"
-                                            Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                            CommandParameter="{Binding}" />
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <icon:Icon IconSize="14"
+                                                   Stroke="{StaticResource Brushes.Text.Muted}"
+                                                   GeometryKey="Icons.Route.Rules"
+                                                   Margin="0,0,8,0" />
+                                        <TextBlock Text="{Binding TriggerText}"
+                                                   FontFamily="{StaticResource Typography.Sans}"
+                                                   FontSize="{StaticResource Typography.Size.Small}"
+                                                   Foreground="{StaticResource Brushes.Text.Muted}" />
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Column="3"
+                                               Text="{Binding TriggerText}"
+                                               FontFamily="{StaticResource Typography.Sans}"
+                                               FontSize="{StaticResource Typography.Size.Small}"
+                                               Foreground="{StaticResource Brushes.Text.Muted}"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" />
+
+                                    <inputs:ToggleSwitch Grid.Column="4"
+                                                         IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                                         IsLabelVisible="False"
+                                                         Width="80"
+                                                         VerticalAlignment="Center"
+                                                         HorizontalAlignment="Center"
+                                                         AutomationProperties.Name="Toggle rule enabled" />
                                 </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
             </Grid>
         </Border>
     </Grid>

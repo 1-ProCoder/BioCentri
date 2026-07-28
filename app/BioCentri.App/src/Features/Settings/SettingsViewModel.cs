@@ -13,33 +13,42 @@ using CommunityToolkit.Mvvm.Input;
 namespace BioCentri.App.Features.Settings;
 
 /// <summary>
-/// Settings view-model. M2 placeholder per IMPLEMENTATION_PLAN §7.
-/// FR-6 detail panel arrives in Milestone 6; today the view-model
-/// exposes the category list so navigation + design language work
-/// end-to-end.
+/// Settings view-model. M7 polish: ships the six settings rows
+/// visible on the polished BioCentri Settings page
+/// (System Startup &amp; Tray / Challenge Behavior / Appearance),
+/// the reduced-motion toggle, and the Windows Hello test affordance.
 ///
-/// M7.5+: visibly demonstrates the Windows Hello pipeline so the user
-/// can confirm auth works without first configuring a protected app.
-/// Injects <see cref="IBiometricAuthService"/> + <see cref="IToastService"/>
-/// + <see cref="IDispatcher"/>; surfaces live capability + a Test command.
+/// Persistence file: <c>%LOCALAPPDATA%\BioCentri\Settings.json</c>.
+/// All new properties use <c>init</c> with non-conflicting defaults
+/// so legacy <c>Settings.json</c> files (M2..M6) round-trip cleanly
+/// through <c>System.Text.Json</c> without throwing.
 /// </summary>
 public sealed partial class SettingsViewModel : ObservableObject
 {
     public string Title => RouteTable.Get(Route.Settings).Title;
     public string Subtitle => RouteTable.Get(Route.Settings).Subtitle;
 
-    /// <summary>POCO serialised to <c>%LOCALAPPDATA%\BioCentri\Settings.json</c>
-    /// so user preferences survive app restarts. <see cref="DefaultAuthMethod"/>
-    /// is the fallback credential tier the OS offers when biometric is
-    /// disabled by policy / not configured for this user.</summary>
-    private sealed record PersistentSettings(
-        bool IsReducedMotionEnabled,
-        string DefaultAuthMethod);
+    /// <summary>POCO serialised to <c>%LOCALAPPDATA%\BioCentri\Settings.json</c>.
+    /// Every property is optional with a sensible default so legacy
+    /// files that pre-date a field still deserialise.</summary>
+    private sealed record PersistentSettings
+    {
+        public bool IsReducedMotionEnabled { get; init; }
+        public string DefaultAuthMethod { get; init; } = "Biometric";
+
+        // M7 added ----
+        public bool IsLaunchOnBootEnabled { get; init; } = true;
+        public bool IsMinimizeToTrayEnabled { get; init; } = true;
+        public string GracePeriod { get; init; } = "15 mins";
+        public string RePromptAfterInactivity { get; init; } = "30 mins";
+        public string Theme { get; init; } = "Dark";
+        public string AccentColor { get; init; } = "Obsidian Blue";
+        // -------------
+    }
 
     private static readonly string SettingsPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "BioCentri",
-        "Settings.json");
+        "BioCentri", "Settings.json");
 
     private static readonly JsonSerializerOptions SettingsJsonOptions = new()
     {
@@ -51,59 +60,86 @@ public sealed partial class SettingsViewModel : ObservableObject
     private readonly IBiometricAuthService _auth;
     private readonly IToastService _toast;
 
+    // ----------------------------------------------------------
+    // Persistence-bound state (driven from PersistentSettings).
+    // ----------------------------------------------------------
     private bool _isReducedMotionEnabled;
+    private bool _isLaunchOnBootEnabled = true;
+    private bool _isMinimizeToTrayEnabled = true;
+    private GracePeriodOption _gracePeriod = GracePeriodOption.Mins15;
+    private RePromptOption _rePrompt = RePromptOption.Mins30;
+    private ThemeOption _theme = ThemeOption.Dark;
+    private AccentOption _accent = AccentOption.ObsidianBlue;
+    private AuthMethodOption _defaultAuthMethod = AuthMethodOption.Biometric;
+    private AuthCapability _authCapability = AuthCapability.Unknown;
 
-    /// <summary>
-    /// Milestone 7: reduced-motion toggle. Mirrored into
-    /// <c>UseReducedMotion</c> and the <c>Motion.RespectReducedMotion</c>
-    /// Application resource so all animation components gate on it.
-    /// Persisted to disk on every change; loaded on construction.
-    /// </summary>
+    /// <summary>M7: launch-at-startup toggle.</summary>
+    public bool IsLaunchOnBootEnabled
+    {
+        get => _isLaunchOnBootEnabled;
+        set { if (SetProperty(ref _isLaunchOnBootEnabled, value)) PersistSettings(); }
+    }
+
+    /// <summary>M7: close-to-tray toggle.</summary>
+    public bool IsMinimizeToTrayEnabled
+    {
+        get => _isMinimizeToTrayEnabled;
+        set { if (SetProperty(ref _isMinimizeToTrayEnabled, value)) PersistSettings(); }
+    }
+
+    public IReadOnlyList<GracePeriodOption> GracePeriodOptions { get; } =
+        Enum.GetValues<GracePeriodOption>();
+
+    public GracePeriodOption GracePeriod
+    {
+        get => _gracePeriod;
+        set { if (SetProperty(ref _gracePeriod, value)) PersistSettings(); }
+    }
+
+    public IReadOnlyList<RePromptOption> RePromptOptions { get; } =
+        Enum.GetValues<RePromptOption>();
+
+    public RePromptOption RePromptAfterInactivity
+    {
+        get => _rePrompt;
+        set { if (SetProperty(ref _rePrompt, value)) PersistSettings(); }
+    }
+
+    public IReadOnlyList<ThemeOption> ThemeOptions { get; } =
+        Enum.GetValues<ThemeOption>();
+
+    public ThemeOption Theme
+    {
+        get => _theme;
+        set { if (SetProperty(ref _theme, value)) PersistSettings(); }
+    }
+
+    public IReadOnlyList<AccentOption> AccentOptions { get; } =
+        Enum.GetValues<AccentOption>();
+
+    public AccentOption AccentColor
+    {
+        get => _accent;
+        set { if (SetProperty(ref _accent, value)) PersistSettings(); }
+    }
+
     public bool IsReducedMotionEnabled
     {
         get => _isReducedMotionEnabled;
         set
         {
             if (!SetProperty(ref _isReducedMotionEnabled, value)) return;
-
-            if (value)
-                UseReducedMotion.Enable();
-            else
-                UseReducedMotion.Disable();
-
+            if (value) UseReducedMotion.Enable(); else UseReducedMotion.Disable();
             System.Windows.Application.Current.Resources["Motion.RespectReducedMotion"] = value;
-
             PersistSettings();
         }
     }
 
-    private AuthMethodOption _defaultAuthMethod = AuthMethodOption.Biometric;
-
-    /// <summary>
-    /// Fallback credential choice when Windows Hello biometric is
-    /// unavailable or disabled by policy. <c>Biometric</c> prefers
-    /// fingerprint / face when available; <c>PinFallback</c> routes the
-    /// user through the OS PIN sign-in path instead. Persisted.
-    /// </summary>
     public AuthMethodOption DefaultAuthMethod
     {
         get => _defaultAuthMethod;
-        set
-        {
-            if (!SetProperty(ref _defaultAuthMethod, value)) return;
-            PersistSettings();
-        }
+        set { if (SetProperty(ref _defaultAuthMethod, value)) PersistSettings(); }
     }
-
-    /// <summary>
-    /// M7.5: current device capability reported by the biometric
-    /// adapter. Surfaces a "Windows Hello not configured" hint on the
-    /// Settings page so the user knows what to do if the Test button
-    /// reports a non-Verified outcome. The probe runs once at boot;
-    /// <see cref="ILocalJsonStore"/> does NOT persist this — it's a
-    /// runtime-only signal of what the OS will actually accept.
-    /// </summary>
-    private AuthCapability _authCapability = AuthCapability.Unknown;
 
     public AuthCapability AuthCapability
     {
@@ -117,7 +153,6 @@ public sealed partial class SettingsViewModel : ObservableObject
         }
     }
 
-    /// <summary>Single-line status copy rendered on the Settings page.</summary>
     public string AuthCapabilityLabel => _authCapability switch
     {
         AuthCapability.Available                => "Windows Hello is ready on this device.",
@@ -129,13 +164,24 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     public bool CanTestAuth => _authCapability == AuthCapability.Available;
 
-    /// <summary>
-    /// M7.5: Test button on the Settings page. Prompts the OS for the
-    /// fake app name "BioCentri · Auth test" and toasts the outcome so
-    /// the user can SEE the full Windows Hello pipeline without first
-    /// configuring a protected app launch.
-    /// </summary>
     public IAsyncRelayCommand TestAuthCommand { get; }
+
+    /// <summary>M7: clicked from the Theme picker row in
+    /// <see cref="SettingsPage"/>. Bound via
+    /// <c>DataContext.SetThemeCommand</c> + CommandParameter.</summary>
+    [RelayCommand]
+    private void SetTheme(ThemeOption option)
+    {
+        Theme = option;
+    }
+
+    /// <summary>M7: clicked from the Accent Color picker row in
+    /// <see cref="SettingsPage"/>.</summary>
+    [RelayCommand]
+    private void SetAccentColor(AccentOption option)
+    {
+        AccentColor = option;
+    }
 
     public ObservableCollection<SettingsCategoryRow> Categories { get; } = new();
 
@@ -148,8 +194,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         _toast = toast;
         _dispatcher = dispatcher;
 
-        // IconKey map: only keys that exist in app/BioCentri.App/src/styles/Icons.xaml
-        // (Decision 9 followup: action keys are limited to what the design system ships.)
+        // Sidebar list — kept for navigation parity with prior milestones.
         Categories.Add(new SettingsCategoryRow(
             "Appearance",   "Theme, density, motion",                "Icons.Action.More"));
         Categories.Add(new SettingsCategoryRow(
@@ -172,14 +217,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         FireAndForgetCapabilityProbe();
     }
 
-    private void FireAndForgetCapabilityProbe()
-    {
-        // Fire-and-forget; outcome updates AuthCapability on the dispatcher.
-        // Exceptions stay swallowed because the UI surfaces "Checking…"
-        // as the default and a transient probe failure should not crash
-        // the shell.
-        _ = ProbeAuthCapabilityAsync();
-    }
+    private void FireAndForgetCapabilityProbe() => _ = ProbeAuthCapabilityAsync();
 
     private async Task ProbeAuthCapabilityAsync()
     {
@@ -188,23 +226,13 @@ public sealed partial class SettingsViewModel : ObservableObject
             var cap = await _auth.GetCapabilityAsync(CancellationToken.None).ConfigureAwait(false);
             await _dispatcher.InvokeAsync(() => AuthCapability = cap).ConfigureAwait(false);
         }
-        catch
-        {
-            // Leave default (Unknown). UI shows "Checking…"; user can
-            // hit Test to force a fresh prompt if they want.
-        }
+        catch { /* see SettingsViewModel docstring */ }
     }
 
     private async Task TestAuthAsync()
     {
-        // Use a stable, recognisable app name so the OS prompt shows
-        // "Verify your identity to launch BioCentri · Auth test" and
-        // any coalesced waiting watcher-side would land here too.
         const string testAppName = "BioCentri · Auth test";
         var outcome = await _auth.AuthenticateAsync(testAppName, CancellationToken.None).ConfigureAwait(false);
-
-        // ToastService mutations and ItemsControl binding notify must
-        // marshal back onto the WPF UI thread.
         await _dispatcher.InvokeAsync(() => ShowOutcomeToast(outcome)).ConfigureAwait(false);
     }
 
@@ -213,51 +241,27 @@ public sealed partial class SettingsViewModel : ObservableObject
         switch (outcome)
         {
             case AuthOutcome.Verified:
-                _toast.Show(
-                    ToastSeverity.Success,
-                    "Hello verified",
-                    "Windows Hello confirmed your identity.");
-                break;
+                _toast.Show(ToastSeverity.Success, "Hello verified",
+                    "Windows Hello confirmed your identity."); break;
             case AuthOutcome.UserCancelled:
-                _toast.Show(
-                    ToastSeverity.Info,
-                    "Auth test dismissed",
-                    "You closed the Windows Hello prompt.");
-                break;
+                _toast.Show(ToastSeverity.Info, "Auth test dismissed",
+                    "You closed the Windows Hello prompt."); break;
             case AuthOutcome.NotConfiguredForUser:
-                _toast.Show(
-                    ToastSeverity.Warning,
-                    "Hello not set up",
-                    "Enroll a fingerprint, face, or PIN in Windows Settings → Accounts → Sign-in options.");
-                break;
+                _toast.Show(ToastSeverity.Warning, "Hello not set up",
+                    "Enroll a fingerprint, face, or PIN in Windows Settings → Accounts → Sign-in options."); break;
             case AuthOutcome.DisabledByPolicy:
-                _toast.Show(
-                    ToastSeverity.Warning,
-                    "Hello blocked by policy",
-                    "Your organisation has disabled biometric authentication on this device.");
-                break;
+                _toast.Show(ToastSeverity.Warning, "Hello blocked by policy",
+                    "Your organisation has disabled biometric authentication on this device."); break;
             case AuthOutcome.DeviceUnavailable:
-                _toast.Show(
-                    ToastSeverity.Warning,
-                    "Biometric unavailable",
-                    "The biometric device is busy or temporarily unavailable.");
-                break;
+                _toast.Show(ToastSeverity.Warning, "Biometric unavailable",
+                    "The biometric device is busy or temporarily unavailable."); break;
             case AuthOutcome.RetriesExhausted:
-                _toast.Show(
-                    ToastSeverity.Danger,
-                    "Auth failed",
-                    "Windows Hello could not verify your identity after the OS retry window.");
-                break;
-            case AuthOutcome.Deduped:
-                // 500ms window swallowed the call because another prompt
-                // just ran. Don't surface a toast — user didn't see it.
-                break;
+                _toast.Show(ToastSeverity.Danger, "Auth failed",
+                    "Windows Hello could not verify your identity after the OS retry window."); break;
+            case AuthOutcome.Deduped: break;
             default:
-                _toast.Show(
-                    ToastSeverity.Warning,
-                    "Auth test",
-                    $"Outcome: {outcome}");
-                break;
+                _toast.Show(ToastSeverity.Warning, "Auth test",
+                    $"Outcome: {outcome}"); break;
         }
     }
 
@@ -272,22 +276,30 @@ public sealed partial class SettingsViewModel : ObservableObject
             var settings = JsonSerializer.Deserialize<PersistentSettings>(json, SettingsJsonOptions);
             if (settings is not null)
             {
-                _isReducedMotionEnabled = settings.IsReducedMotionEnabled;
-                _defaultAuthMethod = ParseAuthMethod(settings.DefaultAuthMethod);
+                _isReducedMotionEnabled   = settings.IsReducedMotionEnabled;
+                _isLaunchOnBootEnabled    = settings.IsLaunchOnBootEnabled;
+                _isMinimizeToTrayEnabled  = settings.IsMinimizeToTrayEnabled;
+                _gracePeriod              = ParseGrace(settings.GracePeriod);
+                _rePrompt                 = ParseRePrompt(settings.RePromptAfterInactivity);
+                _theme                    = ParseTheme(settings.Theme);
+                _accent                   = ParseAccent(settings.AccentColor);
+                _defaultAuthMethod        = ParseAuthMethod(settings.DefaultAuthMethod);
+
                 OnPropertyChanged(nameof(IsReducedMotionEnabled));
+                OnPropertyChanged(nameof(IsLaunchOnBootEnabled));
+                OnPropertyChanged(nameof(IsMinimizeToTrayEnabled));
+                OnPropertyChanged(nameof(GracePeriod));
+                OnPropertyChanged(nameof(RePromptAfterInactivity));
+                OnPropertyChanged(nameof(Theme));
+                OnPropertyChanged(nameof(AccentColor));
                 OnPropertyChanged(nameof(DefaultAuthMethod));
 
-                if (_isReducedMotionEnabled)
-                    UseReducedMotion.Enable();
-
+                if (_isReducedMotionEnabled) UseReducedMotion.Enable();
                 System.Windows.Application.Current.Resources["Motion.RespectReducedMotion"]
                     = _isReducedMotionEnabled;
             }
         }
-        catch
-        {
-            // First launch, corrupt file, or permission issue — use defaults.
-        }
+        catch { /* first launch / corrupt */ }
     }
 
     private void PersistSettings()
@@ -295,40 +307,41 @@ public sealed partial class SettingsViewModel : ObservableObject
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
-            var settings = new PersistentSettings(
-                IsReducedMotionEnabled: _isReducedMotionEnabled,
-                DefaultAuthMethod:    _defaultAuthMethod.ToString());
+            var settings = new PersistentSettings
+            {
+                IsReducedMotionEnabled   = _isReducedMotionEnabled,
+                IsLaunchOnBootEnabled    = _isLaunchOnBootEnabled,
+                IsMinimizeToTrayEnabled  = _isMinimizeToTrayEnabled,
+                GracePeriod              = _gracePeriod.ToString(),
+                RePromptAfterInactivity  = _rePrompt.ToString(),
+                Theme                    = _theme.ToString(),
+                AccentColor              = _accent.ToString(),
+                DefaultAuthMethod        = _defaultAuthMethod.ToString(),
+            };
             var json = JsonSerializer.Serialize(settings, SettingsJsonOptions);
-
-            // Atomic write (temp + rename) — same durability as LocalJsonStore.
             var temp = SettingsPath + ".tmp";
             File.WriteAllText(temp, json);
             File.Move(temp, SettingsPath, overwrite: true);
         }
-        catch
-        {
-            // Best-effort persistence; don't crash the setter.
-        }
+        catch { /* best-effort */ }
     }
 
+    private static GracePeriodOption ParseGrace(string? raw)
+        => Enum.TryParse<GracePeriodOption>(raw, ignoreCase: true, out var v) ? v : GracePeriodOption.Mins15;
+    private static RePromptOption ParseRePrompt(string? raw)
+        => Enum.TryParse<RePromptOption>(raw, ignoreCase: true, out var v) ? v : RePromptOption.Mins30;
+    private static ThemeOption ParseTheme(string? raw)
+        => Enum.TryParse<ThemeOption>(raw, ignoreCase: true, out var v) ? v : ThemeOption.Dark;
+    private static AccentOption ParseAccent(string? raw)
+        => Enum.TryParse<AccentOption>(raw, ignoreCase: true, out var v) ? v : AccentOption.ObsidianBlue;
     private static AuthMethodOption ParseAuthMethod(string? raw)
-    {
-        if (Enum.TryParse<AuthMethodOption>(raw, ignoreCase: true, out var parsed))
-            return parsed;
-        return AuthMethodOption.Biometric;
-    }
+        => Enum.TryParse<AuthMethodOption>(raw, ignoreCase: true, out var v) ? v : AuthMethodOption.Biometric;
 }
 
-/// <summary>
-/// Public UI-facing enum bound by the Settings page. Maps to the
-/// app-internal <c>AuthOutcome</c> / OS choice; kept as a stable
-/// 2-value type today because Phase-2 will add the broader
-/// time-window policies on top.
-/// </summary>
-public enum AuthMethodOption
-{
-    Biometric,
-    PinFallback,
-}
+public enum GracePeriodOption { Mins5, Mins15, Hr1 }
+public enum RePromptOption   { Mins10, Mins30, Never }
+public enum ThemeOption      { Dark, Light, System }
+public enum AccentOption     { ObsidianBlue, EmeraldGreen, AmethystPurple }
+public enum AuthMethodOption { Biometric, PinFallback }
 
 public sealed record SettingsCategoryRow(string Title, string Subtitle, string Glyph);

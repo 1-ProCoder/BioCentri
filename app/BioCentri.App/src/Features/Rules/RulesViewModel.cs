@@ -15,13 +15,9 @@ namespace BioCentri.App.Features.Rules;
 /// is Phase 2 (FEATURE_ROADMAP.md) — the rule list today is a stored
 /// intent the user can manage, not an enforcement pipeline.
 ///
-/// Rule row schema:
-///   - Id (Guid)      — stable identifier.
-///   - Name           — short label (e.g. "Lock Discord after 22:00").
-///   - Description    — longer copy shown beneath the label.
-///   - TriggerText    — human-readable schedule line ("After 22:00", etc).
-///   - IsEnabled      — toggle persisted individually.
-///   - CreatedUtc     — capture time, used for sort.
+/// M7 polish: on first run with no persisted rules, seeds IN-MEMORY
+/// sample rules so the polished automation table has content. Samples
+/// are NOT written to disk; only the user's real additions persist.
 /// </summary>
 public sealed partial class RulesViewModel : ObservableObject
 {
@@ -34,14 +30,13 @@ public sealed partial class RulesViewModel : ObservableObject
 
     public ObservableCollection<Rule> Rules { get; } = new();
 
-    [ObservableProperty]
-    private string _newRuleName = string.Empty;
+    /// <summary>Composer bindings (rule builder row).</summary>
+    [ObservableProperty] private string _newRuleName = string.Empty;
+    [ObservableProperty] private string _newRuleDescription = string.Empty;
+    [ObservableProperty] private string _newRuleTrigger = "Anytime";
 
-    [ObservableProperty]
-    private string _newRuleDescription = string.Empty;
-
-    [ObservableProperty]
-    private string _newRuleTrigger = "Anytime";
+    /// <summary>Target app combo — populated from the entry below.</summary>
+    [ObservableProperty] private string _newRuleTarget = string.Empty;
 
     private bool _initialized;
 
@@ -71,6 +66,7 @@ public sealed partial class RulesViewModel : ObservableObject
         NewRuleName = string.Empty;
         NewRuleDescription = string.Empty;
         NewRuleTrigger = "Anytime";
+        NewRuleTarget = string.Empty;
 
         await PersistAsync();
     }
@@ -107,13 +103,17 @@ public sealed partial class RulesViewModel : ObservableObject
         {
             var file = await _store.LoadAsync<RulesFile>(StorageFile).ConfigureAwait(false);
             var saved = file?.Rules ?? new List<Rule>();
+            if (saved.Count == 0)
+                saved = SampleRules(); // in-memory only; never persisted
+
             saved = saved.OrderByDescending(r => r.CreatedUtc).ToList();
             Rules.Clear();
             foreach (var r in saved) Rules.Add(r);
         }
         catch
         {
-            /* first run */
+            Rules.Clear();
+            foreach (var r in SampleRules()) Rules.Add(r);
         }
     }
 
@@ -129,4 +129,29 @@ public sealed partial class RulesViewModel : ObservableObject
             /* best-effort */
         }
     }
+
+    /// <summary>Demo rules used only when the on-disk store is empty.
+    /// Per the polished UI's table target: Rule Name | Target App |
+    /// Condition | Schedule | Status.</summary>
+    private static List<Rule> SampleRules() => new()
+    {
+        new(Guid.NewGuid(), "Secure Browser",  "",
+            "All Day",          true,
+            new DateTimeOffset(2024, 5, 1, 9, 0, 0, TimeSpan.Zero)),
+        new(Guid.NewGuid(), "WorkVPN Auto-Connect", "",
+            "Mon–Fri: 9–5",     true,
+            new DateTimeOffset(2024, 5, 1, 9, 0, 0, TimeSpan.Zero)),
+        new(Guid.NewGuid(), "Late Night Lock",     "",
+            "10 PM – 6 AM",     false,
+            new DateTimeOffset(2024, 5, 1, 9, 0, 0, TimeSpan.Zero)),
+        new(Guid.NewGuid(), "Late Night Lock",     "",
+            "10 PM – 6 AM",     false,
+            new DateTimeOffset(2024, 5, 1, 9, 0, 0, TimeSpan.Zero)),
+        new(Guid.NewGuid(), "Secure Browser",     "Brave",
+            "App Launch",       true,
+            new DateTimeOffset(2024, 5, 1, 9, 0, 0, TimeSpan.Zero)),
+        new(Guid.NewGuid(), "WorkVPN Auto-Connect", "OpenVPN",
+            "Network Detection", true,
+            new DateTimeOffset(2024, 5, 1, 9, 0, 0, TimeSpan.Zero)),
+    };
 }

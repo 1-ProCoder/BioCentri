@@ -14,7 +14,8 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0"
+        <StackPanel x:Name="LabelHost"
+                    Grid.Column="0"
                     VerticalAlignment="Center"
                     Margin="0,0,16,0">
             <TextBlock x:Name="LabelText"

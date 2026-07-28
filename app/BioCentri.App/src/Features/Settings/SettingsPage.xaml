@@ -4,6 +4,7 @@
       xmlns:header="clr-namespace:BioCentri.App.Components.Nav"
       xmlns:nav="clr-namespace:BioCentri.App.Components.Nav"
       xmlns:input="clr-namespace:BioCentri.App.Components.Inputs"
+      xmlns:icon="clr-namespace:BioCentri.App.Components.Iconography"
       xmlns:items="clr-namespace:BioCentri.App.Features.Settings"
       Title="Settings"
       Background="Transparent"
@@ -18,55 +19,295 @@
                                Subtitle="{Binding Subtitle}"
                                Eyebrow="Preferences" />
 
-            <ItemsControl ItemsSource="{Binding Categories}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type items:SettingsCategoryRow}">
-                        <nav:SettingsRow Title="{Binding Title}"
-                                         Description="{Binding Subtitle}"
-                                         IconKey="{Binding Glyph}"
-                                         Margin="{StaticResource Spacing.Pad.Sm}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <!-- ============================================================ -->
+            <!-- System Startup &amp; Tray                                      -->
+            <!-- ============================================================ -->
+            <Border Background="{StaticResource Brushes.GlassStrong.Tint}"
+                    BorderBrush="{StaticResource Brushes.Border.HairlineInner}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Corners.Md}"
+                    Padding="20,16"
+                    Margin="0,16,0,0">
+                <StackPanel>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   Text="System Startup &amp; Tray"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Body}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                   Foreground="{StaticResource Brushes.Text.Primary}"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1"
+                                   Text="Surface 2"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Caption}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                   Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                                   Opacity="0.85"
+                                   Margin="0,2,4,0" />
+                    </Grid>
 
-            <!-- Milestone 7: reduced-motion toggle. -->
-            <Border Background="Transparent"
-                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
-                    BorderThickness="0,0,0,1"
-                    Padding="0,16"
-                    Margin="{StaticResource Spacing.Pad.Sm}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="1"
-                               Text="Reduced motion"
-                               FontFamily="{StaticResource Typography.Sans}"
-                               FontSize="{StaticResource Typography.Size.Body}"
-                               FontWeight="{StaticResource Typography.Weight.Medium}"
-                               Foreground="{StaticResource Brushes.Text.Primary}"
-                               VerticalAlignment="Center" />
-                    <input:ToggleSwitch Grid.Column="2"
-                                        IsChecked="{Binding IsReducedMotionEnabled}"
-                                        Label="Disable animations"
-                                        AutomationProperties.Name="Toggle reduced motion"
-                                        VerticalAlignment="Center" />
-                </Grid>
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Grid.Column="0"
+                                 Width="14" Height="14"
+                                 Fill="{StaticResource Brushes.Accent.Indigo}"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,12,0" />
+                        <TextBlock Grid.Column="1"
+                                   Text="Launch BioCentri at Windows startup"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Body}"
+                                   Foreground="{StaticResource Brushes.Text.Primary}"
+                                   VerticalAlignment="Center" />
+                        <input:ToggleSwitch Grid.Column="2"
+                                            IsChecked="{Binding IsLaunchOnBootEnabled, Mode=TwoWay}"
+                                            IsLabelVisible="False"
+                                            AutomationProperties.Name="Launch on boot" />
+                    </Grid>
+
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Grid.Column="0"
+                                 Width="14" Height="14"
+                                 Fill="{StaticResource Brushes.Accent.Indigo}"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,12,0" />
+                        <TextBlock Grid.Column="1"
+                                   Text="Minimize to system tray on close"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Body}"
+                                   Foreground="{StaticResource Brushes.Text.Primary}"
+                                   VerticalAlignment="Center" />
+                        <input:ToggleSwitch Grid.Column="2"
+                                            IsChecked="{Binding IsMinimizeToTrayEnabled, Mode=TwoWay}"
+                                            IsLabelVisible="False"
+                                            AutomationProperties.Name="Minimize to tray" />
+                    </Grid>
+                </StackPanel>
             </Border>
 
-            <!-- M7.5: Windows Hello authentication affordance.
-                 The status line binds to AuthCapabilityLabel (a single
-                 string derived from the IBiometricAuthService capability
-                 probe); the button binds to TestAuthCommand so the user
-                 can SEE the full OS Hello prompt fire without first
-                 configuring a protected app launch. -->
-            <Border Background="Transparent"
-                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
-                    BorderThickness="0,0,0,1"
-                    Padding="0,16"
-                    Margin="{StaticResource Spacing.Pad.Sm}">
+            <!-- ============================================================ -->
+            <!-- Challenge Behavior                                            -->
+            <!-- ============================================================ -->
+            <Border Background="{StaticResource Brushes.GlassStrong.Tint}"
+                    BorderBrush="{StaticResource Brushes.Border.HairlineInner}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Corners.Md}"
+                    Padding="20,16"
+                    Margin="0,16,0,0">
+                <StackPanel>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   Text="Challenge Behavior"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Body}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                   Foreground="{StaticResource Brushes.Text.Primary}"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1"
+                                   Text="Surface 2"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Caption}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                   Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                                   Opacity="0.85"
+                                   Margin="0,2,4,0" />
+                    </Grid>
+
+                    <StackPanel Margin="0,8,0,0">
+                        <TextBlock Text="Grace period after successful unlock (e.g., 5 mins, 15 mins, 1 hour)"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Small}"
+                                   Foreground="{StaticResource Brushes.Text.Muted}" />
+                        <ComboBox SelectedItem="{Binding GracePeriod, Mode=TwoWay}"
+                                  ItemsSource="{Binding GracePeriodOptions}"
+                                  Background="{StaticResource Brushes.Subtle.Surface}"
+                                  BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                                  BorderThickness="1"
+                                  Foreground="{StaticResource Brushes.Text.Primary}"
+                                  FontFamily="{StaticResource Typography.Sans}"
+                                  FontSize="{StaticResource Typography.Size.Small}"
+                                  MinWidth="220"
+                                  Margin="0,6,0,0"
+                                  Padding="10,4" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,12,0,0">
+                        <TextBlock Text="Re-prompt after inactivity (e.g., 10 mins, 30 mins, Never)"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Small}"
+                                   Foreground="{StaticResource Brushes.Text.Muted}" />
+                        <ComboBox SelectedItem="{Binding RePromptAfterInactivity, Mode=TwoWay}"
+                                  ItemsSource="{Binding RePromptOptions}"
+                                  Background="{StaticResource Brushes.Subtle.Surface}"
+                                  BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                                  BorderThickness="1"
+                                  Foreground="{StaticResource Brushes.Text.Primary}"
+                                  FontFamily="{StaticResource Typography.Sans}"
+                                  FontSize="{StaticResource Typography.Size.Small}"
+                                  MinWidth="220"
+                                  Margin="0,6,0,0"
+                                  Padding="10,4" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- Appearance                                                    -->
+            <!-- ============================================================ -->
+            <Border Background="{StaticResource Brushes.GlassStrong.Tint}"
+                    BorderBrush="{StaticResource Brushes.Border.HairlineInner}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Corners.Md}"
+                    Padding="20,16"
+                    Margin="0,16,0,0">
+                <StackPanel>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   Text="Appearance"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Body}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                   Foreground="{StaticResource Brushes.Text.Primary}"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1"
+                                   Text="Surface 2"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Caption}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                   Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                                   Opacity="0.85"
+                                   Margin="0,2,4,0" />
+                    </Grid>
+
+                    <!-- Theme picker -->
+                    <StackPanel Margin="0,8,0,0">
+                        <TextBlock Text="Theme"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Small}"
+                                   Foreground="{StaticResource Brushes.Text.Muted}" />
+                        <ItemsControl ItemsSource="{Binding ThemeOptions}" Margin="0,8,0,0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Margin="0,0,8,0"
+                                            Padding="14,7"
+                                            Background="{StaticResource Brushes.Subtle.Surface}"
+                                            BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                                            BorderThickness="1"
+                                            Cursor="Hand"
+                                            Command="{Binding DataContext.SetThemeCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            CommandParameter="{Binding}">
+                                        <TextBlock Text="{Binding}"
+                                                   FontFamily="{StaticResource Typography.Sans}"
+                                                   FontSize="{StaticResource Typography.Size.Small}"
+                                                   FontWeight="{StaticResource Typography.Weight.Medium}"
+                                                   Foreground="{StaticResource Brushes.Text.Primary}" />
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                    <!-- Accent color -->
+                    <StackPanel Margin="0,16,0,0">
+                        <TextBlock Text="Accent Color"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Small}"
+                                   Foreground="{StaticResource Brushes.Text.Muted}" />
+                        <ItemsControl ItemsSource="{Binding AccentOptions}" Margin="0,8,0,0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Margin="0,0,8,0"
+                                            Padding="14,7"
+                                            Background="{StaticResource Brushes.Subtle.Surface}"
+                                            BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                                            BorderThickness="1"
+                                            Cursor="Hand"
+                                            Command="{Binding DataContext.SetAccentColorCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            CommandParameter="{Binding}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse Width="10" Height="10"
+                                                     VerticalAlignment="Center"
+                                                     Margin="0,0,8,0"
+                                                     Fill="{StaticResource Brushes.Accent.Indigo}" />
+                                            <TextBlock Text="{Binding}"
+                                                       FontFamily="{StaticResource Typography.Sans}"
+                                                       FontSize="{StaticResource Typography.Size.Small}"
+                                                       FontWeight="{StaticResource Typography.Weight.Medium}"
+                                                       Foreground="{StaticResource Brushes.Text.Primary}" />
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                    <!-- Reduced motion -->
+                    <Grid Margin="0,20,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Reduced motion"
+                                       FontFamily="{StaticResource Typography.Sans}"
+                                       FontSize="{StaticResource Typography.Size.Body}"
+                                       Foreground="{StaticResource Brushes.Text.Primary}" />
+                            <TextBlock Text="Disables animations and entrance transitions across the app."
+                                       FontFamily="{StaticResource Typography.Sans}"
+                                       FontSize="{StaticResource Typography.Size.Caption}"
+                                       Foreground="{StaticResource Brushes.Text.Muted}"
+                                       TextWrapping="Wrap"
+                                       Margin="0,4,0,0" />
+                        </StackPanel>
+                        <input:ToggleSwitch Grid.Column="1"
+                                            IsChecked="{Binding IsReducedMotionEnabled, Mode=TwoWay}"
+                                            IsLabelVisible="False"
+                                            AutomationProperties.Name="Toggle reduced motion" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- Windows Hello authentication                                   -->
+            <!-- ============================================================ -->
+            <Border Background="{StaticResource Brushes.GlassStrong.Tint}"
+                    BorderBrush="{StaticResource Brushes.Border.HairlineInner}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Corners.Md}"
+                    Padding="20,16"
+                    Margin="0,16,0,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -76,28 +317,37 @@
                         <TextBlock Text="Windows Hello authentication"
                                    FontFamily="{StaticResource Typography.Sans}"
                                    FontSize="{StaticResource Typography.Size.Body}"
-                                   FontWeight="{StaticResource Typography.Weight.Medium}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
                                    Foreground="{StaticResource Brushes.Text.Primary}" />
                         <TextBlock Text="{Binding AuthCapabilityLabel}"
                                    FontFamily="{StaticResource Typography.Sans}"
                                    FontSize="{StaticResource Typography.Size.Caption}"
                                    Foreground="{StaticResource Brushes.Text.Muted}"
-                                   Margin="0,4,0,0"
-                                   TextWrapping="Wrap" />
+                                   TextWrapping="Wrap"
+                                   MaxWidth="600"
+                                   Margin="0,4,0,0" />
                     </StackPanel>
                     <Button Grid.Column="1"
                             Content="Test Windows Hello"
                             Command="{Binding TestAuthCommand}"
                             IsEnabled="{Binding CanTestAuth}"
                             FontFamily="{StaticResource Typography.Sans}"
-                            FontSize="{StaticResource Typography.Size.Body}"
+                            FontSize="{StaticResource Typography.Size.Small}"
+                            FontWeight="{StaticResource Typography.Weight.SemiBold}"
                             Padding="16,8"
                             Background="{StaticResource Brushes.Accent.Gradient}"
                             Foreground="White"
                             BorderThickness="0"
-                            Cursor="Hand" />
+                            Cursor="Hand"
+                            VerticalAlignment="Center" />
                 </Grid>
             </Border>
+
+            <TextBlock Text="BioCentri open · no cloud · no telemetry"
+                       FontFamily="{StaticResource Typography.Sans}"
+                       FontSize="{StaticResource Typography.Size.Caption}"
+                       Foreground="{StaticResource Brushes.Text.Muted}"
+                       Margin="0,32,0,0" />
         </StackPanel>
     </ScrollViewer>
 </Page>

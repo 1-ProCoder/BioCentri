@@ -3,37 +3,90 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:header="clr-namespace:BioCentri.App.Components.Nav"
       xmlns:icon="clr-namespace:BioCentri.App.Components.Iconography"
-      xmlns:nav="clr-namespace:BioCentri.App.Components.Nav"
       xmlns:items="clr-namespace:BioCentri.App.Features.Activity"
       xmlns:feedback="clr-namespace:BioCentri.App.Components.Feedback"
       Title="Activity"
       Background="Transparent"
       Foreground="{StaticResource Brushes.Text.Primary}">
 
-    <Page.Resources>
-        <CollectionViewSource x:Key="GroupedEvents"
-                              Source="{Binding Events}">
-            <CollectionViewSource.GroupDescriptions>
-                <PropertyGroupDescription PropertyName="Group" />
-            </CollectionViewSource.GroupDescriptions>
-        </CollectionViewSource>
-    </Page.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <header:PageHeader Grid.Row="0"
-                           Title="{Binding Title}"
-                           Subtitle="{Binding Subtitle}"
-                           Eyebrow="Audit Log" />
+        <!-- Title row -->
+        <Grid Grid.Row="0" Margin="32,32,32,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-        <ItemsControl Grid.Row="1"
-                      ItemsSource="{Binding Stats}"
-                      Margin="32,8,32,16">
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="SYSTEM ACTIVITY AUDIT LOGS"
+                           FontFamily="{StaticResource Typography.Sans}"
+                           FontSize="{StaticResource Typography.Size.Caption}"
+                           FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                           Foreground="{StaticResource Brushes.Accent.IndigoLight}"
+                           Opacity="0.85" />
+                <TextBlock Text="Audit Logs &amp; Timeline"
+                           FontFamily="{StaticResource Typography.Display}"
+                           FontSize="{StaticResource Typography.Size.H1}"
+                           FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                           Foreground="{StaticResource Brushes.Text.Primary}"
+                           TextOptions.TextFormattingMode="Display"
+                           Margin="0,4,0,0" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                <Button Padding="14,8"
+                        Margin="0,0,8,0"
+                        Background="{StaticResource Brushes.Subtle.Surface}"
+                        Foreground="{StaticResource Brushes.Text.Primary}"
+                        FontFamily="{StaticResource Typography.Sans}"
+                        FontSize="{StaticResource Typography.Size.Small}"
+                        FontWeight="{StaticResource Typography.Weight.Medium}"
+                        BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                        BorderThickness="1"
+                        Cursor="Hand"
+                        Command="{Binding ExportCsvCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <icon:Icon IconSize="14"
+                                   GeometryKey="Icons.Action.ChevronRight"
+                                   Stroke="{StaticResource Brushes.Text.Muted}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0" />
+                        <TextBlock Text="Export CSV"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button Padding="14,8"
+                        Background="{StaticResource Brushes.Subtle.Surface}"
+                        Foreground="{StaticResource Brushes.Text.Primary}"
+                        FontFamily="{StaticResource Typography.Sans}"
+                        FontSize="{StaticResource Typography.Size.Small}"
+                        FontWeight="{StaticResource Typography.Weight.Medium}"
+                        BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                        BorderThickness="1"
+                        Cursor="Hand"
+                        Command="{Binding ClearCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <icon:Icon IconSize="14"
+                                   GeometryKey="Icons.Action.Close"
+                                   Stroke="{StaticResource Brushes.Text.Muted}"
+                                   VerticalAlignment="Center"
+                                       Margin="0,0,8,0" />
+                        <TextBlock Text="Clear Logs"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Stat tiles -->
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Stats}" Margin="32,0,32,12">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Columns="4" />
@@ -49,46 +102,259 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <ScrollViewer Grid.Row="2"
-                      VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled"
-                      Padding="32,0,32,32">
+        <!-- Filter row -->
+        <Grid Grid.Row="2" Margin="32,8,32,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-            <ItemsControl ItemsSource="{Binding Source={StaticResource GroupedEvents}}">
-                <ItemsControl.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.ContainerStyle>
-                            <Style TargetType="GroupItem">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="GroupItem">
-                                            <StackPanel Margin="0,16,0,0">
-                                                <TextBlock Text="{Binding Name}"
-                                                           FontFamily="{StaticResource Typography.Sans}"
-                                                           FontSize="{StaticResource Typography.Size.Caption}"
-                                                           FontWeight="{StaticResource Typography.Weight.SemiBold}"
-                                                           Foreground="{StaticResource Brushes.Accent.IndigoLight}"
-                                                           Margin="0,0,0,12" />
-                                                <ItemsPresenter />
-                                            </StackPanel>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </GroupStyle.ContainerStyle>
-                    </GroupStyle>
-                </ItemsControl.GroupStyle>
+            <Border Grid.Column="0" Background="{StaticResource Brushes.Subtle.Surface}"
+                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                    CornerRadius="{StaticResource Corners.Md}"
+                    Padding="12,8"
+                    Margin="0,0,8,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Time Range"
+                               FontFamily="{StaticResource Typography.Sans}"
+                               FontSize="{StaticResource Typography.Size.Small}"
+                               Foreground="{StaticResource Brushes.Text.Muted}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0" />
+                    <ComboBox Grid.Column="2"
+                              SelectedItem="{Binding TimeRange, Mode=TwoWay}"
+                              ItemsSource="{Binding TimeRangeOptions}"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              Foreground="{StaticResource Brushes.Text.Primary}"
+                              FontFamily="{StaticResource Typography.Sans}"
+                              FontSize="{StaticResource Typography.Size.Small}"
+                              VerticalAlignment="Center" />
+                </Grid>
+            </Border>
 
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type items:ActivityTimelineRow}">
-                        <feedback:TimelineEntry
-                            Title="{Binding Title}"
-                            Detail="{Binding Detail}"
-                            Timestamp="{Binding Timestamp}"
-                            Severity="{Binding Severity}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+            <Border Grid.Column="1" Background="{StaticResource Brushes.Subtle.Surface}"
+                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                    CornerRadius="{StaticResource Corners.Md}"
+                    Padding="12,8"
+                    Margin="0,0,8,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Event Type"
+                               FontFamily="{StaticResource Typography.Sans}"
+                               FontSize="{StaticResource Typography.Size.Small}"
+                               Foreground="{StaticResource Brushes.Text.Muted}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0" />
+                    <ComboBox Grid.Column="2"
+                              SelectedItem="{Binding EventType, Mode=TwoWay}"
+                              ItemsSource="{Binding EventTypeOptions}"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              Foreground="{StaticResource Brushes.Text.Primary}"
+                              FontFamily="{StaticResource Typography.Sans}"
+                              FontSize="{StaticResource Typography.Size.Small}"
+                              VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2" Background="{StaticResource Brushes.Subtle.Surface}"
+                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                    CornerRadius="{StaticResource Corners.Md}"
+                    Padding="12,8"
+                    Margin="0,0,8,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Target"
+                               FontFamily="{StaticResource Typography.Sans}"
+                               FontSize="{StaticResource Typography.Size.Small}"
+                               Foreground="{StaticResource Brushes.Text.Muted}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0" />
+                    <ComboBox Grid.Column="2"
+                              SelectedItem="{Binding Target, Mode=TwoWay}"
+                              ItemsSource="{Binding TargetOptions}"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              Foreground="{StaticResource Brushes.Text.Primary}"
+                              FontFamily="{StaticResource Typography.Sans}"
+                              FontSize="{StaticResource Typography.Size.Small}"
+                              VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="3" Background="{StaticResource Brushes.Subtle.Surface}"
+                    BorderBrush="{StaticResource Brushes.Border.Hairline}"
+                    CornerRadius="{StaticResource Corners.Md}"
+                    Padding="12,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Outcome"
+                               FontFamily="{StaticResource Typography.Sans}"
+                               FontSize="{StaticResource Typography.Size.Small}"
+                               Foreground="{StaticResource Brushes.Text.Muted}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0" />
+                    <ComboBox Grid.Column="2"
+                              SelectedItem="{Binding Outcome, Mode=TwoWay}"
+                              ItemsSource="{Binding OutcomeOptions}"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              Foreground="{StaticResource Brushes.Text.Primary}"
+                              FontFamily="{StaticResource Typography.Sans}"
+                              FontSize="{StaticResource Typography.Size.Small}"
+                              VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Audit table -->
+        <Border Grid.Row="3"
+                Background="{StaticResource Brushes.GlassStrong.Tint}"
+                BorderBrush="{StaticResource Brushes.Border.HairlineInner}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource Corners.Md}"
+                Margin="32,16,32,32">
+            <Border.Effect>
+                <StaticResource ResourceKey="Elevation.1.Resting" />
+            </Border.Effect>
+
+            <Grid>
+                <!-- Column header -->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0"
+                        Background="{StaticResource Brushes.Glass.Tint}"
+                        BorderBrush="{StaticResource Brushes.Border.HairlineSoft}"
+                        BorderThickness="0,0,0,1"
+                        Padding="20,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Time"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Caption}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                   Foreground="{StaticResource Brushes.Text.Muted}"
+                                   Width="160" />
+                        <TextBlock Grid.Column="1" Text="Event Type"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Caption}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                   Foreground="{StaticResource Brushes.Text.Muted}" />
+                        <TextBlock Grid.Column="2" Text="Target"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Caption}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                   Foreground="{StaticResource Brushes.Text.Muted}" />
+                        <TextBlock Grid.Column="3" Text="Details"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Caption}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                   Foreground="{StaticResource Brushes.Text.Muted}" />
+                        <TextBlock Grid.Column="4" Text="Outcome"
+                                   FontFamily="{StaticResource Typography.Sans}"
+                                   FontSize="{StaticResource Typography.Size.Caption}"
+                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                   Foreground="{StaticResource Brushes.Text.Muted}"
+                                   Width="120"
+                                   TextAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Timeline rows (flat list bound to filtered Events) -->
+                <ItemsControl Grid.Row="1"
+                              ItemsSource="{Binding Events}"
+                              Padding="0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type items:ActivityTimelineRow}">
+                            <Border BorderBrush="{StaticResource Brushes.Border.HairlineSoft}"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="20,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="2*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding Timestamp, StringFormat='{}{0:MMM dd, yyyy hh:mm tt +0000}'}"
+                                               Width="160"
+                                               FontFamily="{StaticResource Typography.Monospace}"
+                                               FontSize="{StaticResource Typography.Size.Small}"
+                                               Foreground="{StaticResource Brushes.Text.Muted}"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Severity}"
+                                               FontFamily="{StaticResource Typography.Sans}"
+                                               FontSize="{StaticResource Typography.Size.Small}"
+                                               Foreground="{StaticResource Brushes.Text.Primary}"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding AppName}"
+                                               FontFamily="{StaticResource Typography.Sans}"
+                                               FontSize="{StaticResource Typography.Size.Small}"
+                                               FontWeight="{StaticResource Typography.Weight.Medium}"
+                                               Foreground="{StaticResource Brushes.Text.Primary}"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Grid.Column="3"
+                                               Text="{Binding Description}"
+                                               FontFamily="{StaticResource Typography.Sans}"
+                                               FontSize="{StaticResource Typography.Size.Small}"
+                                               Foreground="{StaticResource Brushes.Text.Muted}"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <Border Grid.Column="4"
+                                            Background="{StaticResource Brushes.Subtle.Surface}"
+                                            BorderBrush="{StaticResource Brushes.Status.Success}"
+                                            BorderThickness="1"
+                                            CornerRadius="{StaticResource Corners.Pill}"
+                                            Padding="10,3"
+                                            Width="100"
+                                            HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding Outcome}"
+                                                   FontFamily="{StaticResource Typography.Sans}"
+                                                   FontSize="{StaticResource Typography.Size.Caption}"
+                                                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
+                                                   Foreground="{StaticResource Brushes.Status.Success}"
+                                                   TextAlignment="Center" />
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </Border>
     </Grid>
 </Page>
