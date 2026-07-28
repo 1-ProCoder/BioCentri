@@ -11,7 +11,7 @@ namespace BioCentri.App.Services;
 ///
 /// Strategy (per M6 thinker validation):
 ///   * Load the file once at construction and cache a <c>HashSet&lt;string&gt;</c>
-///     of lower-cased, normalized executable paths.
+///     of lower-cased exe-leaf names (e.g. "brave.exe").
 ///   * On every <see cref="IsProtected"/> call, check whether the file's
 ///     <c>LastWriteTimeUtc</c> has changed since the last cache fill. If
 ///     so, re-read and replace the cache. This keeps per-call overhead at
@@ -19,11 +19,15 @@ namespace BioCentri.App.Services;
 ///   * The store already uses atomic write, so partial reads cannot
 ///     happen.
 ///
-/// Normalization: the <c>ProtectedApp.Path</c> from the JSON file is
-/// already an absolute filesystem path. The <see cref="IsProtected"/>
-/// contract accepts either bare exe names or full paths. To match, we
-/// normalize the incoming candidate to lower-case and do a suffix match:
-/// the candidate must end with <c>\chrome.exe</c> (case-insensitive).
+/// Normalization: the cache key is the bare executable name extracted
+/// from <c>ProtectedApp.Path</c> via <see cref="System.IO.Path.GetFileName(string)"/>.
+/// This matches the WMI <c>Win32_ProcessStartTrace.ProcessName</c> and
+/// <c>Process.GetProcesses()</c> output, both of which return bare exe
+/// names like "brave.exe" — full paths are unreliable for elevated
+/// processes running in different sessions. Two installs of the same
+/// exe (e.g. brave.exe in two locations) intentionally collapse to
+/// the same rule; the user wants the app protected regardless of
+/// install path.
 /// </summary>
 public sealed class FileBackedAuthAppRules : IAuthAppRules
 {
@@ -67,19 +71,19 @@ public sealed class FileBackedAuthAppRules : IAuthAppRules
                 ReloadUnderLock();
         }
 
-        var normalized = Normalize(processName);
+        // Match by exe leaf name. The cache stores leaves (see
+        // ReloadUnderLock), so a single HashSet.Contains check is
+        // both correct and O(1).
+        var leaf = System.IO.Path.GetFileName(Normalize(processName));
+        if (string.IsNullOrEmpty(leaf)) return false;
+
         HashSet<string> snapshot;
         lock (_gate) { snapshot = _cache; }
 
-        if (snapshot.Contains(normalized)) return true;
-
-        // Suffix match: "C:\Program Files\Google\Chrome\Application\chrome.exe"
-        // against cache entry "C:\Program Files\...\chrome.exe".
-        // Both sides have been lower-cased and backslash-normalized.
-        foreach (var entry in snapshot)
+        if (snapshot.Contains(leaf))
         {
-            if (normalized.EndsWith("\\" + entry, StringComparison.OrdinalIgnoreCase))
-                return true;
+            System.Diagnostics.Debug.WriteLine($"[AuthAppRules] Match: {leaf}");
+            return true;
         }
 
         return false;
@@ -114,7 +118,15 @@ public sealed class FileBackedAuthAppRules : IAuthAppRules
                 foreach (var app in apps)
                 {
                     if (!string.IsNullOrWhiteSpace(app.Path))
-                        _cache.Add(Normalize(app.Path));
+                    {
+                        // Store just the exe leaf — the watcher input
+                        // from WMI / Process.GetProcesses() is also a
+                        // bare exe name, so this is the only key shape
+                        // that actually matches. See IsProtected() above.
+                        var leaf = System.IO.Path.GetFileName(Normalize(app.Path));
+                        if (!string.IsNullOrEmpty(leaf))
+                            _cache.Add(leaf);
+                    }
                 }
             }
 
