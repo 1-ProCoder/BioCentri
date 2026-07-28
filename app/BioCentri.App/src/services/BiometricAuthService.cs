@@ -61,6 +61,16 @@ public sealed class BiometricAuthService : IBiometricAuthService
     /// </summary>
     private static readonly TimeSpan AuthTimeout = TimeSpan.FromSeconds(60);
 
+    /// <summary>
+    /// True when our internal 60s timer is the source of a
+    /// cancellation (and not the caller's token). Used by both the
+    /// post-await intercept and the catch block to classify the
+    /// outcome as <see cref="AuthOutcome.Timeout"/> rather than
+    /// <see cref="AuthOutcome.UserCancelled"/> or <see cref="AuthOutcome.Error"/>.
+    /// </summary>
+    private static bool IsOurTimeout(CancellationTokenSource cts, CancellationToken caller)
+        => cts.IsCancellationRequested && !caller.IsCancellationRequested;
+
     public BiometricAuthService(
         IDispatcher dispatcher,
         IToastService toast,
@@ -151,7 +161,7 @@ public sealed class BiometricAuthService : IBiometricAuthService
             // timed out — distinct from UserCancelled so the audit
             // log shows "user walked away" vs "user actively hit
             // cancel".
-            var timedOut = cts.IsCancellationRequested && !cancellationToken.IsCancellationRequested;
+            var timedOut = IsOurTimeout(cts, cancellationToken);
             var outcome = timedOut ? AuthOutcome.Timeout : Translate(helloResult);
             Debug.WriteLine($"[BiometricAuthService] Prompt resolved: {outcome} (timedOut={timedOut})");
             tcs.TrySetResult(outcome);
@@ -173,9 +183,7 @@ public sealed class BiometricAuthService : IBiometricAuthService
             // token didn't fire). Otherwise a coincidental
             // NullReferenceException + simultaneous timeout would be
             // misclassified as Timeout and hide a real bug.
-            var outcome = (ex is OperationCanceledException
-                        && cts.IsCancellationRequested
-                        && !cancellationToken.IsCancellationRequested)
+            var outcome = (ex is OperationCanceledException && IsOurTimeout(cts, cancellationToken))
                 ? AuthOutcome.Timeout
                 : AuthOutcome.Error;
             tcs.TrySetResult(outcome);
