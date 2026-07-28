@@ -135,6 +135,7 @@ public sealed class ProcessMonitor : IProcessMonitor, IDisposable
     private void Emit(string processName, int pid)
     {
         var args = new ProcessLaunchDetectedEventArgs(processName, pid, DateTimeOffset.UtcNow);
+        Debug.WriteLine($"[ProcessMonitor] Detected: {processName} ({pid})");
         try
         {
             ProcessLaunchDetected?.Invoke(this, args);

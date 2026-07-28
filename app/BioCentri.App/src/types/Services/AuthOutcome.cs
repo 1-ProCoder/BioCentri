@@ -30,6 +30,16 @@ public enum AuthOutcome
 
     /// <summary>An internal error occurred (COMException, marshalling failure, etc).</summary>
     Error,
+
+    /// <summary>
+    /// The OS biometric prompt did not resolve within the
+    /// <see cref="BioCentri.App.Services.BiometricAuthService"/> timeout
+    /// (60 s). Treated like any other non-Verified outcome: the
+    /// process is blocked and the kill chain runs. Distinct from
+    /// <see cref="UserCancelled"/> so the audit trail shows whether
+    /// the user actively hit cancel versus walked away.
+    /// </summary>
+    Timeout,
 }
 
 /// <summary>

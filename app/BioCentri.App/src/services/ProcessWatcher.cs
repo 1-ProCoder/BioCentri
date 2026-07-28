@@ -97,6 +97,7 @@ public sealed class ProcessWatcher : IDisposable
             Debug.WriteLine($"[ProcessWatcher] Allow (unprotected): {e.ProcessName}");
             return;
         }
+        Debug.WriteLine($"[ProcessWatcher] Challenge required: {e.ProcessName} ({e.Pid})");
         _ = HandleProtectedLaunchAsync(e);
     }
 

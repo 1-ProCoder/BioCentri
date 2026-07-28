@@ -48,6 +48,19 @@ public sealed class BiometricAuthService : IBiometricAuthService
 
     private static readonly TimeSpan DedupeWindow = TimeSpan.FromMilliseconds(500);
 
+    /// <summary>
+    /// Hard upper bound on how long the OS biometric prompt is
+    /// allowed to remain unanswered before the chain treats it as a
+    /// non-verification. Real users verify in &lt;5 s; 60 s covers a
+    /// user stepping away without making the kill chain wait
+    /// forever (which would leave the protected process running
+    /// without an audit trail entry).
+    ///
+    /// Hardcoded, NOT settings-driven: a malicious actor could
+    /// otherwise raise the value to bypass the block-and-kill flow.
+    /// </summary>
+    private static readonly TimeSpan AuthTimeout = TimeSpan.FromSeconds(60);
+
     public BiometricAuthService(
         IDispatcher dispatcher,
         IToastService toast,
@@ -115,16 +128,28 @@ public sealed class BiometricAuthService : IBiometricAuthService
         try
         {
             var message = $"Verify your identity to launch {appName}.";
+            // Linked CTS owns the 60s timeout policy. The adapter
+            // forwards the token to the WinRT async, so OS-side
+            // cancellation still works if the user clicks Cancel on
+            // the overlay (ShellState.AuthenticationCancelRequested
+            // → OnShellStateCancelRequested → tcs.TrySetResult,
+            // which is idempotent if our timeout also fires).
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(AuthTimeout);
+            Debug.WriteLine($"[BiometricAuthService] Prompt initiated for {appName}");
+
             // Marshal the WinRT call onto the WPF STA thread.
-            // The token is passed through to IHelloService; if the
-            // user cancels the overlay, ShellState fires
-            // AuthenticationCancelRequested → TCS resolves with
-            // UserCancelled, and the cancellation token fires.
             var helloResult = await _dispatcher.InvokeAsync(async () =>
-                await _hello.RequestVerificationAsync(message, cancellationToken)
+                await _hello.RequestVerificationAsync(message, cts.Token)
             ).ConfigureAwait(false);
 
-            var outcome = Translate(helloResult);
+            // If our CTS fired but the caller's token didn't, we
+            // timed out — distinct from UserCancelled so the audit
+            // log shows "user walked away" vs "user actively hit
+            // cancel".
+            var timedOut = cts.IsCancellationRequested && !cancellationToken.IsCancellationRequested;
+            var outcome = timedOut ? AuthOutcome.Timeout : Translate(helloResult);
+            Debug.WriteLine($"[BiometricAuthService] Prompt resolved: {outcome} (timedOut={timedOut})");
             tcs.TrySetResult(outcome);
             _ = _activity.LogAsync(new BioCentri.App.Types.ActivityEvent(
                 TimestampUtc: now,
