@@ -351,7 +351,8 @@ public partial class App : Application
         // stack so the user (or the sidecar log) reports the actual
         // root cause ONCE — no cascading popup storm, no BAML
         // desynchronisation.
-        if (e.Exception is System.Windows.Markup.XamlParseException)
+        if (e.Exception is System.Windows.Markup.XamlParseException
+            || e.Exception is System.Windows.ResourceReferenceKeyNotFoundException)
         {
             TryWriteSidecarLog(e.Exception);
             e.Handled = false;
@@ -401,13 +402,24 @@ public partial class App : Application
     {
         try
         {
+            // GUID suffix guarantees a unique file per render-tick
+            // exception even when multiple fires land in the same
+            // millisecond (storm scenario). DATETIME prefix keeps the
+            // filename human-sortable so the user can 'ls -lt' to find
+            // the latest one.
             var logPath = System.IO.Path.Combine(
                 System.IO.Path.GetTempPath(),
-                $"biocentri-xaml-error-{DateTime.UtcNow:yyyyMMddHHmmssfff}.log");
+                $"biocentri-xaml-error-{DateTime.UtcNow:yyyyMMddHHmmssfff}-{Guid.NewGuid():N}.log");
+
+            // GetBaseException() returns the deepest non-wrapping
+            // exception — typically the real root cause buried inside
+            // the WPF-internal XamlParseException → Resource.. → ... chain.
+            var rootCause = ex.GetBaseException();
             System.IO.File.WriteAllText(
                 logPath,
                 $"Timestamp: {DateTime.UtcNow:O}\n" +
                 $"Exception type: {ex.GetType().FullName}\n" +
+                $"Base cause:    {rootCause.GetType().FullName}: {rootCause.Message}\n" +
                 $"Message: {ex.Message}\n" +
                 $"\n--- ToString() (includes InnerException chain + stack) ---\n{ex}\n");
         }
