@@ -23,6 +23,12 @@
                       BlurRadius="20"
                       ShadowDepth="0" />
 
+    <DropShadowEffect x:Key="Elevation.2.Resting"
+                      Color="#000000"
+                      Opacity="0.30"
+                      BlurRadius="24"
+                      ShadowDepth="0" />
+
     <DropShadowEffect x:Key="Elevation.2.Hover"
                       Color="#000000"
                       Opacity="0.35"
