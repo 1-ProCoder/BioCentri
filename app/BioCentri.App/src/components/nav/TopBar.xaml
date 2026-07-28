@@ -7,11 +7,14 @@
       SnapsToDevicePixels="True"
       UseLayoutRounding="True">
 
-    <!-- Glass-effect background -->
+    <!-- Glass-effect background. Polished: asymmetric top highlight makes
+         the TopBar read as a raised glass surface instead of a flat
+         slab, matching the website's frosted chrome. -->
     <Grid.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#F2060606" Offset="0.0" />
-            <GradientStop Color="#F0060606" Offset="1.0" />
+            <GradientStop Color="#F8060608" Offset="0.0" />
+            <GradientStop Color="#F2060606" Offset="0.55" />
+            <GradientStop Color="#EE060606" Offset="1.0" />
         </LinearGradientBrush>
     </Grid.Background>
 
@@ -20,23 +23,46 @@
         <ColumnDefinition Width="Auto" />
     </Grid.ColumnDefinitions>
 
-    <!-- Bottom hairline -->
+    <!-- Accent gradient bottom border: thin 1px hairline, then a 1px
+         indigo→emerald accent underneath, so the boundary visually
+         'pulses' with brand colour. Designer championed the look in
+         the website footer. -->
     <Border BorderBrush="{StaticResource Brushes.Border.HairlineSoft}"
             BorderThickness="0,0,0,1" />
+    <Border Height="1"
+            VerticalAlignment="Bottom"
+            Margin="0,1,0,0"
+            IsHitTestVisible="False">
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                <GradientStop Color="Transparent" Offset="0.0" />
+                <GradientStop Color="{StaticResource Colors.Accent.IndigoGlow}" Offset="0.25" />
+                <GradientStop Color="{StaticResource Colors.Accent.EmeraldGlow}" Offset="0.75" />
+                <GradientStop Color="Transparent" Offset="1.0" />
+            </LinearGradientBrush>
+        </Border.Background>
+    </Border>
 
-    <!-- Left: route label -->
+    <!-- Left: route label. Polished: eyebrow uses looser letter-spacing
+         so the brand chip reads as a confident kicker; the route title
+         picks up the same Display typeface the dashboard uses so the
+         two surfaces feel like part of one product. -->
     <StackPanel Grid.Column="0"
                 Orientation="Vertical"
                 VerticalAlignment="Center"
                 Margin="32,0,0,0">
         <TextBlock x:Name="EyebrowText"
-                   Text="BioCentri"
+                   Text="BIOCENTRI"
                    FontFamily="{StaticResource Typography.Sans}"
                    FontSize="{StaticResource Typography.Size.Caption}"
-                   FontWeight="{StaticResource Typography.Weight.Medium}"
+                   FontWeight="{StaticResource Typography.Weight.SemiBold}"
                    Foreground="{StaticResource Brushes.Accent.IndigoLight}"
                    Margin="0,0,0,3"
-                   Opacity="0.9" />
+                   Opacity="0.85">
+            <TextBlock.Effect>
+                <DropShadowEffect Color="#8B5CF6" BlurRadius="6" ShadowDepth="0" Opacity="0.35" />
+            </TextBlock.Effect>
+        </TextBlock>
         <TextBlock x:Name="TitleText"
                    Text="Dashboard"
                    FontFamily="{StaticResource Typography.Display}"

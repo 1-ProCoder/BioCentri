@@ -91,18 +91,44 @@
         <StackPanel Grid.Column="0"
                     Orientation="Horizontal"
                     VerticalAlignment="Center">
-            <!-- Pulse dot -->
+            <!-- Pulse dot. Polished: a long, calm pulse on the Status.Success
+                 ring so the all-systems indicator 'breathes' once every
+                 2.2s. The Storyboard targets the Border itself via
+                 EventTrigger scope (not Style.Triggers), so TargetName
+                 is intentionally omitted per the WPF rule. -->
             <Border Width="7"
                     Height="7"
                     CornerRadius="4"
                     Background="{StaticResource Brushes.Status.Success}"
-                    Margin="0,0,10,0">
+                    Margin="0,0,10,0"
+                    RenderTransformOrigin="0.5,0.5">
                 <Border.Effect>
-                    <DropShadowEffect Color="#34D399"
+                    <DropShadowEffect x:Name="PulseGlow"
+                                      Color="#34D399"
                                       BlurRadius="6"
                                       ShadowDepth="0"
                                       Opacity="0.6" />
                 </Border.Effect>
+                <Border.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 From="1.0" To="0.4"
+                                                 Duration="0:0:2.2"/>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                 From="1.0" To="1.35"
+                                                 Duration="0:0:2.2"/>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                 From="1.0" To="1.35"
+                                                 Duration="0:0:2.2"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Border.Triggers>
+                <Border.RenderTransform>
+                    <ScaleTransform/>
+                </Border.RenderTransform>
             </Border>
             <TextBlock x:Name="HealthText"
                        Text="All systems operational"
