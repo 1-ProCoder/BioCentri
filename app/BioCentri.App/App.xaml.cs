@@ -221,8 +221,51 @@ public partial class App : Application
         base.OnExit(e);
     }
 
+    // ------------------------------------------------------------
+    // Loop-breaker for DispatcherUnhandledException.
+    //
+    // The pre-fix handler would mark every exception as Handled and
+    // immediately re-show the popup. WPF exceptions fired from a render
+    // tick (animations, frozen-resource mutations, path-resolution
+    // failures, etc.) re-evaluate on every ~16ms composition pass. The
+    // result was an infinite MessageBox cascade that could crash the
+    // app via modal exhaustion.
+    //
+    // Behaviour now:
+    //   * First time a given exception fingerprint surfaces        → show
+    //     the popup so the user can still copy the inner-exception text.
+    //   * Same fingerprint re-fires within 1500ms                 → silently
+    //     swallow (e.Handled = true). This is the loop-breaker; the user
+    //     keeps using the app instead of being modal-bombed.
+    //   * Different fingerprint, or more than 1500ms later         → next
+    //     popup is shown again (so genuinely new errors aren't hidden).
+    //
+    // Static fields are intentional: App is process-singleton so the
+    // previous-handler-cache survives the lifetime of the application.
+    private static string? _lastShownFingerprint;
+    private static DateTime _lastShownAtUtc = DateTime.MinValue;
+    private static readonly TimeSpan LoopBreakWindow = TimeSpan.FromMilliseconds(1500);
+
     private static void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
+        // Mark handled unconditionally so the dispatcher continues.
+        e.Handled = true;
+
+        var fingerprint = ComputeFingerprint(e.Exception);
+        var now = DateTime.UtcNow;
+
+        // If the same exception re-fires within the debounce window,
+        // silently swallow it. Same garbage, same UI — just keep going.
+        if (_lastShownFingerprint is not null
+            && string.Equals(_lastShownFingerprint, fingerprint, StringComparison.Ordinal)
+            && (now - _lastShownAtUtc) < LoopBreakWindow)
+        {
+            return;
+        }
+
+        _lastShownFingerprint = fingerprint;
+        _lastShownAtUtc = now;
+
         // e.Exception.ToString() unwraps the full chain (message + all inner
         // exceptions + stack traces), unlike .Message which shows only the
         // top-level string (often a generic wrapper like "Cannot locate
@@ -232,7 +275,20 @@ public partial class App : Application
             "BioCentri",
             MessageBoxButton.OK,
             MessageBoxImage.Error);
-        e.Handled = true;
+    }
+
+    /// <summary>
+    /// Stable per-exception fingerprint: exception type + the first
+    /// ~256 chars of stack trace. We deliberately include the stack so
+    /// two unrelated exceptions of the same type don't get collapsed.
+    /// </summary>
+    private static string ComputeFingerprint(Exception ex)
+    {
+        var typeName = ex.GetType().FullName ?? ex.GetType().Name;
+        var stackHead = ex.StackTrace ?? string.Empty;
+        const int head = 256;
+        var stackSample = stackHead.Length <= head ? stackHead : stackHead.Substring(0, head);
+        return typeName + "::" + stackSample;
     }
 
     private static void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)

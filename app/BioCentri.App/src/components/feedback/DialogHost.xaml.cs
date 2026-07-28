@@ -43,9 +43,25 @@ public partial class DialogHost : Grid
         host.Dimmer.Opacity = 0;
         host.DialogPresenter.Content = e.NewValue;
 
-        // Fade-in
+        // IMPORTANT: BOTH storyboards are StaticResources pulled from the
+        // application MergedDictionaries. ResourceDictionary animations are
+        // *frozen* by WPF for thread-safety. Retargeting + beginning a
+        // frozen storyboard without first cloning throws
+        // InvalidOperationException (\"Cannot modify a Frozen object\")
+        // on every render tick. Pre-fix this exception fired synchronously
+        // here, hit OnDispatcherUnhandledException (e.Handled = true), and
+        // was re-raised on the next ~16ms composition pass — producing the
+        // MessageBox cascade the user observed. The Dimmer path already
+        // .Clone()s; the PopIn path did not. Fix matches the Dimmer pattern.
         host.Dimmer.BeginStoryboard(((Storyboard)host.TryFindResource("Transitions.Dimmer.Show")!).Clone());
-        if (((Storyboard)host.TryFindResource("Transitions.Dialog.PopIn")!) is { } sb)
+
+        // Cast MUST wrap the resource lookup, THEN invoke Clone() on the
+        // typed Storyboard. The earlier `(Storyboard)....Clone()` shape
+        // called Clone() on `object` (TryFindResource's compile-time return
+        // type) before the cast ran, which the compiler rejected as CS1061.
+        // The `as` cast + `?.Clone()` + pattern test null-safe handles both
+        // a missing resource AND a wrong-typed resource without throwing.
+        if ((host.TryFindResource("Transitions.Dialog.PopIn") as Storyboard)?.Clone() is { } sb)
         {
             Storyboard.SetTarget(sb, host.DialogPresenter);
             host.BeginStoryboard(sb);

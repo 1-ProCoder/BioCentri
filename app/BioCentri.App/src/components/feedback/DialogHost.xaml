@@ -20,10 +20,25 @@
           MinWidth="320"
           Margin="{StaticResource Spacing.Pad.Xl}">
 
+        <!--
+            IMPORTANT: DialogPresenter MUST declare its RenderTransform
+            (and origin) up-front. Transitions.Dialog.PopIn animates
+            (UIElement.RenderTransform).(ScaleTransform.ScaleX/Y); if the
+            presenter has no RenderTransform at all, WPF raises a path-
+            resolution error on every composition pass instead of simply
+            being a no-op. The PopIn storyboard doubles in (0.94 → 1.0)
+            and we want the scale anchored to the centre so the dialog
+            grows in place rather than drifting from the top-left.
+        -->
         <ContentPresenter x:Name="DialogPresenter"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          IsHitTestVisible="True" />
+                          IsHitTestVisible="True"
+                          RenderTransformOrigin="0.5,0.5">
+            <ContentPresenter.RenderTransform>
+                <ScaleTransform ScaleX="1" ScaleY="1" />
+            </ContentPresenter.RenderTransform>
+        </ContentPresenter>
     </Grid>
 
 </Grid>
